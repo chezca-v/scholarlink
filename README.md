@@ -1,59 +1,191 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎓 ScholarLink
+### Scholarship Application & Screening Management System  
+**Course:** Software Design  
+**Target Output:** Web-Based Application 
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+---
 
-## About Laravel
+## 📌 Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+ScholarLink is a centralized scholarship management platform designed to modernize scholarship administration in the Philippines.  
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+The system enables students to:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Browse scholarships without logging in
+- Create a professional academic profile
+- Apply and track applications
+- Receive real-time updates via In-App, Email, and SMS
 
-## Learning Laravel
+Organizations can:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+- Manage scholarships
+- Evaluate applicants
+- Apply dynamic weighted scoring
+- Ensure blind screening for fairness
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+ScholarLink integrates both **web-based software architecture** and **embedded hardware systems (ESP32 + GSM)** to ensure accessibility, transparency, and inclusivity.
 
-## Laravel Sponsors
+---
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## 🎯 Key Features
 
-### Premium Partners
+### 🔎 Public Scholarship Browsing
+- Filter by course, GPA, income bracket, location
+- Deadline countdown timer
+- “Coming Soon” indicator
+- Philippine scholarships only
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+### 👤 Scholar Profile (Student Wallet)
+A LinkedIn-style academic profile including:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- GPA / Academic Records
+- Financial Documents (ITR)
+- Valid ID
+- Certificates
+- Portfolio uploads
 
-## Code of Conduct
+Reusable verified documents across multiple applications.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+### 📊 Intelligent Scholarship Matching
+- Match percentage display
+- Eligibility validation
+- Recommendation explanation
+- Prevents ineligible applications
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
 
-## License
+### 🧮 Dynamic Weighted Scoring Engine
+Customizable scoring:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- Merit-focused
+- Needs-focused
+- Configurable grade vs income weights
+
+---
+
+### 👁 Blind Screening
+During evaluation, system hides:
+- Name
+- Address
+- Gender
+- School (optional)
+
+Ensures fairness and bias reduction.
+
+---
+
+### 📈 Application Status Tracking
+Stages:
+- Submitted
+- Document Review
+- Under Evaluation
+- Interview Scheduled
+- Final Decision
+
+Color-coded visual indicators.
+
+---
+
+### 📅 Deadline Management System
+Automated reminders:
+- 14 days – Email
+- 7 days – Email + In-app
+- 3 days – Email + SMS
+- 1 day – Email + SMS
+- 6 hours – SMS only
+
+Includes:
+- Deadline extensions
+- Google Calendar integration
+
+---
+
+### 📩 Embedded SMS Notification Gateway
+Hardware Integration:
+- ESP32
+- GSM Module (SIM800L)
+
+Workflow:
+1. Admin updates application status.
+2. Laravel backend triggers API request.
+3. ESP32 receives JSON command.
+4. GSM sends SMS to applicant.
+
+Ensures accessibility for students with limited internet.
+
+---
+
+### 🤖 AI Help Desk Chatbot
+- 24/7 FAQ Support
+- Scholarship suggestion assistance
+- Step-by-step guidance
+
+---
+
+## 🏗 System Architecture
+
+### Backend
+- PHP (Laravel Framework)
+
+### Frontend
+- HTML5
+- Tailwind CSS
+- JavaScript
+
+### Database
+- MySQL
+
+### Authentication
+- Email & Password
+- Google OAuth
+- Facebook OAuth
+- Microsoft OAuth
+
+### Notifications
+- PHP Mailer (Email)
+- ESP32 + GSM (SMS)
+
+### Embedded System
+- ESP32 Development Board
+- SIM800L GSM Module
+- HTTP REST API (JSON Communication)
+
+---
+
+## 👥 User Roles
+
+### 1️⃣ Superadmin
+- System-wide management
+- Organization oversight
+- Analytics dashboard
+
+### 2️⃣ Admin
+- Manages assigned scholarships
+- Adjusts deadlines
+- Reviews metrics
+
+### 3️⃣ Evaluator
+- Reviews applications
+- Verifies documents
+- Applies weighted scoring
+
+### 4️⃣ Applicant
+- Creates profile
+- Applies to scholarships
+- Tracks application status
+- Receives notifications
+
+---
+
+## 🗄 Database Design Highlights
+
+Implements:
+- Multi-Tenancy Architecture
+- Role-Based Access Control (RBAC)
+- Logical isolation of organizations
+- Conflict detection & fraud prevention
+
