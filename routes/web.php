@@ -1,7 +1,13 @@
 <?php
 
-use App\Http\Controllers.*;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\ScholarshipController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\EvaluatorController;
+use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\SuperadminController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -14,7 +20,6 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::get('/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile/setup', [ProfileController::class, 'setup'])->name('profile.setup');
     Route::get('/applicant/documents', [DocumentController::class, 'index'])->name('documents.index');
-    // Add other applicant routes here...
 });
 
 // Admin Routes (Role: admin)
