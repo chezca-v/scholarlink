@@ -10,6 +10,9 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -33,7 +36,31 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
+
+    Route::get('/auth/{provider}/redirect', function ($provider) {
+        return Socialite::driver($provider)->redirect();
+    })->name('social.login');
+
+    Route::get('/auth/{provider}/callback', function ($provider) {
+        try {
+            $socialUser = Socialite::driver($provider)->user();
+
+            $user = User::updateOrCreate([
+                'email' => $socialUser->email,
+            ], [
+                'name' => $socialUser->name,
+                'password' => bcrypt(str()->random(24)),
+                'role' => 'applicant', // Scholars are applicants by default
+            ]);
+
+            Auth::login($user);
+            return redirect()->intended('/dashboard');
+        } catch (\Exception $e) {
+            return redirect('/login')->with('error', "Authentication with {$provider} failed.");
+        }
+    });
 });
+
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
@@ -56,4 +83,23 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+Route::get('/auth/google/redirect', function () {
+    return Socialite::driver('google')->redirect();
+})->name('google.login');
+
+Route::get('/auth/google/callback', function () {
+    $googleUser = Socialite::driver('google')->user();
+
+    $user = User::updateOrCreate([
+        'email' => $googleUser->email,
+    ], [
+        'name' => $googleUser->name,
+        'password' => bcrypt(str()->random(24)),
+        'role' => 'applicant', // Default role for OAuth
+    ]);
+
+    Auth::login($user);
+    return redirect('/dashboard');
+});
 });
