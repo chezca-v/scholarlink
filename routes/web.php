@@ -1,20 +1,38 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers.*;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
+// Public Routes
+Route::get('/', [PublicController::class, 'landing'])->name('landing');
+Route::get('/scholarships', [ScholarshipController::class, 'index'])->name('scholarships.index');
+Route::get('/scholarships/{id}', [ScholarshipController::class, 'show'])->name('scholarships.show');
+
+// Applicant Routes (Role: applicant)
+Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
+    Route::get('/dashboard', [ProfileController::class, 'dashboard'])->name('dashboard');
+    Route::get('/profile/setup', [ProfileController::class, 'setup'])->name('profile.setup');
+    Route::get('/applicant/documents', [DocumentController::class, 'index'])->name('documents.index');
+    // Add other applicant routes here...
 });
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// Admin Routes (Role: admin)
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    Route::resource('scholarships', ScholarshipController::class)->except(['index', 'show']);
+});
 
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+// Evaluator Routes (Role: evaluator)
+Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evaluator.')->group(function () {
+    Route::get('/dashboard', [EvaluatorController::class, 'dashboard'])->name('dashboard');
+    Route::get('/review/{id}', [EvaluationController::class, 'show'])->name('review');
+});
+
+// Superadmin Routes (Role: superadmin)
+Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('/dashboard', [SuperadminController::class, 'dashboard'])->name('dashboard');
+    Route::get('/organizations', [SuperadminController::class, 'organizations'])->name('organizations');
 });
 
 require __DIR__.'/auth.php';
