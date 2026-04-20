@@ -14,7 +14,6 @@ return new class extends Migration
                   ->nullable()
                   ->constrained('organizations')
                   ->nullOnDelete();
-            $table->string('role')->default('applicant'); // Values: applicant, admin, evaluator, superadmin
             $table->string('first_name', 100);
             $table->string('last_name', 100);
             $table->string('email', 255)->unique();

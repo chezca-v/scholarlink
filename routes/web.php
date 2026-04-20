@@ -15,16 +15,11 @@ use App\Http\Controllers\{
     SuperadminController
 };
 
-<<<<<<< HEAD
-Route::get('/', function () {
-    return view('home');
-=======
 /*
 Public Routes
 */
 Route::controller(PublicController::class)->group(function () {
     Route::get('/', 'landing')->name('landing');
->>>>>>> 2d7013474f286386234622f1a85f01bda3610917
 });
 
 Route::controller(ScholarshipController::class)->group(function () {
@@ -36,7 +31,7 @@ Route::controller(ScholarshipController::class)->group(function () {
 Applicant Routes (Role: applicant)
 */
 Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
-    
+
     // Dashboard & Profile Management
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
@@ -70,7 +65,7 @@ Admin Routes (Role: admin)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
-    
+
     // Scholarship CRUD & Extensions
     Route::resource('scholarships', ScholarshipController::class);
     Route::controller(ScholarshipController::class)->group(function () {
@@ -93,7 +88,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evaluator.')->group(function () {
     Route::get('/dashboard', [EvaluatorController::class, 'dashboard'])->name('dashboard');
     Route::get('/queue', [EvaluatorController::class, 'queue'])->name('queue');
-    
+
     // Evaluation Logic
     Route::controller(EvaluationController::class)->group(function () {
         Route::get('/review/{id}', 'show')->name('review.show');
