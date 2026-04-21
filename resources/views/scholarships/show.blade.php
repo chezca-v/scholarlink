@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $scholarship->name }} — ScholarLink</title>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -106,22 +107,22 @@
 
                 {{-- Benefit Snippet Row --}}
                 <div class="flex flex-wrap items-center gap-6 mb-10 text-[15px]" style="color: #000000; letter-spacing: 0.0175em;">
-                    @if($scholarship->income_bracket)
+                    @if($scholarship->benefit_snippet_1)
                         <span class="flex items-center gap-2">
                             <span style="color: #E8A838;">💰</span>
-                            {{ $scholarship->income_bracket }}
+                            {{ $scholarship->benefit_snippet_1 }}
                         </span>
                     @endif
-                    @if($scholarship->gpa_requirement)
+                    @if($scholarship->benefit_snippet_2)
                         <span class="flex items-center gap-2">
                             <span>📚</span>
-                            GPA {{ $scholarship->gpa_requirement }}
+                            {{ $scholarship->benefit_snippet_2 }}
                         </span>
                     @endif
-                    @if($scholarship->open_date)
+                    @if($scholarship->posted_at)
                         <span class="flex items-center gap-2">
                             <span style="color: #E8A838;">🕐</span>
-                            Posted {{ \Carbon\Carbon::parse($scholarship->open_date)->format('F j, Y') }}
+                            Posted {{ \Carbon\Carbon::parse($scholarship->posted_at)->format('F j, Y') }}
                         </span>
                     @endif
                 </div>
@@ -225,7 +226,22 @@
                     </h2>
                     <div class="rounded-2xl p-8" style="background: #C8E8E4;">
                         <div class="flex items-center gap-3 mb-4">
-                            <div class="w-[30px] h-[30px] rounded-full flex-shrink-0" style="background: #D9D9D9;"></div>
+                            @if($scholarship->org_logo)
+                                <img src="{{ asset($scholarship->org_logo) }}"
+                                    class="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
+                                    alt="{{ $scholarship->provider_name }}"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                {{-- Fallback must be HERE (next sibling in DOM), not in @else --}}
+                                <div class="w-[30px] h-[30px] rounded-full flex-shrink-0 items-center justify-center text-xs font-bold"
+                                    style="background: #0F4C5C; color: #F9D679; font-family: 'Fraunces', serif; display: none;">
+                                    {{ strtoupper(substr($scholarship->provider_name, 0, 1)) }}
+                                </div>
+                            @else
+                                <div class="w-[30px] h-[30px] rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
+                                    style="background: #0F4C5C; color: #F9D679; font-family: 'Fraunces', serif;">
+                                    {{ strtoupper(substr($scholarship->provider_name, 0, 1)) }}
+                                </div>
+                            @endif
                             <span class="text-[18px] font-bold" style="color: #0A3040; letter-spacing: 0.0175em;">
                                 {{ $scholarship->provider_name }}
                             </span>
@@ -468,29 +484,6 @@
 
 </div>
 
-@push('scripts')
-<script>
-function countdownTimer(deadline) {
-    return {
-        days: '00', hours: '00', minutes: '00', seconds: '00',
-        startTimer() {
-            this.update();
-            setInterval(() => this.update(), 1000);
-        },
-        update() {
-            const diff = new Date(deadline).getTime() - new Date().getTime();
-            if (diff <= 0) {
-                this.days = this.hours = this.minutes = this.seconds = '00';
-                return;
-            }
-            this.days    = String(Math.floor(diff / 86400000)).padStart(2, '0');
-            this.hours   = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
-            this.minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-            this.seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-        }
-    }
-}
-</script>
 <script>
 function countdownTimer(deadline) {
     return {
