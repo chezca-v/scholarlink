@@ -40,6 +40,7 @@ return new class extends Migration
             $table->string('father_employment_status', 100)->nullable();
             $table->string('mother_employment_status', 100)->nullable();
             $table->timestamp('profile_completed_at')->nullable();
+            $table->enum('gwa_scale', ['college', 'shs'])->default('college');
             $table->timestamps();
         });
     }

@@ -22,6 +22,11 @@ class UserSeeder extends Seeder
             ['first_name' => 'Joshua', 'last_name' => 'Lim',        'email' => 'josh.lim@gmail.com',       'password' => 'Joshua@008'],
             ['first_name' => 'Fatima', 'last_name' => 'Hassan',     'email' => 'fatima.h@gmail.com',       'password' => 'Fatima@009'],
             ['first_name' => 'Alex',   'last_name' => 'Rivera',     'email' => 'alex.rivera@gmail.com',    'password' => 'Alex@010'],
+            ['first_name' => 'Sofia',   'last_name' => 'Aguilar', 'email' => 'sofia.aguilar@gmail.com',   'password' => 'Sofia@021'],
+            ['first_name' => 'Miguel',  'last_name' => 'Torres',  'email' => 'miguel.torres@gmail.com',   'password' => 'Miguel@022'],
+            ['first_name' => 'Hannah',  'last_name' => 'Pascual', 'email' => 'hannah.pascual@gmail.com',  'password' => 'Hannah@023'],
+            ['first_name' => 'Rainier', 'last_name' => 'Domingo', 'email' => 'rainier.domingo@gmail.com', 'password' => 'Rainier@024'],
+            ['first_name' => 'Camille', 'last_name' => 'Navarro', 'email' => 'camille.navarro@gmail.com', 'password' => 'Camille@025'],
         ];
 
         foreach ($applicants as $applicant) {
