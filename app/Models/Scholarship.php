@@ -35,11 +35,16 @@ class Scholarship extends Model
         'contact_email',
         'website',
         'address',
+        'benefit_snippet_1',
+        'benefit_snippet_2',
+        'org_logo',
+        'posted_at',
     ];
 
     protected $casts = [
         'open_date'        => 'date',
         'deadline'         => 'date',
+        'posted_at'        => 'datetime',
         'tags'             => 'array',
         'blind_screening'  => 'boolean',
         'ai_match_enabled' => 'boolean',
