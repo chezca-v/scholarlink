@@ -201,7 +201,14 @@ footer { background: #071820; padding: 64px 48px 32px; }
 </nav>
 
 <section class="hero">
-  <div class="hero-badge"><span class="badge-dot"></span>Now live — Philippines' first AI scholarship platform</div>
+<div class="floating-icon" style="top: 15%; left: 10%; font-size: 60px;">🎓</div>
+<div class="floating-icon" style="top: 20%; right: 15%; font-size: 40px;">📜</div>
+<div class="floating-icon" style="bottom: 20%; left: 20%; font-size: 50px;">💡</div>
+<div class="floating-icon" style="bottom: 10%; right: 20%; font-size: 45px;">📘</div>
+
+<div class="hero-badge"><span class="badge-dot"></span>Now live — Philippines' first AI scholarship platform</div>
+
+<h1 class="hero-title" id="typing-text"></h1>
   <h1 class="hero-title">One Profile.<br><em>Every</em> <span class="accent">Scholarship.</span></h1>
   <p class="hero-sub">Stop repeating yourself. Build your academic profile once and apply to every scholarship in the Philippines — AI-matched, just for you.</p>
   <div class="hero-actions">
