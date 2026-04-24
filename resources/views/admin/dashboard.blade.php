@@ -591,6 +591,12 @@
     </style>
 </head>
 <body>
+@php
+    $adminName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? ''));
+    $adminName = $adminName !== '' ? $adminName : (auth()->user()->email ?? 'Admin User');
+    $initials = strtoupper(substr(auth()->user()->first_name ?? 'A', 0, 1) . substr(auth()->user()->last_name ?? 'D', 0, 1));
+    $totalForBreakdown = max(1, $totalApplications ?? 0);
+@endphp
 
 <div class="app-container">
     <aside class="sidebar">
@@ -626,9 +632,9 @@
         </nav>
 
         <div class="side-user">
-            <div class="user-av">RM</div>
+            <div class="user-av">{{ $initials }}</div>
             <div style="font-size:12px;">
-                <p style="font-weight:700;">Ryan Mondero</p>
+                <p style="font-weight:700;">{{ $adminName }}</p>
                 <div style="font-size:9.5px; background:rgba(234,140,85,0.2); color:var(--amber-light); padding:2px 6px; border-radius:20px; display:inline-block; margin-top:4px; font-weight:700;">ADMIN</div>
             </div>
         </div>
@@ -648,9 +654,11 @@
                 <div class="admin-pill">Admin</div>
                 <button class="notif-btn" type="button" aria-label="Notifications">
                     <span style="font-size:14px;">🔔</span>
-                    <span class="notif-dot"></span>
+                    @if(($unreadNotifications ?? 0) > 0)
+                        <span class="notif-dot"></span>
+                    @endif
                 </button>
-                <div class="top-avatar">RM</div>
+                <div class="top-avatar">{{ $initials }}</div>
             </div>
         </header>
 
@@ -659,7 +667,7 @@
                 <div>
                     <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">PLM Scholarship Office</p>
                     <h2 style="font-family:'Fraunces'; font-size:28px; font-weight:700;">Admin Dashboard</h2>
-                    <p style="font-size:12px; color:var(--muted); margin-top:2px;">Tuesday, April 1, 2026 · Academic Year 2026–2027</p>
+                    <p style="font-size:12px; color:var(--muted); margin-top:2px;">{{ $now->format('l, F j, Y') }} · Academic Year {{ $now->year }}–{{ $now->copy()->addYear()->year }}</p>
                 </div>
                 <div class="heading-actions">
                     <button class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
@@ -669,28 +677,28 @@
 
             <div class="stat-grid">
                 <div class="stat-card">
-                    <div style="display:flex; justify-content:space-between;"><span class="icon">📖</span><span class="stat-badge">↑ 3 new</span></div>
-                    <h1>8</h1>
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">📖</span><span class="stat-badge">↑ {{ $newScholarships }} new</span></div>
+                    <h1>{{ $openScholarships }}</h1>
                     <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Open Scholarships</p>
-                    <p class="stat-card-foot">2 closing soon · 1 drafting</p>
+                    <p class="stat-card-foot">{{ $closingSoonScholarships }} closing soon · {{ $draftScholarships }} drafting</p>
                 </div>
                 <div class="stat-card">
-                    <div style="display:flex; justify-content:space-between;"><span class="icon">📝</span><span class="stat-badge" style="color:var(--red-alert)">↑ 5 today</span></div>
-                    <h1>7</h1>
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">📝</span><span class="stat-badge" style="color:var(--red-alert)">↑ {{ $pendingToday }} today</span></div>
+                    <h1>{{ $pendingReviews }}</h1>
                     <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Pending Reviews</p>
-                    <p class="stat-card-foot">Oldest: 4 days ago</p>
+                    <p class="stat-card-foot">Oldest: {{ $oldestPendingDays }} days ago</p>
                 </div>
                 <div class="stat-card">
-                    <div style="display:flex; justify-content:space-between;"><span class="icon">📈</span><span class="stat-badge">↑ 14%</span></div>
-                    <h1>142</h1>
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">📈</span><span class="stat-badge">{{ $applicationsGrowth >= 0 ? '↑' : '↓' }} {{ abs($applicationsGrowth) }}%</span></div>
+                    <h1>{{ $totalApplications }}</h1>
                     <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Total Applications</p>
                     <p class="stat-card-foot">This academic year</p>
                 </div>
                 <div class="stat-card">
                     <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">↑ 8%</span></div>
-                    <h1>38</h1>
+                    <h1>{{ $approvedAwarded }}</h1>
                     <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Approved / Awarded</p>
-                    <p class="stat-card-foot">26.8% approval rate</p>
+                    <p class="stat-card-foot">{{ $approvalRate }}% approval rate</p>
                 </div>
             </div>
 
@@ -704,24 +712,24 @@
                         <div class="alert-row alert-red">
                             <div style="font-size:18px;">🚨</div>
                             <div>
-                                <b style="font-size:13px;">3 Applications Unassigned for 4+ Days</b>
-                                <p style="font-size:12px; opacity:0.8;">STEM Forward Scholars Program. Risk of missing SLA.</p>
+                                <b style="font-size:13px;">{{ $unassignedApplications }} Applications Unassigned for 4+ Days</b>
+                                <p style="font-size:12px; opacity:0.8;">Applications with no evaluations assigned yet. Risk of missing SLA.</p>
                                 <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Assign Evaluators →</a>
                             </div>
                         </div>
                         <div class="alert-row alert-orange">
                             <div style="font-size:18px;">⏳</div>
                             <div>
-                                <b style="font-size:13px;">Deadline in 3 Days — 8 Applicants with Incomplete Docs</b>
-                                <p style="font-size:12px; opacity:0.8;">Bright Horizons Grant. SMS notifications sent.</p>
+                                <b style="font-size:13px;">Upcoming Deadlines — {{ $incompleteDocsApplications }} Applicants with Incomplete Docs</b>
+                                <p style="font-size:12px; opacity:0.8;">Applicants still missing at least one required document.</p>
                                 <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">View Applicants →</a>
                             </div>
                         </div>
                         <div class="alert-row alert-blue">
                             <div style="font-size:18px;">📢</div>
                             <div>
-                                <b style="font-size:13px;">2 Scholarships Awaiting Approval</b>
-                                <p style="font-size:12px; opacity:0.8;">Gokongwei STEM Grant and PLM Excellence Award.</p>
+                                <b style="font-size:13px;">{{ $awaitingApprovalScholarships }} Scholarships Awaiting Approval</b>
+                                <p style="font-size:12px; opacity:0.8;">Draft scholarships are ready for review and publication.</p>
                                 <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Review Drafts →</a>
                             </div>
                         </div>
@@ -734,66 +742,26 @@
                         </div>
 
                         <div class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon" style="background: #f3f4f6; color: #10b981;">✓</div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Evaluator Sanchez</strong> approved application of <strong>Dudoy Listangco</strong> for Lingap Kabataan Scholarship</div>
-                                    <div class="activity-meta">
-                                        <span class="activity-badge" style="background: #f3f4f6; color: #8b5cf6;">Evaluation</span>
-                                        <span>Score: 88.4 / 100</span>
-                                        <span class="activity-time">10:32 AM</span>
+                            @forelse($recentActivity as $activity)
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background: #f3f4f6; color: #0f4c5c;">📌</div>
+                                    <div class="activity-content">
+                                        <div class="activity-text"><strong>{{ trim((optional($activity->user)->first_name ?? '').' '.(optional($activity->user)->last_name ?? '')) ?: 'System' }}</strong> {{ $activity->action }}</div>
+                                        <div class="activity-meta">
+                                            <span class="activity-badge">{{ ucfirst(str_replace('_', ' ', $activity->target_type ?? 'system')) }}</span>
+                                            <span>{{ $activity->target_type ? 'Target ID: '.$activity->target_id : 'System activity' }}</span>
+                                            <span class="activity-time">{{ $activity->created_at->diffForHumans() }}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon" style="background: #fcfdfe; color: #ef5350;">✗</div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Application #142</strong> was rejected by Evaluator Esteban — below GPA threshold</div>
-                                    <div class="activity-meta">
-                                        <span class="activity-badge">Application</span>
-                                        <span>CHED Merit · GPA 1.8 required</span>
-                                        <span class="activity-time">9:58 AM</span>
+                            @empty
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background: #f3f4f6; color: #0f4c5c;">ℹ️</div>
+                                    <div class="activity-content">
+                                        <div class="activity-text"><strong>No recent activity yet.</strong> Activity logs will appear here as users interact with the system.</div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon" style="background: #f9fafb; color: #0f4c5c;">📋</div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Elena Lanuza</strong> submitted application for Unity Scholars Financial Aid Program</div>
-                                    <div class="activity-meta">
-                                        <span class="activity-badge">Application</span>
-                                        <span>Docs complete · AI Match 91%</span>
-                                        <span class="activity-time">9:14 AM</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon" style="background: #f9fafb; color: #ea8c55;">⏱️</div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Admin Escaño</strong> extended deadline of <strong>LiftED Youth Scholarship Grant</strong> by 7 days</div>
-                                    <div class="activity-meta">
-                                        <span class="activity-badge" style="color: #d97706;">Scholarship</span>
-                                        <span>New deadline: Apr 20, 2025</span>
-                                        <span class="activity-time">Yesterday</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon" style="background: #f3f4f6; color: #8b5cf6;">👥</div>
-                                <div class="activity-content">
-                                    <div class="activity-text"><strong>Evaluator Banayad</strong> was assigned to <strong>5 pending applications</strong> for Paglaum at Pag-ibig ng Bayan Foundation</div>
-                                    <div class="activity-meta">
-                                        <span class="activity-badge" style="color: #8b5cf6;">Evaluator</span>
-                                        <span>Blind screening enabled</span>
-                                        <span class="activity-time">Yesterday</span>
-                                    </div>
-                                </div>
-                            </div>
-
+                            @endforelse
                         </div>
                     </div>
 
@@ -813,20 +781,30 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td><b>Paglaum Program</b><br><small style="color:var(--muted)">Paglaum Foundation</small></td>
-                                <td><span style="color:var(--green-success); font-weight:700;">● Open</span></td>
-                                <td>42 / 50</td>
-                                <td><div class="prog-bar-container"><div class="prog-bar-fill" style="width:84%"></div></div></td>
-                                <td style="text-align:right;"><a href="#" style="color:var(--teal-mid); font-weight:700;">View →</a></td>
-                            </tr>
-                            <tr>
-                                <td><b>CHED Merit (CMSP)</b><br><small style="color:var(--muted)">CHED Scholarship</small></td>
-                                <td><span style="color:var(--green-success); font-weight:700;">● Open</span></td>
-                                <td>11 / 20</td>
-                                <td><div class="prog-bar-container"><div class="prog-bar-fill" style="width:55%"></div></div></td>
-                                <td style="text-align:right;"><a href="#" style="color:var(--teal-mid); font-weight:700;">View →</a></td>
-                            </tr>
+                            @forelse($scholarshipOverview as $scholarship)
+                                @php
+                                    $appsCount = $scholarship->applications_count ?? 0;
+                                    $slots = max(1, (int) $scholarship->slots);
+                                    $fill = min(100, (int) round(($appsCount / $slots) * 100));
+                                    $statusColor = match($scholarship->status) {
+                                        'open' => 'var(--green-success)',
+                                        'closed' => 'var(--red-alert)',
+                                        'coming_soon' => 'var(--orange-warning)',
+                                        default => 'var(--muted)',
+                                    };
+                                @endphp
+                                <tr>
+                                    <td><b>{{ $scholarship->name }}</b><br><small style="color:var(--muted)">{{ $scholarship->provider_name }}</small></td>
+                                    <td><span style="color:{{ $statusColor }}; font-weight:700;">● {{ ucfirst(str_replace('_', ' ', $scholarship->status)) }}</span></td>
+                                    <td>{{ $appsCount }} / {{ $scholarship->slots }}</td>
+                                    <td><div class="prog-bar-container"><div class="prog-bar-fill" style="width:{{ $fill }}%"></div></div></td>
+                                    <td style="text-align:right;"><a href="{{ route('admin.scholarships.show', $scholarship->id) }}" style="color:var(--teal-mid); font-weight:700;">View →</a></td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" style="text-align:center; color:var(--muted);">No scholarships found.</td>
+                                </tr>
+                            @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -858,46 +836,46 @@
                     <div class="alerts-section">
                         <div class="section-header">
                             <h3>Application Breakdown</h3>
-                            <span class="subtitle">142 total</span>
+                            <span class="subtitle">{{ $totalApplications }} total</span>
                         </div>
 
                         <div>
                             <div class="breakdown-item">
                                 <div class="breakdown-color" style="background: #ea8c55;"></div>
                                 <div class="breakdown-label">Pending Review</div>
-                                <div class="breakdown-number">47</div>
-                                <div class="breakdown-percent">33%</div>
+                                <div class="breakdown-number">{{ $statusCounts['pending'] }}</div>
+                                <div class="breakdown-percent">{{ round(($statusCounts['pending'] / $totalForBreakdown) * 100) }}%</div>
                             </div>
                             <div class="breakdown-item">
                                 <div class="breakdown-color" style="background: #1a8fa0;"></div>
                                 <div class="breakdown-label">Under Evaluation</div>
-                                <div class="breakdown-number">35</div>
-                                <div class="breakdown-percent">25%</div>
+                                <div class="breakdown-number">{{ $statusCounts['under_review'] }}</div>
+                                <div class="breakdown-percent">{{ round(($statusCounts['under_review'] / $totalForBreakdown) * 100) }}%</div>
                             </div>
                             <div class="breakdown-item">
                                 <div class="breakdown-color" style="background: #8b5cf6;"></div>
                                 <div class="breakdown-label">Awaiting Docs</div>
-                                <div class="breakdown-number">22</div>
-                                <div class="breakdown-percent">15%</div>
+                                <div class="breakdown-number">{{ $statusCounts['revision'] }}</div>
+                                <div class="breakdown-percent">{{ round(($statusCounts['revision'] / $totalForBreakdown) * 100) }}%</div>
                             </div>
                             <div class="breakdown-item">
                                 <div class="breakdown-color" style="background: #10b981;"></div>
                                 <div class="breakdown-label">Approved</div>
-                                <div class="breakdown-number">38</div>
-                                <div class="breakdown-percent">27%</div>
+                                <div class="breakdown-number">{{ $statusCounts['approved'] }}</div>
+                                <div class="breakdown-percent">{{ round(($statusCounts['approved'] / $totalForBreakdown) * 100) }}%</div>
                             </div>
                             <div class="breakdown-item">
                                 <div class="breakdown-color" style="background: #ef5350;"></div>
                                 <div class="breakdown-label">Rejected</div>
-                                <div class="breakdown-number">0</div>
-                                <div class="breakdown-percent">0%</div>
+                                <div class="breakdown-number">{{ $statusCounts['rejected'] }}</div>
+                                <div class="breakdown-percent">{{ round(($statusCounts['rejected'] / $totalForBreakdown) * 100) }}%</div>
                             </div>
 
                             <div class="stacked-bar">
-                                <div class="stacked-bar-segment" style="background: #ea8c55; width: 33%;"></div>
-                                <div class="stacked-bar-segment" style="background: #1a8fa0; width: 25%;"></div>
-                                <div class="stacked-bar-segment" style="background: #8b5cf6; width: 15%;"></div>
-                                <div class="stacked-bar-segment" style="background: #10b981; width: 27%;"></div>
+                                <div class="stacked-bar-segment" style="background: #ea8c55; width: {{ ($statusCounts['pending'] / $totalForBreakdown) * 100 }}%;"></div>
+                                <div class="stacked-bar-segment" style="background: #1a8fa0; width: {{ ($statusCounts['under_review'] / $totalForBreakdown) * 100 }}%;"></div>
+                                <div class="stacked-bar-segment" style="background: #8b5cf6; width: {{ ($statusCounts['revision'] / $totalForBreakdown) * 100 }}%;"></div>
+                                <div class="stacked-bar-segment" style="background: #10b981; width: {{ ($statusCounts['approved'] / $totalForBreakdown) * 100 }}%;"></div>
                             </div>
                             <div style="font-size: 12px; color: #3da9b8; margin-top: 8px;">Stacked distribution across all scholarships</div>
                         </div>
@@ -910,38 +888,30 @@
                         </div>
 
                         <div>
-                            <div class="deadline-item">
-                                <div class="deadline-color" style="background: #ef5350;"></div>
-                                <div class="deadline-content">
-                                    <div class="deadline-name">Charity First Foundation, Inc.</div>
-                                    <div class="deadline-date">Apr 4 · 28/30 slots filled</div>
+                            @forelse($upcomingDeadlines as $deadlineScholarship)
+                                @php
+                                    $daysLeft = max(0, $now->diffInDays($deadlineScholarship->deadline, false));
+                                    $deadlineClass = $daysLeft <= 3 ? 'urgent' : ($daysLeft <= 10 ? 'warning' : ($daysLeft <= 20 ? 'safe' : 'info'));
+                                    $deadlineColor = $daysLeft <= 3 ? '#ef5350' : ($daysLeft <= 10 ? '#ea8c55' : ($daysLeft <= 20 ? '#10b981' : '#1a8fa0'));
+                                @endphp
+                                <div class="deadline-item">
+                                    <div class="deadline-color" style="background: {{ $deadlineColor }};"></div>
+                                    <div class="deadline-content">
+                                        <div class="deadline-name">{{ $deadlineScholarship->name }}</div>
+                                        <div class="deadline-date">{{ $deadlineScholarship->deadline->format('M j') }} · {{ $deadlineScholarship->applications_count }}/{{ $deadlineScholarship->slots }} slots filled</div>
+                                    </div>
+                                    <div class="deadline-days {{ $deadlineClass }}">{{ $daysLeft }}d</div>
                                 </div>
-                                <div class="deadline-days urgent">3d</div>
-                            </div>
-                            <div class="deadline-item">
-                                <div class="deadline-color" style="background: #ea8c55;"></div>
-                                <div class="deadline-content">
-                                    <div class="deadline-name">Ayala Foundation Scholarship</div>
-                                    <div class="deadline-date">Apr 10 · 42/50 slots filled</div>
+                            @empty
+                                <div class="deadline-item">
+                                    <div class="deadline-color" style="background: #1a8fa0;"></div>
+                                    <div class="deadline-content">
+                                        <div class="deadline-name">No upcoming deadlines</div>
+                                        <div class="deadline-date">Create or open a scholarship to see timelines here.</div>
+                                    </div>
+                                    <div class="deadline-days info">--</div>
                                 </div>
-                                <div class="deadline-days warning">9d</div>
-                            </div>
-                            <div class="deadline-item">
-                                <div class="deadline-color" style="background: #10b981;"></div>
-                                <div class="deadline-content">
-                                    <div class="deadline-name">Panasonic Scholarship</div>
-                                    <div class="deadline-date">Apr 20 · 11/20 slots filled</div>
-                                </div>
-                                <div class="deadline-days safe">19d</div>
-                            </div>
-                            <div class="deadline-item">
-                                <div class="deadline-color" style="background: #1a8fa0;"></div>
-                                <div class="deadline-content">
-                                    <div class="deadline-name">Security Bank Regalo Mo Kinabukasan Ko Scholarship</div>
-                                    <div class="deadline-date">May 15 · 19/40 slots filled</div>
-                                </div>
-                                <div class="deadline-days info">44d</div>
-                            </div>
+                            @endforelse
                         </div>
                     </div>
                 </aside>
