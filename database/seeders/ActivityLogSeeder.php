@@ -56,6 +56,51 @@ class ActivityLogSeeder extends Seeder
                 'user_agent'  => null,
                 'created_at'  => '2026-01-07 00:00:00',
             ],
+            [
+                'user_id'     => 21,
+                'action'      => 'submitted_application',
+                'target_type' => 'Application',
+                'target_id'   => 31,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-10 00:00:00',
+            ],
+            [
+                'user_id'     => 22,
+                'action'      => 'submitted_application',
+                'target_type' => 'Application',
+                'target_id'   => 34,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-08 00:00:00',
+            ],
+            [
+                'user_id'     => 23,
+                'action'      => 'submitted_application',
+                'target_type' => 'Application',
+                'target_id'   => 37,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-09 00:00:00',
+            ],
+            [
+                'user_id'     => 24,
+                'action'      => 'submitted_application',
+                'target_type' => 'Application',
+                'target_id'   => 40,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-07 00:00:00',
+            ],
+            [
+                'user_id'     => 25,
+                'action'      => 'submitted_application',
+                'target_type' => 'Application',
+                'target_id'   => 43,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-06 00:00:00',
+            ],
 
             // ── DOCUMENT UPLOADS ──────────────────────────────
             [
@@ -94,6 +139,33 @@ class ActivityLogSeeder extends Seeder
                 'user_agent'  => null,
                 'created_at'  => '2026-01-04 00:00:00',
             ],
+            [
+                'user_id'     => 21,
+                'action'      => 'uploaded_document',
+                'target_type' => 'Document',
+                'target_id'   => 41,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-08 00:00:00',
+            ],
+            [
+                'user_id'     => 23,
+                'action'      => 'uploaded_document',
+                'target_type' => 'Document',
+                'target_id'   => 49,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-07 00:00:00',
+            ],
+            [
+                'user_id'     => 25,
+                'action'      => 'uploaded_document',
+                'target_type' => 'Document',
+                'target_id'   => 57,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-04 00:00:00',
+            ],
 
             // ── SCHOLARSHIP VIEWS ─────────────────────────────
             [
@@ -113,6 +185,24 @@ class ActivityLogSeeder extends Seeder
                 'ip_address'  => null,
                 'user_agent'  => null,
                 'created_at'  => '2026-01-12 00:00:00',
+            ],
+            [
+                'user_id'     => 21,
+                'action'      => 'viewed_scholarship',
+                'target_type' => 'Scholarship',
+                'target_id'   => 21,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-05 00:00:00',
+            ],
+            [
+                'user_id'     => 25,
+                'action'      => 'viewed_scholarship',
+                'target_type' => 'Scholarship',
+                'target_id'   => 25,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-03 00:00:00',
             ],
 
             // ── SAVED SCHOLARSHIPS ────────────────────────────
@@ -134,7 +224,25 @@ class ActivityLogSeeder extends Seeder
                 'user_agent'  => null,
                 'created_at'  => '2026-01-16 00:00:00',
             ],
-
+            [
+                'user_id'     => 22,
+                'action'      => 'saved_scholarship',
+                'target_type' => 'Scholarship',
+                'target_id'   => 24,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-06 00:00:00',
+            ],
+            [
+                'user_id'     => 24,
+                'action'      => 'saved_scholarship',
+                'target_type' => '
+                ',
+                'target_id'   => 22,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-04 00:00:00',
+            ],
             // ── EVALUATIONS ───────────────────────────────────
             [
                 'user_id'     => 11,
@@ -172,6 +280,24 @@ class ActivityLogSeeder extends Seeder
                 'user_agent'  => null,
                 'created_at'  => '2026-02-07 00:00:00',
             ],
+            [
+                'user_id'     => 12,
+                'action'      => 'evaluated_application',
+                'target_type' => 'Application',
+                'target_id'   => 31,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-05-19 00:00:00',
+            ],
+            [
+                'user_id'     => 19,
+                'action'      => 'evaluated_application',
+                'target_type' => 'Application',
+                'target_id'   => 43,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-05-15 00:00:00',
+            ],
 
             // ── PROFILE UPDATES ───────────────────────────────
             [
@@ -192,6 +318,15 @@ class ActivityLogSeeder extends Seeder
                 'user_agent'  => null,
                 'created_at'  => '2026-01-07 00:00:00',
             ],
+            [
+                'user_id'     => 23,
+                'action'      => 'updated_profile',
+                'target_type' => 'User',
+                'target_id'   => 23,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-07 00:00:00',
+            ],
 
             // ── LOGIN ─────────────────────────────────────────
             [
@@ -202,6 +337,15 @@ class ActivityLogSeeder extends Seeder
                 'ip_address'  => null,
                 'user_agent'  => null,
                 'created_at'  => '2026-01-21 00:00:00',
+            ],
+            [
+                'user_id'     => 22,
+                'action'      => 'login',
+                'target_type' => 'User',
+                'target_id'   => 22,
+                'ip_address'  => null,
+                'user_agent'  => null,
+                'created_at'  => '2026-04-06 00:00:00',
             ],
         ];
 
