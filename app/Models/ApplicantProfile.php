@@ -35,6 +35,7 @@ class ApplicantProfile extends Model
         'father_employment_status',
         'mother_employment_status',
         'profile_completed_at',
+        'gwa_scale',
     ];
 
     protected $casts = [

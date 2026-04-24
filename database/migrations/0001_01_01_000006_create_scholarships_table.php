@@ -37,6 +37,10 @@ return new class extends Migration
             $table->string('contact_email', 255)->nullable();
             $table->string('website', 255)->nullable();
             $table->text('address')->nullable();
+            $table->string('benefit_snippet_1', 255)->nullable();
+            $table->string('benefit_snippet_2', 255)->nullable();
+            $table->string('org_logo', 500)->nullable();
+            $table->timestamp('posted_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

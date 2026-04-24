@@ -13,7 +13,7 @@ class PublicController extends Controller
      */
     public function landing()
     {
-        return view('welcome'); // Renders the public landing page
+        return view('home'); // Renders the public landing page
     }
 
     /**

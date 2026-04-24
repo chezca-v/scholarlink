@@ -195,6 +195,102 @@ class EvaluationSeeder extends Seeder
                 'notes'            => 'Strong STEM profile. Scoring near completion.',
                 'evaluated_at'     => null,
             ],
+            // Eval 16 — App 31 (Sofia → Bagong Alab) — approved
+            [
+                'application_id'   => 31,
+                'evaluator_id'     => 12,
+                'gpa_score'        => 96.00,
+                'income_score'     => 91.00,
+                'final_score'      => 94.20,
+                'decision'         => 'approved',
+                'rejection_reason' => null,
+                'notes'            => 'Exceptional SHS GPA. Household income well within bracket. Strong first-year candidate.',
+                'evaluated_at'     => '2026-05-19 00:00:00',
+            ],
+            // Eval 17 — App 34 (Miguel → Sindak) — rejected
+            [
+                'application_id'   => 34,
+                'evaluator_id'     => 13,
+                'gpa_score'        => 74.00,
+                'income_score'     => 70.00,
+                'final_score'      => 72.00,
+                'decision'         => 'rejected',
+                'rejection_reason' => 'income_bracket',
+                'notes'            => 'Household income slightly exceeds the qualified bracket. GPA meets requirement.',
+                'evaluated_at'     => '2026-05-17 00:00:00',
+            ],
+            // Eval 18 — App 37 (Hannah → Talino at Puso) — approved
+            [
+                'application_id'   => 37,
+                'evaluator_id'     => 15,
+                'gpa_score'        => 93.00,
+                'income_score'     => 90.00,
+                'final_score'      => 91.65,
+                'decision'         => 'approved',
+                'rejection_reason' => null,
+                'notes'            => 'Well-rounded applicant. GPA and income fully qualify. Active community involvement noted.',
+                'evaluated_at'     => '2026-05-18 00:00:00',
+            ],
+            // Eval 19 — App 40 (Rainier → Lakbay Dunong) — approved
+            [
+                'application_id'   => 40,
+                'evaluator_id'     => 14,
+                'gpa_score'        => 87.00,
+                'income_score'     => 84.00,
+                'final_score'      => 85.80,
+                'decision'         => 'approved',
+                'rejection_reason' => null,
+                'notes'            => 'Residency and financial need confirmed. Meets all eligibility criteria for Lakbay Dunong.',
+                'evaluated_at'     => '2026-05-16 00:00:00',
+            ],
+            // Eval 20 — App 43 (Camille → Haligi ng Bayan) — approved
+            [
+                'application_id'   => 43,
+                'evaluator_id'     => 19,
+                'gpa_score'        => 97.00,
+                'income_score'     => 93.00,
+                'final_score'      => 95.60,
+                'decision'         => 'approved',
+                'rejection_reason' => null,
+                'notes'            => 'Top applicant this cycle. Highest SHS GPA among submissions. Leadership record verified.',
+                'evaluated_at'     => '2026-05-15 00:00:00',
+            ],
+            // Eval 21 — App 32 (Sofia → Sindak) — in progress
+            [
+                'application_id'   => 32,
+                'evaluator_id'     => 17,
+                'gpa_score'        => 89.00,
+                'income_score'     => 88.00,
+                'final_score'      => null,
+                'decision'         => null,
+                'rejection_reason' => null,
+                'notes'            => 'Documents verified. Scoring in progress.',
+                'evaluated_at'     => null,
+            ],
+            // Eval 22 — App 38 (Hannah → Bagong Alab) — in progress
+            [
+                'application_id'   => 38,
+                'evaluator_id'     => 13,
+                'gpa_score'        => 91.00,
+                'income_score'     => 89.00,
+                'final_score'      => null,
+                'decision'         => null,
+                'rejection_reason' => null,
+                'notes'            => 'Strong SHS profile. Awaiting final deliberation.',
+                'evaluated_at'     => null,
+            ],
+            // Eval 23 — App 44 (Camille → Talino at Puso) — in progress
+            [
+                'application_id'   => 44,
+                'evaluator_id'     => 19,
+                'gpa_score'        => 94.00,
+                'income_score'     => 92.00,
+                'final_score'      => null,
+                'decision'         => null,
+                'rejection_reason' => null,
+                'notes'            => 'Outstanding candidate. Final score pending.',
+                'evaluated_at'     => null,
+            ],
         ];
 
         foreach ($evaluations as $evaluation) {
