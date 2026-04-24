@@ -51,7 +51,7 @@
       <div class="auth-sub">Enter the email address linked to your ScholarLink account.</div>
       <div class="form-group">
         <label class="form-label">Email Address *</label>
-        <input class="input" placeholder="juan@university.edu.ph" value="juan.delacruz@plm.edu.ph">
+        <input class="input" placeholder="nycfrigillana2024@plm.edu.ph" value="nycfrigillana2024@plm.edu.ph">
       </div>
       <button class="btn btn-primary" onclick="showForgotSuccess()">Send Reset Link</button>
       <div style="text-align:center;margin-top:16px;"><a class="auth-link">← Back to Login</a></div>
@@ -61,7 +61,7 @@
       <div class="auth-centered">
         <div class="auth-icon-big">📬</div>
         <div class="auth-title">Check your inbox!</div>
-        <div class="auth-sub" style="max-width:280px;">We sent a reset link to <strong>juan.delacruz@plm.edu.ph</strong>.</div>
+        <div class="auth-sub" style="max-width:280px;">We sent a reset link to <strong>nycfrigillana2024@plm.edu.ph</strong>.</div>
         <div style="width:100%;display:flex;flex-direction:column;gap:10px;">
           <button class="btn btn-primary">Open Gmail →</button>
           <button class="btn btn-ghost" onclick="showForgotForm()">Resend email</button>
