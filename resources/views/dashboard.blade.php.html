@@ -10,40 +10,34 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --teal:#0F4C5C;
-  --teal-hover:#0c3f4d;
-  --teal-light:#2A8FA0;
-  --amber:#C9A84C;
-  --amber-light:#F9D679;
-  --cloud:#F4F6FA;
-  --mist:#E2E8F0;
-  --slate:#8A95A3;
-  --ink:#1C1C2E;
-  --green-bg:#dcfce7;
-  --green-text:#15803d;
-  --warn-bg:#fef9c3;
-  --warn-text:#854d0e;
-  --violet-bg:#ede9fe;
-  --violet-text:#6d28d9;
-  --light-green:#F0FAFA;
-  --sidebar-w:210px;
+  --teal:#0F4C5C;--teal-hover:#0c3f4d;--teal-light:#2A8FA0;
+  --amber:#C9A84C;--amber-light:#F9D679;
+  --cloud:#F4F6FA;--mist:#E2E8F0;--slate:#8A95A3;--ink:#1C1C2E;
+  --green-bg:#dcfce7;--green-text:#15803d;
+  --warn-bg:#fef9c3;--warn-text:#854d0e;
+  --violet-bg:#ede9fe;--violet-text:#6d28d9;
+  --light-green:#F0FAFA;--sidebar-w:210px;
+  --red-bg:#fee2e2;--red-text:#b91c1c;
 }
 body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* ── NAVBAR (copied from browse page) ── */
-.navbar{
-  background:#FFFF;height:56px;
-  display:flex;align-items:center;padding:0 22px;gap:14px;
-  position:sticky;top:0;z-index:200;
-  box-shadow:0 1px 4px rgba(0,0,0,0.18);
-}
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;background:#F0FAFA;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .4s ease;}
+.loading-overlay.hidden{opacity:0;pointer-events:none;}
+.loading-logo{font-family:'Fraunces',serif;font-size:28px;font-weight:700;color:var(--teal);margin-bottom:16px;}
+.loading-bar{width:200px;height:3px;background:var(--mist);border-radius:10px;overflow:hidden;}
+.loading-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-light));border-radius:10px;animation:loadprog 1.6s ease-in-out forwards;}
+@keyframes loadprog{from{width:0%;}to{width:100%;}}
+.loading-msg{font-size:12px;color:var(--slate);margin-top:10px;}
+
+/* NAVBAR */
+.navbar{background:#fff;height:56px;display:flex;align-items:center;padding:0 22px;gap:14px;position:sticky;top:0;z-index:200;box-shadow:0 1px 4px rgba(0,0,0,0.18);}
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
 .logo-box{width:32px;height:32px;background:#0F4C5C;color:#fff;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,0.12);border:1.5px solid rgba(255,255,255,0.25);border-radius:8px;display:flex;align-items:center;justify-content:center;}
 .logo-text{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:#0F4C5C;letter-spacing:-0.2px;}
 .nav-search{flex:1;max-width:440px;margin:0 auto;position:relative;}
 .nav-search input{width:100%;height:34px;background:var(--light-green);border:1px solid rgba(15,76,92,0.10);border-radius:30px;padding:0 54px 0 34px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--teal);outline:none;}
 .nav-search input::placeholder{color:rgba(15,76,92,0.48);}
-.nav-search input:focus{background:rgba(15,76,92,0);}
 .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#0c3f4d;pointer-events:none;display:flex;}
 .skb{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:2px;pointer-events:none;}
 .kb{background:rgba(255,255,255,0.14);border:1px solid rgba(15,76,92,0.5);border-radius:3px;color:#0c3f4d;font-size:10px;font-weight:600;padding:0 4px;line-height:16px;}
@@ -53,20 +47,11 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .nbadge{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#F9D679;border:1.5px solid var(--teal);}
 .nav-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(160deg,#0F4C5C,#2A8FA0);color:#F9D679;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(255,255,255,0.35);}
 
-/* ── LAYOUT ── */
+/* LAYOUT */
 .app{display:flex;min-height:calc(100vh - 56px);}
 
-/* ── SIDEBAR ── */
-.sidebar{
-  width:var(--sidebar-w);flex-shrink:0;
-  background:#fff;
-  border-right:1px solid var(--mist);
-  display:flex;flex-direction:column;
-  position:sticky;top:56px;
-  height:calc(100vh - 56px);
-  overflow-y:auto;
-  padding:20px 0 16px;
-}
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);flex-shrink:0;background:#fff;border-right:1px solid var(--mist);display:flex;flex-direction:column;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;padding:20px 0 16px;}
 .sidebar::-webkit-scrollbar{width:3px;}
 .sidebar::-webkit-scrollbar-thumb{background:var(--mist);}
 .sb-section-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--slate);padding:0 18px;margin-bottom:6px;margin-top:18px;}
@@ -81,38 +66,28 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .sb-name{font-size:12.5px;font-weight:600;color:var(--ink);}
 .sb-sub{font-size:11px;color:var(--slate);}
 
-/* ── MAIN CONTENT ── */
+/* MAIN */
 .main{flex:1;padding:24px 28px 40px;min-width:0;overflow-y:auto;}
 
-/* ── HERO BANNER ── */
-.hero{
-  border-radius:18px;
-  background:linear-gradient(160deg, #0F4C5C, #2A8FA0);
-  padding:28px 32px;
-  display:flex;align-items:flex-start;justify-content:space-between;
-  margin-bottom:20px;
-  position:relative;
-  overflow:hidden;
-}
+/* HERO */
+.hero{border-radius:18px;background:linear-gradient(160deg,#0F4C5C,#2A8FA0);padding:28px 32px;display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;position:relative;overflow:hidden;}
 .hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px;}
 .hero-name{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:6px;}
 .hero-name em{color:var(--amber-light);font-style:italic;}
 .hero-sub{font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:18px;}
-.btn-ai{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg, #E8A838, #F9D679);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border:none;border-radius:10px;padding:9px 18px;cursor:pointer;transition:all .15s;}
+.btn-ai{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,#E8A838,#F9D679);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border:none;border-radius:10px;padding:9px 18px;cursor:pointer;transition:all .15s;}
 .btn-ai:hover{background:#F9D679;transform:translateY(-1px);}
-.btn-ai svg{flex-shrink:0;}
 .hero-right{display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1;}
 .progress-ring{position:relative;width:80px;height:80px;}
 .progress-ring svg{transform:rotate(-90deg);}
 .ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:7;}
-.ring-fill{fill:none;stroke:var(--amber-light);stroke-width:7;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:55;transition:stroke-dashoffset .6s ease;}
+.ring-fill{fill:none;stroke:var(--amber-light);stroke-width:7;stroke-linecap:round;stroke-dasharray:220;transition:stroke-dashoffset .6s ease;}
 .ring-label{font-family:'Fraunces',serif;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .ring-pct{font-size:18px;font-weight:700;color:#fff;line-height:1;}
-.ring-sub{font-size:8.5px;color:rgba(255,255,255,0.55);margin-top:1px;}
 .hero-right-label{font-size:10.5px;color:rgba(255,255,255,0.55);text-align:center;}
 .hero-right-hint{font-size:10px;color:rgba(255,255,255,0.55);text-align:center;}
 
-/* ── STAT CARDS ── */
+/* STAT CARDS */
 .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
 .stat-card{background:#fff;border:1.5px solid var(--mist);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
 .stat-badge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
@@ -128,58 +103,46 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .stat-num{font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:var(--ink);line-height:1;}
 .stat-lbl{font-size:12px;color:var(--slate);margin-top:3px;}
 
-/* ── SECTION HEADER ── */
+/* SECTION HEADER */
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .sec-title{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:var(--ink);}
 .sec-title svg{color:var(--amber);}
 .sec-sub{font-size:11.5px;color:var(--slate);margin-top:1px;}
 .see-all{font-size:12.5px;color:var(--teal);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:3px;text-decoration:none;}
-.see-all:hover{text-decoration:underline;}
 
-/* ── AI MATCH CARDS ── */
-.ai-section{
-  background:#fff; /* or any color you want */
-  border:1.5px solid var(--mist);
-  border-radius:16px;
-  padding:18px 20px 2px;
-}
+/* AI MATCH CARDS */
+.ai-section{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:18px 20px 2px;}
 .ai-scroll{display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;margin-bottom:28px;overflow-x:auto;}
 .ai-scroll::-webkit-scrollbar{height:3px;}
 .ai-scroll::-webkit-scrollbar-thumb{background:var(--mist);}
 .match-card{background:#fff;border:1.5px solid var(--mist);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:0;flex-shrink:0;transition:box-shadow .15s;}
 .match-card:hover{transform:translateY(-7px);box-shadow:0 16px 36px rgba(15,76,92,0.13);}
-.match-card.top{border-color:var(--amber);border-width:2px;}
+.match-card.top-match{border-color:var(--amber);border-width:2px;}
 .mc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .mc-cat{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--slate);}
-.mc-fit{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;}
-.mc-fit.top{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
-.mc-fit.great{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
-.mc-fit.good{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
-.mc-fit.explore{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
+.mc-fit{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;background:linear-gradient(160deg,#0F4C5C,#2A8FA0);color:#fff;}
 .mc-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:3px;}
 .mc-org{font-size:11px;color:var(--slate);margin-bottom:10px;}
 .mc-amt{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--teal);margin-bottom:2px;}
 .mc-amt-unit{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--slate);}
 .mc-score-lbl{font-size:10.5px;color:var(--slate);margin-bottom:4px;margin-top:10px;}
 .mc-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;position:relative;}
-.mc-bar{flex:1;height:5px;background:var(--cloud);border-radius:20px;overflow:hidden;position:relative;}
+.mc-bar{flex:1;height:5px;background:var(--cloud);border-radius:20px;overflow:hidden;}
 .mc-fill{height:100%;border-radius:20px;background:#0F4C5C;}
-.mc-fill.gold{background: linear-gradient(135deg, #E8A838, #F9D679);}
-.mc-pct{position:absolute;top: -20px;right:0;font-size:12.5px;font-weight:700;color:var(--teal);}
+.mc-fill.gold{background:linear-gradient(135deg,#E8A838,#F9D679);}
+.mc-pct{position:absolute;top:-20px;right:0;font-size:12.5px;font-weight:700;color:var(--teal);}
 .mc-btn-row{display:flex;gap:6px;margin-top:auto;}
-.btn-apply-full{flex:1;background:linear-gradient(135deg, #E8A838, #F9D679);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;border:none;border-radius:8px;padding:8px 0;cursor:pointer;transition:background .12s;}
-.btn-apply-full:hover{background:#F9D679;}
-.btn-view{flex:1;background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#F9D679;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:1.5px solid var(--mist);border-radius:8px;padding:8px 0;cursor:pointer;transition:all .12s;}
-.btn-view:hover{border-color:var(--teal);}
+.btn-apply-full{flex:1;background:linear-gradient(135deg,#E8A838,#F9D679);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;border:none;border-radius:8px;padding:8px 0;cursor:pointer;}
+.btn-view{flex:1;background:linear-gradient(160deg,#0F4C5C,#2A8FA0);color:#F9D679;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:1.5px solid var(--mist);border-radius:8px;padding:8px 0;cursor:pointer;}
 
-/* ── BOTTOM GRID ── */
+/* BOTTOM GRID */
 .bottom-grid{display:grid;grid-template-columns:1fr 260px;gap:18px;}
-
-/* ── ACTIVE APPLICATIONS ── */
 .panel{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:20px;}
+
+/* APPLICATIONS */
 .app-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--cloud);}
 .app-item:last-child{border-bottom:none;padding-bottom:0;}
-.app-avatar{width:38px;height:38px;border:1px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',sans-serif;font-size:12px;font-weight:700;background: #F0FAFA;color:var(--teal);flex-shrink:0;}
+.app-avatar{width:38px;height:38px;border:1px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',sans-serif;font-size:12px;font-weight:700;background:#F0FAFA;color:var(--teal);flex-shrink:0;}
 .app-info{flex:1;min-width:0;}
 .app-name{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .app-org{font-size:11px;color:var(--slate);margin-top:1px;}
@@ -188,13 +151,14 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .ap-dot.done{background:var(--teal);}
 .ap-dot.current{background:var(--amber);}
 .ap-dot.empty{background:var(--mist);}
-.app-status{flex-shrink:0;}
 .app-status-tag{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;}
-.app-status-tag.review{background:var(--warn-bg);color:var(--warn-text);}
-.app-status-tag.docs{background:#fee2e2;color:#b91c1c;}
+.app-status-tag.under_review{background:var(--warn-bg);color:var(--warn-text);}
+.app-status-tag.revision{background:var(--red-bg);color:var(--red-text);}
 .app-status-tag.approved{background:var(--green-bg);color:var(--green-text);}
+.app-status-tag.pending{background:var(--violet-bg);color:var(--violet-text);}
+.app-status-tag.rejected{background:var(--red-bg);color:var(--red-text);}
 
-/* ── DEADLINES ── */
+/* DEADLINES */
 .deadline-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--cloud);}
 .deadline-item:last-child{border-bottom:none;padding-bottom:0;}
 .dl-cal{width:46px;height:52px;border-radius:12px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
@@ -208,21 +172,21 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .dl-cal.normal .dl-month{color:#2A8FA0;}
 .dl-info{flex:1;min-width:0;}
 .dl-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3;}
-.dl-left{font-size:11.5px;margin-top:3px;font-weight:500;display:flex;align-items:center;gap:4px;}
+.dl-left{font-size:11.5px;margin-top:3px;font-weight:500;}
 .dl-left.urgent{color:#c47f17;}
 .dl-left.soon{color:var(--warn-text);}
 .dl-left.ok{color:var(--teal);}
 
-/* ── QUICK ACTIONS ── */
+/* QUICK ACTIONS */
 .qa-section{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:10px 20px 20px;}
 .qa-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
 .qa-card{background:#fff;border:1.5px solid var(--mist);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:8px;}
-.qa-card:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(15,76,92,0.08);}
+.qa-card:hover{border-color:var(--teal);}
 .qa-icon{width:34px;height:34px;border-radius:9px;background:var(--light-green);display:flex;align-items:center;justify-content:center;color:var(--teal);}
 .qa-label{font-size:13px;font-weight:600;color:var(--ink);}
 .qa-hint{font-size:11px;color:var(--slate);}
 
-/* ── NOTIFICATIONS ── */
+/* NOTIFICATIONS */
 .notif-item{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--cloud);font-size:12px;}
 .notif-item:last-child{border-bottom:none;}
 .notif-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px;}
@@ -231,49 +195,32 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .notif-txt{color:var(--ink);line-height:1.45;}
 .notif-time{font-size:10.5px;color:var(--slate);margin-top:2px;}
 
-/* ── SECTION SPACING ── */
+/* DATA SOURCE BADGE */
 .section{margin-bottom:24px;}
-</style>
 
-<button class="fab-ai" title="AI Assistant">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <span class="fab-badge">AI</span>
-</button>
+/* FAB */
+.fab-ai{position:fixed;bottom:24px;right:24px;width:54px;height:54px;border-radius:50%;background:linear-gradient(160deg,#0F4C5C,#2A8FA0);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 24px rgba(15,76,92,0.35);z-index:400;transition:transform .2s ease;}
+.fab-ai:hover{transform:scale(1.08);}
+.fab-badge{position:absolute;top:2px;right:2px;background:var(--amber);color:#fff;font-family:'DM Sans',sans-serif;font-size:9px;font-weight:800;border-radius:20px;padding:2px 5px;border:2px solid #fff;line-height:1;}
 
-<style>
-.fab-ai{
-  position:fixed;
-  bottom:24px;right:24px;
-  width:54px;height:54px;
-  border-radius:50%;
-  background:linear-gradient(160deg,#0F4C5C,#2A8FA0);
-  border:none;
-  color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  box-shadow:0 6px 24px rgba(15,76,92,0.35);
-  z-index:400;
-  transition:transform .2s ease, box-shadow .2s ease;
-  position:fixed;
-}
-.fab-ai:hover{transform:scale(1.08);box-shadow:0 10px 32px rgba(15,76,92,0.45);}
-.fab-badge{
-  position:absolute;
-  top:2px;right:2px;
-  background:var(--amber);
-  color:#fff;
-  font-family:'DM Sans',sans-serif;
-  font-size:9px;font-weight:800;
-  border-radius:20px;
-  padding:2px 5px;
-  border:2px solid #fff;
-  line-height:1;
-}
+/* SKELETON LOADER */
+.skel{background:linear-gradient(90deg,#e8eef2 25%,#f4f6fa 50%,#e8eef2 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* GWA BADGE */
+.gwa-badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;background:var(--teal);color:#F9D679;padding:2px 6px;border-radius:6px;}
 </style>
 </head>
 <body>
 
-<!-- NAVBAR (from browse page) -->
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">🎓 ScholarLink</div>
+  <div class="loading-bar"><div class="loading-fill"></div></div>
+  <div class="loading-msg" id="loadingMsg">Loading your dashboard…</div>
+</div>
+
+<!-- NAVBAR -->
 <nav class="navbar">
   <a class="nav-logo" href="#">
     <div class="logo-box">🎓</div>
@@ -292,13 +239,11 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="nbadge"></span>
     </button>
-    <div class="nav-av">YF</div>
+    <div class="nav-av" id="navAvatar">--</div>
   </div>
 </nav>
 
-<!-- APP LAYOUT -->
 <div class="app">
-
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-section-label">Main</div>
@@ -313,7 +258,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <a class="sb-nav-item" href="#">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       My Applications
-      <span class="sb-badge">3</span>
+      <span class="sb-badge" id="sbAppsBadge">…</span>
     </a>
     <div class="sb-section-label">Resources</div>
     <a class="sb-nav-item" href="#">
@@ -323,7 +268,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <a class="sb-nav-item" href="#">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
       Saved
-      <span class="sb-badge teal">5</span>
+      <span class="sb-badge">5</span>
     </a>
     <a class="sb-nav-item" href="#">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -337,14 +282,14 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <a class="sb-nav-item" href="#">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       Notifications
-      <span class="sb-badge">2</span>
+      <span class="sb-badge" id="sbNotifBadge">…</span>
     </a>
     <div class="sb-spacer"></div>
     <div class="sb-user">
-      <div class="sb-av">YF</div>
+      <div class="sb-av" id="sidebarAvatar">--</div>
       <div>
-        <div class="sb-name">Ysa Frigillana</div>
-        <div class="sb-sub">Applicant · PLM</div>
+        <div class="sb-name" id="sidebarName">Loading…</div>
+        <div class="sb-sub" id="sidebarSub">Applicant</div>
       </div>
     </div>
   </aside>
@@ -355,9 +300,9 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <!-- HERO -->
     <div class="hero section">
       <div class="hero-left">
-        <div class="hero-eyebrow">Good Afternoon</div>
-        <div class="hero-name">Kamusta, <em>Ysa!</em></div>
-        <div class="hero-sub">You have 2 deadlines this week and 3 new AI-matched scholarships ready.</div>
+        <div class="hero-eyebrow" id="heroGreeting">Good Morning</div>
+        <div class="hero-name">Kamusta, <em id="heroFirstName">…</em></div>
+        <div class="hero-sub" id="heroSub">Loading your personalized dashboard…</div>
         <button class="btn-ai">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           View AI Recommendations
@@ -368,10 +313,10 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="progress-ring">
           <svg width="80" height="80" viewBox="0 0 80 80">
             <circle class="ring-bg" cx="40" cy="40" r="33"/>
-            <circle class="ring-fill" cx="40" cy="40" r="33"/>
+            <circle class="ring-fill" id="profileRing" cx="40" cy="40" r="33" style="stroke-dashoffset:220;"/>
           </svg>
           <div class="ring-label">
-            <span class="ring-pct">75%</span>
+            <span class="ring-pct" id="profilePct">…</span>
           </div>
         </div>
         <div class="hero-right-hint">Complete for better matches</div>
@@ -385,7 +330,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="stat-icon teal">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F4C5C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         </div>
-        <div class="stat-num">3</div>
+        <div class="stat-num" id="statActiveApps">–</div>
         <div class="stat-lbl">Active Applications</div>
       </div>
       <div class="stat-card">
@@ -393,7 +338,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="stat-icon violet">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6d28d9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        <div class="stat-num">12</div>
+        <div class="stat-num" id="statAiMatches">–</div>
         <div class="stat-lbl">AI-Matched Scholarships</div>
       </div>
       <div class="stat-card">
@@ -401,7 +346,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="stat-icon green">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <div class="stat-num">1</div>
+        <div class="stat-num" id="statAwarded">–</div>
         <div class="stat-lbl">Scholarships Awarded</div>
       </div>
       <div class="stat-card">
@@ -409,7 +354,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="stat-icon amber">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C9A84C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         </div>
-        <div class="stat-num">5</div>
+        <div class="stat-num" id="statSaved">–</div>
         <div class="stat-lbl">Saved Scholarships</div>
       </div>
     </div>
@@ -417,132 +362,56 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <!-- AI MATCHED -->
     <div class="section ai-section">
       <div class="sec-hd">
-        <div class="sec-title-wrap">
+        <div>
           <div class="sec-title">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             AI-Matched for You
+
           </div>
-          <div class="sec-sub">Based on your GPA, income bracket &amp; course — updated today.</div>
+          <div class="sec-sub" id="aiMatchSubtitle">Loading matches based on your gwa &amp; monthly_household_income…</div>
         </div>
-        <a class="see-all" href="#">See all 12 →</a>
+        <a class="see-all" href="#" id="seeAllMatches">See all →</a>
       </div>
-      <div class="ai-scroll">
-
-        <div class="match-card top">
-          <div class="mc-top"><span class="mc-cat">Merit-Based</span><span class="mc-fit top">Top Match</span></div>
-          <div class="mc-name">Summit Scholars Grant</div>
-          <div class="mc-org">Summit Educational Support Foundation</div>
-          <div class="mc-amt">₱30,000 <span class="mc-amt-unit">/ semester</span></div>
-          <div class="mc-score-lbl">Match Score</div>
-          <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill gold" style="width:94%"></div></div><span class="mc-pct">94%</span></div>
-          <div class="mc-btn-row"><button class="btn-apply-full">Apply Now</button></div>
-        </div>
-
-        <div class="match-card">
-          <div class="mc-top"><span class="mc-cat">Need-Based</span><span class="mc-fit great">Great Fit</span></div>
-          <div class="mc-name">Lingap Kabataan Scholarship</div>
-          <div class="mc-org">Bayanihan Community Development Foundation</div>
-          <div class="mc-amt">₱24,000 <span class="mc-amt-unit">/ year</span></div>
-          <div class="mc-score-lbl">Match Score</div>
-          <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill" style="width:88%"></div></div><span class="mc-pct">88%</span></div>
-          <div class="mc-btn-row"><button class="btn-view">View Details</button></div>
-        </div>
-
-        <div class="match-card">
-          <div class="mc-top"><span class="mc-cat">Engineering</span><span class="mc-fit good">Good Fit</span></div>
-          <div class="mc-name">Bukas Palad Scholarship</div>
-          <div class="mc-org">Palad ng Pagbabago Social Foundation</div>
-          <div class="mc-amt">₱40,000 <span class="mc-amt-unit">/ year</span></div>
-          <div class="mc-score-lbl">Match Score</div>
-          <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill" style="width:81%"></div></div><span class="mc-pct">81%</span></div>
-          <div class="mc-btn-row"><button class="btn-view">View Details</button></div>
-        </div>
-
-        <div class="match-card">
-          <div class="mc-top"><span class="mc-cat">Merit + Need</span><span class="mc-fit good">Good Fit</span></div>
-          <div class="mc-name">EmpowerED Academic Scholarship</div>
-          <div class="mc-org">EmpowerED Community Foundation</div>
-          <div class="mc-amt">₱50,000 <span class="mc-amt-unit">/ year</span></div>
-          <div class="mc-score-lbl">Match Score</div>
-          <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill" style="width:76%"></div></div><span class="mc-pct">76%</span></div>
-          <div class="mc-btn-row"><button class="btn-view">View Details</button></div>
-        </div>
-
-        <div class="match-card">
-          <div class="mc-top"><span class="mc-cat">Community</span><span class="mc-fit explore">Explore</span></div>
-          <div class="mc-name">STEM Forward Scholars Program</div>
-          <div class="mc-org">Philippine Science Advancement Initiative</div>
-          <div class="mc-amt">₱36,000 <span class="mc-amt-unit">/ year</span></div>
-          <div class="mc-score-lbl">Match Score</div>
-          <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill" style="width:70%"></div></div><span class="mc-pct">70%</span></div>
-          <div class="mc-btn-row"><button class="btn-view">View Details</button></div>
-        </div>
-
+      <div class="ai-scroll" id="aiMatchContainer">
+        <!-- Skeleton cards -->
+        <div class="match-card"><div class="skel" style="height:200px;"></div></div>
+        <div class="match-card"><div class="skel" style="height:200px;"></div></div>
+        <div class="match-card"><div class="skel" style="height:200px;"></div></div>
+        <div class="match-card"><div class="skel" style="height:200px;"></div></div>
+        <div class="match-card"><div class="skel" style="height:200px;"></div></div>
       </div>
     </div>
 
     <!-- BOTTOM GRID -->
     <div class="bottom-grid">
-
-      <!-- LEFT: Active Applications -->
       <div>
+        <!-- Active Applications -->
         <div class="panel section">
           <div class="sec-hd" style="margin-bottom:10px;">
-            <div class="sec-title">Active Applications</div>
+            <div class="sec-title">
+              Active Applications
+
+            </div>
             <a class="see-all" href="#">View all →</a>
           </div>
-          <div class="app-item">
-            <div class="app-avatar" style="background:#F0FAFA;">SS</div>
-            <div class="app-info">
-              <div class="app-name">Summit Scholars Grant</div>
-              <div class="app-org">Summit Educational Support Foundation</div>
-              <div class="app-progress">
-                <div class="ap-dot done"></div><div class="ap-dot done"></div><div class="ap-dot current"></div><div class="ap-dot empty"></div><div class="ap-dot empty"></div>
-              </div>
-            </div>
-            <div class="app-status"><span class="app-status-tag review">Under Review</span></div>
-          </div>
-          <div class="app-item">
-            <div class="app-avatar" style="background:#F0FAFA;">LK</div>
-            <div class="app-info">
-              <div class="app-name">Lingap Kabataan Scholarship</div>
-              <div class="app-org">Bayanihan Community Development Foundation</div>
-              <div class="app-progress">
-                <div class="ap-dot done"></div><div class="ap-dot current"></div><div class="ap-dot empty"></div><div class="ap-dot empty"></div><div class="ap-dot empty"></div>
-              </div>
-            </div>
-            <div class="app-status"><span class="app-status-tag docs">Docs Needed</span></div>
-          </div>
-          <div class="app-item">
-            <div class="app-avatar" style="background:#F0FAFA;">BP</div>
-            <div class="app-info">
-              <div class="app-name">Bukas Palad Scholarship</div>
-              <div class="app-org">Palad ng Pagbabago Social Foundation</div>
-              <div class="app-progress">
-                <div class="ap-dot done"></div><div class="ap-dot done"></div><div class="ap-dot done"></div><div class="ap-dot done"></div><div class="ap-dot done"></div>
-              </div>
-            </div>
-            <div class="app-status"><span class="app-status-tag approved">Approved! 🎉</span></div>
+          <div id="applicationsContainer">
+            <div class="skel" style="height:60px;margin-bottom:8px;"></div>
+            <div class="skel" style="height:60px;margin-bottom:8px;"></div>
+            <div class="skel" style="height:60px;"></div>
           </div>
         </div>
 
         <!-- Quick Actions -->
         <div class="section qa-section">
-            <div class="sec-hd">
-            <div class="sec-title">Quick Actions</div>
-            </div>
-            <div class="qa-row">
+          <div class="sec-hd"><div class="sec-title">Quick Actions</div></div>
+          <div class="qa-row">
             <div class="qa-card">
-              <div class="qa-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              </div>
+              <div class="qa-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
               <div class="qa-label">Browse All</div>
               <div class="qa-hint">Find scholarships</div>
             </div>
             <div class="qa-card">
-              <div class="qa-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
+              <div class="qa-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
               <div class="qa-label">Upload Docs</div>
               <div class="qa-hint">Add to wallet</div>
             </div>
@@ -551,89 +420,512 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       </div>
 
       <div style="display:flex;flex-direction:column;gap:18px;">
-
         <!-- Deadlines -->
         <div class="panel">
           <div class="sec-hd" style="margin-bottom:10px;">
-            <div class="sec-title">Upcoming Deadlines</div>
+            <div class="sec-title">Upcoming Deadlines
+
+            </div>
             <a class="see-all" href="#">Calendar →</a>
           </div>
-          <div class="deadline-item">
-            <div class="dl-cal urgent">
-              <div class="dl-day">04</div>
-              <div class="dl-month">APR</div>
-            </div>
-            <div class="dl-info">
-              <div class="dl-name">Lingap Kabataan Scholarship</div>
-              <div class="dl-left urgent">⚠ 3 days left — submit docs!</div>
-            </div>
-          </div>
-          <div class="deadline-item">
-            <div class="dl-cal normal">
-              <div class="dl-day">10</div>
-              <div class="dl-month">APR</div>
-            </div>
-            <div class="dl-info">
-              <div class="dl-name">Summit Scholars Grant</div>
-              <div class="dl-left soon">9 days left</div>
-            </div>
-          </div>
-          <div class="deadline-item">
-            <div class="dl-cal normal">
-              <div class="dl-day">20</div>
-              <div class="dl-month">APR</div>
-            </div>
-            <div class="dl-info">
-              <div class="dl-name">Ayala Foundation Grant</div>
-              <div class="dl-left ok">19 days left</div>
-            </div>
-          </div>
-          <div class="deadline-item">
-            <div class="dl-cal normal">
-              <div class="dl-day">15</div>
-              <div class="dl-month">MAY</div>
-            </div>
-            <div class="dl-info">
-              <div class="dl-name">DOST-SEI Renewal</div>
-              <div class="dl-left ok">44 days left</div>
-            </div>
+          <div id="deadlinesContainer">
+            <div class="skel" style="height:52px;margin-bottom:8px;"></div>
+            <div class="skel" style="height:52px;margin-bottom:8px;"></div>
+            <div class="skel" style="height:52px;"></div>
           </div>
         </div>
 
         <!-- Notifications -->
         <div class="panel">
           <div class="sec-hd" style="margin-bottom:10px;">
-            <div class="sec-title">Notifications</div>
+            <div class="sec-title">Notifications
+
+            </div>
             <a class="see-all" href="#">View all →</a>
           </div>
-          <div class="notif-item">
-            <div class="notif-dot amber"></div>
-            <div>
-              <div class="notif-txt">Your <strong>Bukas Palad</strong> application was approved!</div>
-              <div class="notif-time">2 hours ago</div>
-            </div>
-          </div>
-          <div class="notif-item">
-            <div class="notif-dot red"></div>
-            <div>
-              <div class="notif-txt">Missing docs required for <strong>Lingap Kabataan</strong>.</div>
-              <div class="notif-time">Yesterday</div>
-            </div>
-          </div>
-          <div class="notif-item">
-            <div class="notif-dot"></div>
-            <div>
-              <div class="notif-txt">3 new AI-matched scholarships are ready to review.</div>
-              <div class="notif-time">2 days ago</div>
-            </div>
+          <div id="notificationsContainer">
+            <div class="skel" style="height:40px;margin-bottom:8px;"></div>
+            <div class="skel" style="height:40px;margin-bottom:8px;"></div>
+            <div class="skel" style="height:40px;"></div>
           </div>
         </div>
-
       </div>
     </div>
 
   </main>
 </div>
 
+<!-- FAB -->
+<button class="fab-ai" title="AI Assistant">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="fab-badge">AI</span>
+</button>
+
+<script>
+// ═══════════════════════════════════════════════
+// MOCK DATABASE — exact field names per documentation
+// ═══════════════════════════════════════════════
+
+const DB = {
+
+  // Table: users (applicant row — user_id: 1)
+  currentUser: {
+    id: 1,
+    first_name: "Maria",
+    last_name: "Santos",
+    email: "maria.santos@gmail.com",
+    role: "applicant",
+    organization_id: null,
+    is_active: 1,
+    email_verified_at: "2026-01-01 00:00:00"
+  },
+
+  // Table: applicant_profiles (profile for user_id: 1)
+  currentProfile: {
+    id: 1,
+    user_id: 1,
+    avatar_url: null,
+    date_of_birth: "2005-06-12",
+    sex: "Female",
+    home_address: "123 Mabini St.",
+    city: "Baras",
+    province: "Rizal",
+    zip_code: "1970",
+    mobile_number: "9171234567",
+    sms_opted_in: 0,
+    phone_verified_at: null,
+    university_name: "University of Rizal System",
+    university_address: "Morong, Rizal",
+    university_email: "maria.santos@urs.edu.ph",
+    course_program: "BS Information Technology",
+    student_number: "2026-12345",
+    year_level: "1st Year",
+    semester: "1st",
+    academic_year: "2026-2027",
+    gwa: 1.25,
+    gwa_scale: "college",
+    monthly_household_income: 12000.00,
+    num_dependents: 4,
+    is_breadwinner: "Partial Contributor",
+    is_4ps: 1,
+    father_employment_status: "Tricycle Driver",
+    mother_employment_status: "Unemployed",
+    profile_completed_at: null
+  },
+
+  // Table: scholarships (20 records — showing 5 open + active ones for AI matching)
+  scholarships: [
+    {
+      id: 7, name: "STEM Forward Scholars Program",
+      provider_name: "Philippine Science Advancement Initiative",
+      tagline: "Empowering the next generation of Filipino scientists.",
+      gpa_requirement: 1.75, income_bracket: "≤ ₱200,000/yr",
+      slots: 30, deadline: "2026-03-31", status: "open",
+      weight_gpa: 50, weight_income: 50,
+      ai_match_enabled: 1,
+      benefit_snippet_1: "Full tuition coverage up to ₱36,000/yr",
+      benefit_snippet_2: "Monthly stipend of ₱2,500",
+      contact_email: "stemforward@psai.org.ph",
+      website: "https://www.psai.org.ph",
+      posted_at: "2025-11-20",
+      tags: ["STEM","merit","need-based"]
+    },
+    {
+      id: 10, name: "Bayanihan Community Scholarship",
+      provider_name: "Bayanihan Community Development Foundation",
+      tagline: "Rooted in community, rising through education.",
+      gpa_requirement: 2.00, income_bracket: "≤ ₱180,000/yr",
+      slots: 25, deadline: "2026-03-31", status: "open",
+      weight_gpa: 40, weight_income: 60,
+      ai_match_enabled: 1,
+      benefit_snippet_1: "Annual grant of ₱24,000",
+      benefit_snippet_2: "Mentorship & livelihood support",
+      contact_email: "scholarships@bayanihan.org.ph",
+      website: "https://www.bayanihan.org.ph",
+      posted_at: "2025-11-18",
+      tags: ["need-based","community"]
+    },
+    {
+      id: 13, name: "Paglaum Scholars Program",
+      provider_name: "Paglaum Social Development Foundation",
+      tagline: "Hope for every deserving Filipino student.",
+      gpa_requirement: 1.75, income_bracket: "≤ ₱150,000/yr",
+      slots: 20, deadline: "2026-03-31", status: "open",
+      weight_gpa: 60, weight_income: 40,
+      ai_match_enabled: 1,
+      benefit_snippet_1: "Tuition + miscellaneous fees covered",
+      benefit_snippet_2: "Book allowance ₱5,000/yr",
+      contact_email: "info@paglaum.org.ph",
+      website: "https://www.paglaum.org.ph",
+      posted_at: "2025-11-25",
+      tags: ["merit","need-based","foundation"]
+    },
+    {
+      id: 16, name: "CHED Merit Scholarship",
+      provider_name: "Commission on Higher Education",
+      tagline: "Recognizing academic excellence nationwide.",
+      gpa_requirement: 1.50, income_bracket: "≤ ₱300,000/yr",
+      slots: 100, deadline: "2026-03-31", status: "open",
+      weight_gpa: 70, weight_income: 30,
+      ai_match_enabled: 1,
+      benefit_snippet_1: "Full tuition and misc. fees",
+      benefit_snippet_2: "Monthly stipend of ₱3,500",
+      contact_email: "merit@ched.gov.ph",
+      website: "https://www.ched.gov.ph",
+      posted_at: "2025-11-10",
+      tags: ["merit","government","CHED"]
+    },
+    {
+      id: 19, name: "Panasonic IT Scholarship",
+      provider_name: "Panasonic Philippines Foundation",
+      tagline: "Bridging technology and opportunity.",
+      gpa_requirement: 1.75, income_bracket: "≤ ₱250,000/yr",
+      slots: 15, deadline: "2026-03-31", status: "open",
+      weight_gpa: 50, weight_income: 50,
+      ai_match_enabled: 1,
+      benefit_snippet_1: "₱40,000 tuition assistance/yr",
+      benefit_snippet_2: "Internship placement at Panasonic PH",
+      contact_email: "foundation@panasonic.com.ph",
+      website: "https://www.panasonic.com/ph",
+      posted_at: "2025-11-22",
+      tags: ["IT","STEM","corporate"]
+    }
+  ],
+
+  // Table: applications (for user_id: 1)
+  applications: [
+    {
+      id: 1, reference_code: "SS-2026-00001",
+      applicant_id: 1, scholarship_id: 1,
+      status: "under_review", stage: "scoring",
+      ai_match_score: 94.50,
+      conflict_flag: 0,
+      submitted_at: "2026-01-10",
+      decided_at: null,
+      // joined scholarship data
+      scholarship_name: "Summit Scholars Grant",
+      scholarship_org: "Summit Educational Support Foundation"
+    },
+    {
+      id: 2, reference_code: "LK-2026-00002",
+      applicant_id: 1, scholarship_id: 5,
+      status: "revision", stage: "doc_review",
+      ai_match_score: 88.20,
+      conflict_flag: 0,
+      submitted_at: "2026-01-12",
+      decided_at: null,
+      scholarship_name: "Lingap Kabataan Scholarship",
+      scholarship_org: "Bayanihan Community Development Foundation"
+    },
+    {
+      id: 3, reference_code: "BP-2026-00003",
+      applicant_id: 1, scholarship_id: 3,
+      status: "approved", stage: "decided",
+      ai_match_score: 81.00,
+      conflict_flag: 0,
+      submitted_at: "2026-01-08",
+      decided_at: "2026-02-15",
+      scholarship_name: "Bukas Palad Scholarship",
+      scholarship_org: "Palad ng Pagbabago Social Foundation"
+    }
+  ],
+
+  // Table: notifications (for user_id: 1, type: in_app)
+  notifications: [
+    {
+      id: 1, user_id: 1, type: "in_app",
+      title: "Application Status Update",
+      body: "Your Bukas Palad Scholarship application was approved!",
+      is_read: 0,
+      related_id: 3,
+      created_at: "2026-02-15 14:32:00"
+    },
+    {
+      id: 2, user_id: 1, type: "in_app",
+      title: "Document Required",
+      body: "Missing docs required for Lingap Kabataan. Please upload immediately.",
+      is_read: 0,
+      related_id: 2,
+      created_at: "2026-02-14 09:10:00"
+    },
+    {
+      id: 3, user_id: 1, type: "in_app",
+      title: "New AI Matches Available",
+      body: "3 new AI-matched scholarships are ready to review based on your profile.",
+      is_read: 1,
+      related_id: null,
+      created_at: "2026-02-13 11:00:00"
+    }
+  ],
+
+  // Upcoming deadlines derived from applications + scholarships.deadline
+  upcomingDeadlines: [
+    { scholarship_name: "Lingap Kabataan Scholarship", deadline: "2026-04-04", days_left: 3 },
+    { scholarship_name: "Summit Scholars Grant", deadline: "2026-04-10", days_left: 9 },
+    { scholarship_name: "Ayala Foundation Grant", deadline: "2026-04-20", days_left: 19 },
+    { scholarship_name: "DOST-SEI Renewal", deadline: "2026-05-15", days_left: 44 }
+  ]
+};
+
+// ═══════════════════════════════════════════════
+// AI MATCH SCORING ENGINE
+// Uses: applicant_profiles.gwa, gpa_requirement
+//       applicant_profiles.monthly_household_income
+//       scholarships.weight_gpa, weight_income, income_bracket
+// ═══════════════════════════════════════════════
+function computeAiMatchScore(profile, scholarship) {
+  // GPA score: Philippine scale (1.00=best, 5.00=fail)
+  // gpa_requirement is minimum threshold
+  const gwaScore = profile.gwa <= scholarship.gpa_requirement
+    ? 100
+    : Math.max(0, 100 - ((profile.gwa - scholarship.gpa_requirement) * 40));
+
+  // Income score: extract ceiling from income_bracket string
+  const bracketMatch = scholarship.income_bracket.match(/[\d,]+/);
+  const annualCeiling = bracketMatch ? parseFloat(bracketMatch[0].replace(/,/g,'')) : 300000;
+  const annualIncome = profile.monthly_household_income * 12;
+  const incomeScore = annualIncome <= annualCeiling
+    ? Math.max(60, 100 - ((annualIncome / annualCeiling) * 40))
+    : 30;
+
+  // Weighted final (uses scholarships.weight_gpa + weight_income)
+  const final = (gwaScore * scholarship.weight_gpa / 100) + (incomeScore * scholarship.weight_income / 100);
+
+  // 4Ps bonus
+  return Math.min(100, final + (profile.is_4ps ? 3 : 0));
+}
+
+function matchLabel(score) {
+  if (score >= 92) return "Top Match";
+  if (score >= 85) return "Great Fit";
+  if (score >= 75) return "Good Fit";
+  return "Explore";
+}
+
+// ═══════════════════════════════════════════════
+// PROFILE COMPLETENESS CALCULATOR
+// Based on applicant_profiles fields
+// ═══════════════════════════════════════════════
+function computeProfileCompleteness(profile) {
+  const fields = [
+    'date_of_birth','sex','home_address','city','province','zip_code',
+    'mobile_number','university_name','university_address','university_email',
+    'course_program','student_number','year_level','semester','academic_year',
+    'gwa','monthly_household_income','num_dependents','is_breadwinner',
+    'father_employment_status','mother_employment_status',
+    'avatar_url','phone_verified_at','profile_completed_at'
+  ];
+  const filled = fields.filter(f => profile[f] !== null && profile[f] !== undefined && profile[f] !== '').length;
+  return Math.round((filled / fields.length) * 100);
+}
+
+// ═══════════════════════════════════════════════
+// RENDER FUNCTIONS
+// ═══════════════════════════════════════════════
+
+function getInitials(first, last) {
+  return (first[0] + last[0]).toUpperCase();
+}
+
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good Morning";
+  if (h < 17) return "Good Afternoon";
+  return "Good Evening";
+}
+
+function timeAgo(dateStr) {
+  const then = new Date(dateStr).getTime();
+  const now = new Date("2026-02-15 20:00:00").getTime(); // simulated "now"
+  const diff = now - then;
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (hours < 24) return `${hours} hour${hours!==1?'s':''} ago`;
+  return `${days} day${days!==1?'s':''} ago`;
+}
+
+function renderHero(user, profile) {
+  const initials = getInitials(user.first_name, user.last_name);
+  document.getElementById('navAvatar').textContent = initials;
+  document.getElementById('sidebarAvatar').textContent = initials;
+  document.getElementById('sidebarName').textContent = `${user.first_name} ${user.last_name}`;
+  document.getElementById('sidebarSub').textContent = `Applicant · ${profile.university_name.split(' ').map(w=>w[0]).join('').slice(0,4)}`;
+  document.getElementById('heroGreeting').textContent = getGreeting();
+  document.getElementById('heroFirstName').textContent = user.first_name + '!';
+
+  const pct = computeProfileCompleteness(profile);
+  document.getElementById('profilePct').textContent = pct + '%';
+  // stroke-dasharray=220, dashoffset = 220 * (1 - pct/100)
+  const offset = 220 * (1 - pct / 100);
+  setTimeout(() => {
+    document.getElementById('profileRing').style.strokeDashoffset = offset;
+  }, 300);
+}
+
+function renderStats(applications, notifications) {
+  const active = applications.filter(a => a.status !== 'approved' && a.status !== 'rejected').length;
+  const awarded = applications.filter(a => a.status === 'approved').length;
+  const aiMatchCount = DB.scholarships.filter(s => s.ai_match_enabled).length;
+  const unreadNotifs = notifications.filter(n => !n.is_read).length;
+
+  document.getElementById('statActiveApps').textContent = active;
+  document.getElementById('statAiMatches').textContent = aiMatchCount;
+  document.getElementById('statAwarded').textContent = awarded;
+  document.getElementById('statSaved').textContent = '5'; // activity_log based
+
+  document.getElementById('sbAppsBadge').textContent = active;
+  document.getElementById('sbNotifBadge').textContent = unreadNotifs || '';
+
+  // Hero subtitle: data-driven from DB
+  const urgentDeadlines = DB.upcomingDeadlines.filter(d => d.days_left <= 7).length;
+  document.getElementById('heroSub').textContent =
+    `You have ${urgentDeadlines} deadline${urgentDeadlines!==1?'s':''} this week and ${aiMatchCount} new AI-matched scholarships ready.`;
+}
+
+function renderAiMatches(profile, scholarships) {
+  // Compute ai_match_score for each scholarship
+  const scored = scholarships
+    .filter(s => s.ai_match_enabled && s.status === 'open')
+    .map(s => ({ ...s, computed_match: computeAiMatchScore(profile, s) }))
+    .sort((a, b) => b.computed_match - a.computed_match);
+
+  document.getElementById('seeAllMatches').textContent = `See all ${scored.length} →`;
+  document.getElementById('aiMatchSubtitle').textContent =
+    `Based on your GWA (${profile.gwa}), ` +
+    `income bracket (₱${profile.monthly_household_income.toLocaleString()}/mo) ` +
+    `& ${profile.course_program} — updated today.`;
+
+  const container = document.getElementById('aiMatchContainer');
+  container.innerHTML = scored.map((s, i) => {
+    const score = Math.round(s.computed_match);
+    const label = matchLabel(score);
+    const isTop = i === 0;
+    const fillClass = isTop ? 'gold' : '';
+    const cardClass = isTop ? 'match-card top-match' : 'match-card';
+    const btn = isTop
+      ? `<button class="btn-apply-full">Apply Now</button>`
+      : `<button class="btn-view">View Details</button>`;
+    return `
+      <div class="${cardClass}">
+        <div class="mc-top">
+          <span class="mc-cat">${s.tags ? s.tags[0] : 'Scholarship'}</span>
+          <span class="mc-fit">${label}</span>
+        </div>
+        <div class="mc-name">${s.name}</div>
+        <div class="mc-org">${s.provider_name}</div>
+        <div class="mc-amt">${s.benefit_snippet_1.match(/₱[\d,]+/) ? s.benefit_snippet_1.match(/₱[\d,]+/)[0] : '₱—'} <span class="mc-amt-unit">/ year</span></div>
+        <div class="mc-score-lbl">Match Score <span style="font-size:9px;color:var(--slate);">(ai_match_score)</span></div>
+        <div class="mc-bar-row">
+          <div class="mc-bar"><div class="mc-fill ${fillClass}" style="width:${score}%"></div></div>
+          <span class="mc-pct">${score}%</span>
+        </div>
+        <div class="mc-btn-row">${btn}</div>
+      </div>`;
+  }).join('');
+}
+
+function stageDotsHTML(stage) {
+  const stages = ['submitted','doc_review','scoring','decided'];
+  const idx = stages.indexOf(stage);
+  return stages.map((s, i) => {
+    let cls = 'empty';
+    if (i < idx) cls = 'done';
+    else if (i === idx) cls = 'current';
+    return `<div class="ap-dot ${cls}"></div>`;
+  }).join('');
+}
+
+function statusTagHTML(status) {
+  const labels = {
+    under_review: 'Under Review',
+    revision: 'Docs Needed',
+    approved: 'Approved! 🎉',
+    pending: 'Pending',
+    rejected: 'Rejected'
+  };
+  return `<span class="app-status-tag ${status}">${labels[status] || status}</span>`;
+}
+
+function renderApplications(applications) {
+  const container = document.getElementById('applicationsContainer');
+  container.innerHTML = applications.map(app => `
+    <div class="app-item">
+      <div class="app-avatar">${app.reference_code.split('-')[0]}</div>
+      <div class="app-info">
+        <div class="app-name">${app.scholarship_name}</div>
+        <div class="app-org">${app.scholarship_org} · <span style="font-size:10px;color:var(--teal);font-weight:600;">${app.reference_code}</span></div>
+        <div class="app-progress">${stageDotsHTML(app.stage)}</div>
+      </div>
+      <div class="app-status">${statusTagHTML(app.status)}</div>
+    </div>`).join('');
+}
+
+function renderDeadlines(deadlines) {
+  const container = document.getElementById('deadlinesContainer');
+  container.innerHTML = deadlines.map(d => {
+    const date = new Date(d.deadline);
+    const day = date.getDate().toString().padStart(2,'0');
+    const month = date.toLocaleString('en-US',{month:'short'}).toUpperCase();
+    const urgencyClass = d.days_left <= 5 ? 'urgent' : 'normal';
+    const textClass = d.days_left <= 5 ? 'urgent' : d.days_left <= 14 ? 'soon' : 'ok';
+    const icon = d.days_left <= 5 ? '⚠ ' : '';
+    return `
+      <div class="deadline-item">
+        <div class="dl-cal ${urgencyClass}">
+          <div class="dl-day">${day}</div>
+          <div class="dl-month">${month}</div>
+        </div>
+        <div class="dl-info">
+          <div class="dl-name">${d.scholarship_name}</div>
+          <div class="dl-left ${textClass}">${icon}${d.days_left} days left${d.days_left <= 5 ? ' — submit docs!' : ''}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderNotifications(notifications) {
+  const container = document.getElementById('notificationsContainer');
+  container.innerHTML = notifications.map(n => {
+    const dotClass = n.is_read ? '' : n.title.includes('Approved') || n.title.includes('Status') ? 'amber' : n.title.includes('Missing') || n.title.includes('Required') ? 'red' : '';
+    return `
+      <div class="notif-item" style="${n.is_read ? 'opacity:.65;' : ''}">
+        <div class="notif-dot ${dotClass}"></div>
+        <div>
+          <div class="notif-txt">${n.body}</div>
+          <div class="notif-time">${timeAgo(n.created_at)} · ${n.type === 'in_app' ? 'In-app' : n.type}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════
+// DASHBOARD INIT — simulates DB query sequence
+// ═══════════════════════════════════════════════
+async function initDashboard() {
+  const msgs = ['Fetching applicant_profiles…','Loading applications…','Computing ai_match_scores…','Rendering dashboard…'];
+  let msgIdx = 0;
+  const msgEl = document.getElementById('loadingMsg');
+  const msgInterval = setInterval(() => {
+    msgEl.textContent = msgs[Math.min(++msgIdx, msgs.length - 1)];
+  }, 400);
+
+  // Simulate async DB calls
+  await new Promise(r => setTimeout(r, 1600));
+  clearInterval(msgInterval);
+
+  // Render all sections from DB
+  renderHero(DB.currentUser, DB.currentProfile);
+  renderStats(DB.applications, DB.notifications);
+  renderAiMatches(DB.currentProfile, DB.scholarships);
+  renderApplications(DB.applications);
+  renderDeadlines(DB.upcomingDeadlines);
+  renderNotifications(DB.notifications);
+
+  // Hide loader
+  document.getElementById('loadingOverlay').classList.add('hidden');
+}
+
+initDashboard();
+</script>
 </body>
 </html>
