@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarLink - Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-teal: #0F4C5C;
+            --teal-mid: #1A6B7A;
+            --teal-light: #2A8FA0;
+            --warm-amber: #E8A838;
+            --amber-light: #F9D679;
+            --bg-grey: #EEF8F8;
+            --border-light: #DFF0EE;
+            --sidebar-bg: #091E2A;
+            --white: #FFFFFF;
+            --muted: #6B8E94;
+
+            --red-alert: #D94848;
+            --green-success: #1A9E6A;
+            --violet-review: #7C5CBF;
+            --orange-warning: #B07B10;
+
+            --sidebar-width: 230px;
+            --topbar-height: 56px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg-grey);
+            color: var(--deep-teal);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            border-right: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .side-brand {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--teal-mid), var(--warm-amber));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .side-nav {
+            flex: 1;
+            padding: 10px 12px;
+            overflow-y: auto;
+        }
+
+        .nav-label {
+            font-size: 9.5px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: rgba(255, 255, 255, 0.3);
+            padding: 15px 15px 8px;
+            font-weight: 700;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            font-size: 13.5px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-weight: 600;
+            box-shadow: inset 3px 0 0 var(--warm-amber);
+        }
+
+        .badge-nav {
+            margin-left: auto;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .side-user {
+            margin-top: auto;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-av {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--warm-amber), var(--amber-light));
+            color: var(--deep-teal);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .main-wrapper {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            min-width: 0;
+        }
+
+        .header-bar {
+            height: var(--topbar-height);
+            background: var(--deep-teal);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            color: white;
+            gap: 12px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-pill {
+            padding: 3px 10px;
+            border-radius: 20px;
+            background: rgba(232, 168, 56, 0.25);
+            color: var(--amber-light);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            border: 1px solid rgba(232, 168, 56, 0.3);
+            line-height: 1.2;
+        }
+
+        .notif-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.06);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.85);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notif-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--warm-amber);
+            border: 2px solid var(--deep-teal);
+            position: absolute;
+            top: 4px;
+            right: 4px;
+        }
+
+        .top-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--warm-amber), var(--amber-light));
+            color: var(--deep-teal);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Fraunces', serif;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .breadcrumb {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            white-space: nowrap;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .tab-link {
+            padding: 6px 14px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            border-radius: 20px;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-weight: 600;
+        }
+
+        .dashboard-body {
+            padding: 32px 24px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .dashboard-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 16px;
+            margin-bottom: 26px;
+            flex-wrap: wrap;
+        }
+
+        .heading-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 21px;
+            min-height: 176px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(15,76,92,0.05);
+        }
+
+        .stat-card h1 {
+            font-family: 'Fraunces', serif;
+            font-size: 36px;
+            font-weight: 900;
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .stat-card-foot {
+            font-size: 11px;
+            color: var(--muted);
+            border-top: 1px solid var(--border-light);
+            padding-top: 8px;
+            margin-top: 10px;
+        }
+
+        .stat-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--bg-grey);
+            color: var(--green-success);
+        }
+
+        .dashboard-main-area {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 340px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .box-container,
+        .activity-section,
+        .alerts-section {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .box-header,
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 10px;
+        }
+
+        .box-title,
+        .section-header h3 {
+            font-family: 'Fraunces', serif;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 12px;
+            color: var(--teal-mid);
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .alert-row {
+            display: flex;
+            gap: 12px;
+            padding: 14px;
+            border-radius: 12px;
+            margin-top: 10px;
+            border: 1px solid transparent;
+        }
+
+        .alert-red { background: #FEF2F2; border-color: #FECACA; color: var(--red-alert); }
+        .alert-orange { background: #FFFBEB; border-color: #FDE68A; color: var(--orange-warning); }
+        .alert-blue { background: #F0F9FF; border-color: #BAE6FD; color: #1A5A7D; }
+
+        .activity-list,
+        .activity-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .activity-item,
+        .activity-node {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .activity-item:last-child,
+        .activity-node:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .activity-content { min-width: 0; flex: 1; }
+        .activity-text { font-size: 13px; line-height: 1.45; }
+
+        .activity-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-top: 4px;
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .activity-time { margin-left: auto; }
+
+        .activity-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: var(--bg-grey);
+            color: var(--teal-mid);
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+
+        th {
+            text-align: left;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            padding: 12px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        td {
+            padding: 15px 12px;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 13.5px;
+        }
+
+        tbody tr:last-child td { border-bottom: none; }
+
+        .prog-bar-container {
+            width: 80px;
+            height: 5px;
+            background: var(--bg-grey);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .prog-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--deep-teal), var(--teal-mid));
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .action-card:hover {
+            border-color: var(--teal-mid);
+            background: var(--bg-grey);
+        }
+
+        .breakdown-item,
+        .deadline-item {
+            display: grid;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .breakdown-item {
+            grid-template-columns: 8px 1fr auto auto;
+        }
+
+        .deadline-item {
+            grid-template-columns: 8px 1fr auto;
+        }
+
+        .breakdown-item:last-child,
+        .deadline-item:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-color,
+        .deadline-color {
+            width: 8px;
+            height: 8px;
+            border-radius: 99px;
+        }
+
+        .breakdown-label,
+        .deadline-name { font-size: 12px; font-weight: 600; }
+
+        .breakdown-number { font-weight: 700; font-size: 13px; }
+        .breakdown-percent { font-size: 11px; color: var(--muted); }
+
+        .stacked-bar {
+            display: flex;
+            height: 8px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 15px 0 8px;
+            background: var(--bg-grey);
+        }
+
+        .stacked-bar-segment { height: 100%; }
+
+        .deadline-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+        .deadline-days {
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 34px;
+            text-align: right;
+        }
+
+        .deadline-days.urgent { color: var(--red-alert); }
+        .deadline-days.warning { color: var(--orange-warning); }
+        .deadline-days.safe { color: var(--green-success); }
+        .deadline-days.info { color: var(--teal-mid); }
+
+        .btn-pri {
+            background: linear-gradient(135deg, var(--deep-teal), var(--teal-mid));
+            color: var(--amber-light);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1240px) {
+            .dashboard-main-area { grid-template-columns: 1fr; }
+            aside { width: 100%; }
+        }
+
+        @media (max-width: 1024px) {
+            :root { --sidebar-width: 86px; }
+
+            .side-brand h3,
+            .side-brand p,
+            .nav-label,
+            .nav-item span:not(:first-child),
+            .side-user > div:nth-child(2) {
+                display: none;
+            }
+
+            .nav-item { justify-content: center; }
+            .badge-nav { display: none; }
+            .side-user { justify-content: center; }
+
+            .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .header-bar { height: auto; min-height: var(--topbar-height); flex-wrap: wrap; padding: 10px 16px; }
+        }
+
+        @media (max-width: 680px) {
+            :root { --sidebar-width: 0px; }
+            .sidebar { display: none; }
+            .main-wrapper { margin-left: 0; }
+            .dashboard-body { padding: 20px 14px; }
+            .stat-grid { grid-template-columns: 1fr; }
+            .tab-group { justify-content: flex-start; }
+            .activity-time { margin-left: 0; }
+            .breakdown-item { grid-template-columns: 8px 1fr auto; }
+            .breakdown-percent { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <aside class="sidebar">
+        <div class="side-brand">
+            <div class="logo-icon">🎓</div>
+            <div>
+                <h3 style="font-family:'Fraunces'; font-size: 16px;">Scholar<span style="color:var(--warm-amber)">Link</span></h3>
+                <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">Admin Panel</p>
+            </div>
+        </div>
+
+        <nav class="side-nav">
+            <div class="nav-label">Overview</div>
+            <div class="nav-item active"><span>📊</span> Dashboard</div>
+            <div class="nav-item"><span>📈</span> Analytics</div>
+
+            <div class="nav-label">Scholarships</div>
+            <div class="nav-item"><span>📋</span> Scholarship List</div>
+            <div class="nav-item"><span>➕</span> Create Scholarship</div>
+            <div class="nav-item"><span>📅</span> Deadline Calendar</div>
+
+            <div class="nav-label">Applications</div>
+            <div class="nav-item"><span>📂</span> All Applications <span class="badge-nav" style="background:var(--warm-amber); color:var(--deep-teal)">14</span></div>
+            <div class="nav-item"><span>⚠️</span> Pending Reviews <span class="badge-nav" style="background:var(--red-alert); color:white">7</span></div>
+
+            <div class="nav-label">Management</div>
+            <div class="nav-item">
+                <span>👥</span> User Management
+            </div>
+            <div class="nav-item">
+                <span>⚙️</span> Settings
+            </div>
+        </nav>
+
+        <div class="side-user">
+            <div class="user-av">RM</div>
+            <div style="font-size:12px;">
+                <p style="font-weight:700;">Ryan Mondero</p>
+                <div style="font-size:9.5px; background:rgba(234,140,85,0.2); color:var(--amber-light); padding:2px 6px; border-radius:20px; display:inline-block; margin-top:4px; font-weight:700;">ADMIN</div>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="header-bar">
+            <div class="breadcrumb">ScholarLink <span style="opacity:0.3">›</span> <b style="color:white">Dashboard</b></div>
+            <nav class="tab-group">
+                <div class="tab-link active">Overview</div>
+                <div class="tab-link">Applications</div>
+                <div class="tab-link">Scholarships</div>
+                <div class="tab-link">Evaluators</div>
+                <div class="tab-link">Reports</div>
+            </nav>
+            <div class="topbar-right">
+                <div class="admin-pill">Admin</div>
+                <button class="notif-btn" type="button" aria-label="Notifications">
+                    <span style="font-size:14px;">🔔</span>
+                    <span class="notif-dot"></span>
+                </button>
+                <div class="top-avatar">RM</div>
+            </div>
+        </header>
+
+        <main class="dashboard-body">
+            <div class="dashboard-heading">
+                <div>
+                    <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">PLM Scholarship Office</p>
+                    <h2 style="font-family:'Fraunces'; font-size:28px; font-weight:700;">Admin Dashboard</h2>
+                    <p style="font-size:12px; color:var(--muted); margin-top:2px;">Tuesday, April 1, 2026 · Academic Year 2026–2027</p>
+                </div>
+                <div class="heading-actions">
+                    <button class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
+                    <button class="btn-pri">New Scholarship</button>
+                </div>
+            </div>
+
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">📖</span><span class="stat-badge">↑ 3 new</span></div>
+                    <h1>8</h1>
+                    <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Open Scholarships</p>
+                    <p class="stat-card-foot">2 closing soon · 1 drafting</p>
+                </div>
+                <div class="stat-card">
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">📝</span><span class="stat-badge" style="color:var(--red-alert)">↑ 5 today</span></div>
+                    <h1>7</h1>
+                    <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Pending Reviews</p>
+                    <p class="stat-card-foot">Oldest: 4 days ago</p>
+                </div>
+                <div class="stat-card">
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">📈</span><span class="stat-badge">↑ 14%</span></div>
+                    <h1>142</h1>
+                    <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Total Applications</p>
+                    <p class="stat-card-foot">This academic year</p>
+                </div>
+                <div class="stat-card">
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">↑ 8%</span></div>
+                    <h1>38</h1>
+                    <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Approved / Awarded</p>
+                    <p class="stat-card-foot">26.8% approval rate</p>
+                </div>
+            </div>
+
+            <div class="dashboard-main-area">
+                <div>
+                    <div class="box-container">
+                        <div class="box-header">
+                            <h3 class="box-title">⚠ Bottleneck Alerts</h3>
+                            <span style="font-size:10px; color:var(--muted)">Auto-refreshes every 5 min</span>
+                        </div>
+                        <div class="alert-row alert-red">
+                            <div style="font-size:18px;">🚨</div>
+                            <div>
+                                <b style="font-size:13px;">3 Applications Unassigned for 4+ Days</b>
+                                <p style="font-size:12px; opacity:0.8;">STEM Forward Scholars Program. Risk of missing SLA.</p>
+                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Assign Evaluators →</a>
+                            </div>
+                        </div>
+                        <div class="alert-row alert-orange">
+                            <div style="font-size:18px;">⏳</div>
+                            <div>
+                                <b style="font-size:13px;">Deadline in 3 Days — 8 Applicants with Incomplete Docs</b>
+                                <p style="font-size:12px; opacity:0.8;">Bright Horizons Grant. SMS notifications sent.</p>
+                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">View Applicants →</a>
+                            </div>
+                        </div>
+                        <div class="alert-row alert-blue">
+                            <div style="font-size:18px;">📢</div>
+                            <div>
+                                <b style="font-size:13px;">2 Scholarships Awaiting Approval</b>
+                                <p style="font-size:12px; opacity:0.8;">Gokongwei STEM Grant and PLM Excellence Award.</p>
+                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Review Drafts →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="activity-section">
+                        <div class="section-header">
+                            <h3>Recent Activity</h3>
+                            <span class="subtitle">View all →</span>
+                        </div>
+
+                        <div class="activity-list">
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #f3f4f6; color: #10b981;">✓</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>Evaluator Sanchez</strong> approved application of <strong>Dudoy Listangco</strong> for Lingap Kabataan Scholarship</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-badge" style="background: #f3f4f6; color: #8b5cf6;">Evaluation</span>
+                                        <span>Score: 88.4 / 100</span>
+                                        <span class="activity-time">10:32 AM</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #fcfdfe; color: #ef5350;">✗</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>Application #142</strong> was rejected by Evaluator Esteban — below GPA threshold</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-badge">Application</span>
+                                        <span>CHED Merit · GPA 1.8 required</span>
+                                        <span class="activity-time">9:58 AM</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #f9fafb; color: #0f4c5c;">📋</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>Elena Lanuza</strong> submitted application for Unity Scholars Financial Aid Program</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-badge">Application</span>
+                                        <span>Docs complete · AI Match 91%</span>
+                                        <span class="activity-time">9:14 AM</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #f9fafb; color: #ea8c55;">⏱️</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>Admin Escaño</strong> extended deadline of <strong>LiftED Youth Scholarship Grant</strong> by 7 days</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-badge" style="color: #d97706;">Scholarship</span>
+                                        <span>New deadline: Apr 20, 2025</span>
+                                        <span class="activity-time">Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background: #f3f4f6; color: #8b5cf6;">👥</div>
+                                <div class="activity-content">
+                                    <div class="activity-text"><strong>Evaluator Banayad</strong> was assigned to <strong>5 pending applications</strong> for Paglaum at Pag-ibig ng Bayan Foundation</div>
+                                    <div class="activity-meta">
+                                        <span class="activity-badge" style="color: #8b5cf6;">Evaluator</span>
+                                        <span>Blind screening enabled</span>
+                                        <span class="activity-time">Yesterday</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="box-container">
+                        <div class="box-header">
+                            <h3 class="box-title">Scholarship Overview</h3>
+                            <a href="#" style="font-size:12px; color:var(--teal-mid); font-weight:700;">Manage all →</a>
+                        </div>
+                        <table style="width: 100%;">
+                            <thead>
+                            <tr>
+                                <th>Scholarship</th>
+                                <th>Status</th>
+                                <th>Apps</th>
+                                <th>Capacity</th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><b>Paglaum Program</b><br><small style="color:var(--muted)">Paglaum Foundation</small></td>
+                                <td><span style="color:var(--green-success); font-weight:700;">● Open</span></td>
+                                <td>42 / 50</td>
+                                <td><div class="prog-bar-container"><div class="prog-bar-fill" style="width:84%"></div></div></td>
+                                <td style="text-align:right;"><a href="#" style="color:var(--teal-mid); font-weight:700;">View →</a></td>
+                            </tr>
+                            <tr>
+                                <td><b>CHED Merit (CMSP)</b><br><small style="color:var(--muted)">CHED Scholarship</small></td>
+                                <td><span style="color:var(--green-success); font-weight:700;">● Open</span></td>
+                                <td>11 / 20</td>
+                                <td><div class="prog-bar-container"><div class="prog-bar-fill" style="width:55%"></div></div></td>
+                                <td style="text-align:right;"><a href="#" style="color:var(--teal-mid); font-weight:700;">View →</a></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <aside>
+                    <div class="box-container">
+                        <h3 class="box-title" style="margin-bottom:12px;">Quick Actions</h3>
+                        <div class="action-grid">
+                            <div class="action-card">
+                                <div style="font-size:18px; margin-bottom:5px;">➕</div>
+                                <b style="font-size:11px;">New Scholarship</b>
+                            </div>
+                            <div class="action-card">
+                                <div style="font-size:18px; margin-bottom:5px;">👥</div>
+                                <b style="font-size:11px;">Assign</b>
+                            </div>
+                            <div class="action-card">
+                                <div style="font-size:18px; margin-bottom:5px;">⚙️</div>
+                                <b style="font-size:11px;">Weight Config</b>
+                            </div>
+                            <div class="action-card">
+                                <div style="font-size:18px; margin-bottom:5px;">📊</div>
+                                <b style="font-size:11px;">Analytics</b>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alerts-section">
+                        <div class="section-header">
+                            <h3>Application Breakdown</h3>
+                            <span class="subtitle">142 total</span>
+                        </div>
+
+                        <div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-color" style="background: #ea8c55;"></div>
+                                <div class="breakdown-label">Pending Review</div>
+                                <div class="breakdown-number">47</div>
+                                <div class="breakdown-percent">33%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-color" style="background: #1a8fa0;"></div>
+                                <div class="breakdown-label">Under Evaluation</div>
+                                <div class="breakdown-number">35</div>
+                                <div class="breakdown-percent">25%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-color" style="background: #8b5cf6;"></div>
+                                <div class="breakdown-label">Awaiting Docs</div>
+                                <div class="breakdown-number">22</div>
+                                <div class="breakdown-percent">15%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-color" style="background: #10b981;"></div>
+                                <div class="breakdown-label">Approved</div>
+                                <div class="breakdown-number">38</div>
+                                <div class="breakdown-percent">27%</div>
+                            </div>
+                            <div class="breakdown-item">
+                                <div class="breakdown-color" style="background: #ef5350;"></div>
+                                <div class="breakdown-label">Rejected</div>
+                                <div class="breakdown-number">0</div>
+                                <div class="breakdown-percent">0%</div>
+                            </div>
+
+                            <div class="stacked-bar">
+                                <div class="stacked-bar-segment" style="background: #ea8c55; width: 33%;"></div>
+                                <div class="stacked-bar-segment" style="background: #1a8fa0; width: 25%;"></div>
+                                <div class="stacked-bar-segment" style="background: #8b5cf6; width: 15%;"></div>
+                                <div class="stacked-bar-segment" style="background: #10b981; width: 27%;"></div>
+                            </div>
+                            <div style="font-size: 12px; color: #3da9b8; margin-top: 8px;">Stacked distribution across all scholarships</div>
+                        </div>
+                    </div>
+
+                    <div class="alerts-section" style="margin-top: 20px;">
+                        <div class="section-header">
+                            <h3>Upcoming Deadlines</h3>
+                            <span class="subtitle">Calendar →</span>
+                        </div>
+
+                        <div>
+                            <div class="deadline-item">
+                                <div class="deadline-color" style="background: #ef5350;"></div>
+                                <div class="deadline-content">
+                                    <div class="deadline-name">Charity First Foundation, Inc.</div>
+                                    <div class="deadline-date">Apr 4 · 28/30 slots filled</div>
+                                </div>
+                                <div class="deadline-days urgent">3d</div>
+                            </div>
+                            <div class="deadline-item">
+                                <div class="deadline-color" style="background: #ea8c55;"></div>
+                                <div class="deadline-content">
+                                    <div class="deadline-name">Ayala Foundation Scholarship</div>
+                                    <div class="deadline-date">Apr 10 · 42/50 slots filled</div>
+                                </div>
+                                <div class="deadline-days warning">9d</div>
+                            </div>
+                            <div class="deadline-item">
+                                <div class="deadline-color" style="background: #10b981;"></div>
+                                <div class="deadline-content">
+                                    <div class="deadline-name">Panasonic Scholarship</div>
+                                    <div class="deadline-date">Apr 20 · 11/20 slots filled</div>
+                                </div>
+                                <div class="deadline-days safe">19d</div>
+                            </div>
+                            <div class="deadline-item">
+                                <div class="deadline-color" style="background: #1a8fa0;"></div>
+                                <div class="deadline-content">
+                                    <div class="deadline-name">Security Bank Regalo Mo Kinabukasan Ko Scholarship</div>
+                                    <div class="deadline-date">May 15 · 19/40 slots filled</div>
+                                </div>
+                                <div class="deadline-days info">44d</div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    // INTERACTIVITY LOGIC
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Admin Dashboard Live");
+        // 5 minute auto-refresh simulation
+        setInterval(() => { console.log("Checking for updates..."); }, 300000);
+    });
+</script>
+</body>
+</html>
