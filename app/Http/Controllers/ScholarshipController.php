@@ -25,7 +25,7 @@ class ScholarshipController extends Controller
 
     public function show($id)
     {
-        $scholarship = \App\Models\Scholarship::findOrFail($id);
+        $scholarship = Scholarship::withCount('applications')->findOrFail($id);
         return view('scholarships.show', compact('scholarship'));
     }
 
