@@ -11,6 +11,19 @@
 html { scroll-behavior: smooth; }
 body { font-family: 'DM Sans', sans-serif; background: #ffffff; color: #0A3040; overflow-x: hidden; }
 
+/* Floating Icons Animation */
+.floating-icon {
+  position: absolute;
+  opacity: 0.15;
+  animation: float 6s ease-in-out infinite;
+  z-index: 0; /* Behind text */
+  pointer-events: none;
+}
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
 /* NAV */
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #EAF4F3; }
 .nav-inner { max-width: 1160px; margin: 0 auto; padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
