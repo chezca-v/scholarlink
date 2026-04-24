@@ -14,9 +14,9 @@ body { font-family: 'DM Sans', sans-serif; background: #ffffff; color: #0A3040; 
 /* Floating Icons Animation */
 .floating-icon {
   position: absolute;
-  opacity: 0.15;
+  opacity: 0.2;
   animation: float 6s ease-in-out infinite;
-  z-index: 0; /* Behind text */
+  z-index: 0; 
   pointer-events: none;
 }
 @keyframes float {
@@ -38,7 +38,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .btn-pill:hover { background: #1A6B7A; transform: translateY(-1px); }
 
 /* HERO */
-.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 48px 80px; text-align: center; background: #fff; position: relative; }
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 48px 80px; text-align: center; background: #fff; position: relative; overflow:hidden;}
 .hero::before {
   content: '';
   position: absolute;
