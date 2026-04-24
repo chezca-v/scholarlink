@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('description');
             $table->decimal('gpa_requirement', 4, 2);
             $table->string('income_bracket', 100)->nullable();
-            $table->integer('slots');
+            $table->integer('slots')->nullable();
             $table->text('eligibility');
             $table->text('benefits');
             $table->text('requirements');
