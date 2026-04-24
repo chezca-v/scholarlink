@@ -384,6 +384,26 @@ document.querySelectorAll('.filter').forEach(btn => {
 });
 const obs = new IntersectionObserver(e => e.forEach(el => { if(el.isIntersecting){el.target.classList.add('visible');obs.unobserve(el.target);}}),{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Typing effect para sa Hero Title
+const text = "One Profile. Every Scholarship.";
+const target = document.getElementById("typing-text");
+let index = 0;
+
+function typeWriter() {
+  if (index < text.length) {
+    target.innerHTML += text.charAt(index);
+    index++;
+    setTimeout(typeWriter, 100);
+  } else {
+    setTimeout(() => {
+        index = 0;
+        target.innerHTML = "";
+        typeWriter();
+    }, 4000); // Wait 4 seconds bago ulitin
+  }
+}
+typeWriter();
 </script>
 </body>
 </html>
