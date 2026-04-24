@@ -11,6 +11,19 @@
 html { scroll-behavior: smooth; }
 body { font-family: 'DM Sans', sans-serif; background: #ffffff; color: #0A3040; overflow-x: hidden; }
 
+/* Floating Icons Animation */
+.floating-icon {
+  position: absolute;
+  opacity: 0.15;
+  animation: float 6s ease-in-out infinite;
+  z-index: 0; /* Behind text */
+  pointer-events: none;
+}
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+  100% { transform: translateY(0px); }
+}
 /* NAV */
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #EAF4F3; }
 .nav-inner { max-width: 1160px; margin: 0 auto; padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; }
@@ -188,8 +201,14 @@ footer { background: #071820; padding: 64px 48px 32px; }
 </nav>
 
 <section class="hero">
-  <div class="hero-badge"><span class="badge-dot"></span>Now live — Philippines' first AI scholarship platform</div>
-  <h1 class="hero-title">One Profile.<br><em>Every</em> <span class="accent">Scholarship.</span></h1>
+<div class="floating-icon" style="top: 15%; left: 10%; font-size: 60px;">🎓</div>
+<div class="floating-icon" style="top: 20%; right: 15%; font-size: 40px;">📜</div>
+<div class="floating-icon" style="bottom: 20%; left: 20%; font-size: 50px;">💡</div>
+<div class="floating-icon" style="bottom: 10%; right: 20%; font-size: 45px;">📘</div>
+
+<div class="hero-badge"><span class="badge-dot"></span>Now live — Philippines' first AI scholarship platform</div>
+
+<h1 class="hero-title" id="typing-text"></h1>
   <p class="hero-sub">Stop repeating yourself. Build your academic profile once and apply to every scholarship in the Philippines — AI-matched, just for you.</p>
   <div class="hero-actions">
     <a href="/scholarships" class="btn-hero-main">🎓 Browse Scholarships</a>
@@ -364,6 +383,26 @@ document.querySelectorAll('.filter').forEach(btn => {
 });
 const obs = new IntersectionObserver(e => e.forEach(el => { if(el.isIntersecting){el.target.classList.add('visible');obs.unobserve(el.target);}}),{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Typing effect para sa Hero Title
+const text = "One Profile. Every Scholarship.";
+const target = document.getElementById("typing-text");
+let index = 0;
+
+function typeWriter() {
+  if (index < text.length) {
+    target.innerHTML += text.charAt(index);
+    index++;
+    setTimeout(typeWriter, 100);
+  } else {
+    setTimeout(() => {
+        index = 0;
+        target.innerHTML = "";
+        typeWriter();
+    }, 4000); // Wait 4 seconds bago ulitin
+  }
+}
+typeWriter();
 </script>
 </body>
 </html>
