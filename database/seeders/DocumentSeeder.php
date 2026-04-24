@@ -69,6 +69,36 @@ class DocumentSeeder extends Seeder
             ['user_id' => 10, 'document_type' => 'Barangay Certificate of Indigency',  'file_url' => 'storage/app/documents/user_10/barangay_certificate.pdf',     'status' => 'verified', 'expiry_date' => '2027-01-01', 'verified_by' => 11,   'created_at' => '2026-01-01'],
             ['user_id' => 10, 'document_type' => 'Latest Report Card / TOR',           'file_url' => 'storage/app/documents/user_10/report_card_tor.pdf',          'status' => 'verified', 'expiry_date' => '2027-01-01', 'verified_by' => 11,   'created_at' => '2026-01-01'],
             ['user_id' => 10, 'document_type' => 'Certificate of Good Moral Character','file_url' => 'storage/app/documents/user_10/good_moral_certificate.pdf',   'status' => 'verified', 'expiry_date' => '2027-01-01', 'verified_by' => 11,   'created_at' => '2026-01-01'],
+
+            // ── USER 21 — Sofia Aguilar ───────────────────────
+            ['user_id' => 21, 'document_type' => 'PSA Birth Certificate',            'file_url' => 'storage/app/documents/user_21/psa_birth_certificate.pdf',  'status' => 'verified', 'expiry_date' => null,         'verified_by' => 11, 'created_at' => '2026-04-08'],
+            ['user_id' => 21, 'document_type' => 'Barangay Certificate of Indigency', 'file_url' => 'storage/app/documents/user_21/barangay_certificate.pdf',    'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-08'],
+            ['user_id' => 21, 'document_type' => 'SHS Form 138 / Report Card',        'file_url' => 'storage/app/documents/user_21/shs_report_card.pdf',         'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-08'],
+            ['user_id' => 21, 'document_type' => 'Certificate of Good Moral Character','file_url' => 'storage/app/documents/user_21/good_moral_certificate.pdf',  'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-08'],
+
+            // ── USER 22 — Miguel Torres ───────────────────────
+            ['user_id' => 22, 'document_type' => 'PSA Birth Certificate',             'file_url' => 'storage/app/documents/user_22/psa_birth_certificate.pdf',  'status' => 'verified', 'expiry_date' => null,         'verified_by' => 11,   'created_at' => '2026-04-06'],
+            ['user_id' => 22, 'document_type' => 'Barangay Certificate of Indigency', 'file_url' => 'storage/app/documents/user_22/barangay_certificate.pdf',    'status' => 'pending',  'expiry_date' => '2027-06-01', 'verified_by' => null, 'created_at' => '2026-04-06'],
+            ['user_id' => 22, 'document_type' => 'SHS Form 138 / Report Card',        'file_url' => 'storage/app/documents/user_22/shs_report_card.pdf',         'status' => 'rejected', 'expiry_date' => '2027-06-01', 'verified_by' => null, 'created_at' => '2026-04-06'],
+            ['user_id' => 22, 'document_type' => 'Certificate of Good Moral Character','file_url' => 'storage/app/documents/user_22/good_moral_certificate.pdf',  'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11,   'created_at' => '2026-04-06'],
+
+            // ── USER 23 — Hannah Pascual ──────────────────────
+            ['user_id' => 23, 'document_type' => 'PSA Birth Certificate',             'file_url' => 'storage/app/documents/user_23/psa_birth_certificate.pdf',  'status' => 'verified', 'expiry_date' => null,         'verified_by' => 11, 'created_at' => '2026-04-07'],
+            ['user_id' => 23, 'document_type' => 'Barangay Certificate of Indigency', 'file_url' => 'storage/app/documents/user_23/barangay_certificate.pdf',    'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-07'],
+            ['user_id' => 23, 'document_type' => 'SHS Form 138 / Report Card',        'file_url' => 'storage/app/documents/user_23/shs_report_card.pdf',         'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-07'],
+            ['user_id' => 23, 'document_type' => 'Certificate of Good Moral Character','file_url' => 'storage/app/documents/user_23/good_moral_certificate.pdf',  'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-07'],
+
+            // ── USER 24 — Rainier Domingo ─────────────────────
+            ['user_id' => 24, 'document_type' => 'PSA Birth Certificate',             'file_url' => 'storage/app/documents/user_24/psa_birth_certificate.pdf',  'status' => 'verified', 'expiry_date' => null,         'verified_by' => 11,   'created_at' => '2026-04-05'],
+            ['user_id' => 24, 'document_type' => 'Barangay Certificate of Indigency', 'file_url' => 'storage/app/documents/user_24/barangay_certificate.pdf',    'status' => 'pending',  'expiry_date' => '2027-06-01', 'verified_by' => null, 'created_at' => '2026-04-05'],
+            ['user_id' => 24, 'document_type' => 'SHS Form 138 / Report Card',        'file_url' => 'storage/app/documents/user_24/shs_report_card.pdf',         'status' => 'pending',  'expiry_date' => '2027-06-01', 'verified_by' => null, 'created_at' => '2026-04-05'],
+            ['user_id' => 24, 'document_type' => 'Certificate of Good Moral Character','file_url' => 'storage/app/documents/user_24/good_moral_certificate.pdf',  'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11,   'created_at' => '2026-04-05'],
+
+            // ── USER 25 — Camille Navarro ─────────────────────
+            ['user_id' => 25, 'document_type' => 'PSA Birth Certificate',             'file_url' => 'storage/app/documents/user_25/psa_birth_certificate.pdf',  'status' => 'verified', 'expiry_date' => null,         'verified_by' => 11, 'created_at' => '2026-04-04'],
+            ['user_id' => 25, 'document_type' => 'Barangay Certificate of Indigency', 'file_url' => 'storage/app/documents/user_25/barangay_certificate.pdf',    'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-04'],
+            ['user_id' => 25, 'document_type' => 'SHS Form 138 / Report Card',        'file_url' => 'storage/app/documents/user_25/shs_report_card.pdf',         'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-04'],
+            ['user_id' => 25, 'document_type' => 'Certificate of Good Moral Character','file_url' => 'storage/app/documents/user_25/good_moral_certificate.pdf',  'status' => 'verified', 'expiry_date' => '2027-06-01', 'verified_by' => 11, 'created_at' => '2026-04-04'],
         ];
 
         foreach ($documents as $document) {
