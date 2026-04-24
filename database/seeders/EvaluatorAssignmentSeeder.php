@@ -80,6 +80,41 @@ class EvaluatorAssignmentSeeder extends Seeder
                 'assigned_by'   => null,
                 'assigned_at'   => '2026-01-02 00:00:00',
             ],
+            // Jose Reyes (12) → Bagong Alab Scholars Fund (21)
+            [
+                'evaluator_id'   => 12,
+                'scholarship_id' => 21,
+                'assigned_by'    => null,
+                'assigned_at'    => '2026-03-01 00:00:00',
+            ],
+            // Ana Cruz (13) → Sindak ng Pag-asa Scholarship (22)
+            [
+                'evaluator_id'   => 13,
+                'scholarship_id' => 22,
+                'assigned_by'    => null,
+                'assigned_at'    => '2026-03-01 00:00:00',
+            ],
+            // Liza Bautista (15) → Talino at Puso Grant (23)
+            [
+                'evaluator_id'   => 15,
+                'scholarship_id' => 23,
+                'assigned_by'    => null,
+                'assigned_at'    => '2026-03-15 00:00:00',
+            ],
+            // Carlo Mendoza (14) → Lakbay Dunong Scholarship (24)
+            [
+                'evaluator_id'   => 14,
+                'scholarship_id' => 24,
+                'assigned_by'    => null,
+                'assigned_at'    => '2026-03-15 00:00:00',
+            ],
+            // Patricia Flores (19) → Haligi ng Bayan Academic Award (25)
+            [
+                'evaluator_id'   => 19,
+                'scholarship_id' => 25,
+                'assigned_by'    => null,
+                'assigned_at'    => '2026-04-01 00:00:00',
+            ],
         ];
 
         foreach ($assignments as $assignment) {
