@@ -44,7 +44,12 @@
         <div class="form-group">
             <label class="form-label">Confirm New Password *</label>
             <input class="input" type="password" name="password_confirmation" x-model="confirm" placeholder="••••••••" required>
-            <div x-show="password === confirm && confirm !== ''" style="color:green; font-size:11px; font-weight:600;">✓ Passwords match</div>
+
+            <div x-show="confirm !== ''"
+                 :style="password === confirm ? 'color:green;' : 'color:red;'"
+                 style="font-size:11px; font-weight:600; margin-top:4px;">
+                <span x-text="password === confirm ? '✓ Passwords match' : '✕ Passwords do not match'"></span>
+            </div>
         </div>
 
         <div style="background:#F0FAFA; padding:12px; border-radius:10px; margin-bottom:16px;">
@@ -55,7 +60,6 @@
             <div style="height:5px; background:#DFF0EE; border-radius:999px; margin-top:6px;">
                 <div style="height:100%; border-radius:999px; background:green;" :style="'width:' + (password.length > 8 ? '100%' : (password.length * 10) + '%')"></div>
             </div>
-            <div x-show="password.length >= 8" style="font-size:10px; color:green; font-weight:700; text-align:right;">Strong</div>
         </div>
 
         <button type="submit" class="btn-primary">Reset Password</button>
