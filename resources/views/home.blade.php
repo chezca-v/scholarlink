@@ -13,16 +13,31 @@ body { font-family: 'DM Sans', sans-serif; background: #ffffff; color: #0A3040; 
 
 /* Floating Icons Animation */
 .floating-icon {
-  position: absolute;
-  opacity: 0.2;
-  animation: float 6s ease-in-out infinite;
-  z-index: 0;
-  pointer-events: none;
+    position: absolute;
+    opacity: 0.15;
+    animation: float 8s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+    font-size: 50px;
 }
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+}
+
+/*:hover EFFECTS*/
+.btn-hero-main, .btn-pill, .btn-cta-main {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-hero-main:hover, .btn-pill:hover, .btn-cta-main:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(15,76,92,0.2);
+}
+.btn-hero-text {
+    transition: transform 0.3s ease;
+}
+.btn-hero-text:hover {
+    transform: translateX(5px);
 }
 /* NAV */
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #EAF4F3; }
@@ -38,8 +53,19 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .btn-pill:hover { background: #1A6B7A; transform: translateY(-1px); }
 
 /* HERO */
-.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 48px 80px; text-align: center; background: #fff; position: relative; overflow:hidden;}
-.hero::before {
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    text-align: center;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.accent::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -384,7 +410,6 @@ document.querySelectorAll('.filter').forEach(btn => {
 const obs = new IntersectionObserver(e => e.forEach(el => { if(el.isIntersecting){el.target.classList.add('visible');obs.unobserve(el.target);}}),{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// Typing effect para sa Hero Title
 const text = "One Profile. Every Scholarship.";
 const target = document.getElementById("typing-text");
 let index = 0;
