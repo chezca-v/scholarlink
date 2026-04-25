@@ -16,7 +16,7 @@ body { font-family: 'DM Sans', sans-serif; background: #ffffff; color: #0A3040; 
   position: absolute;
   opacity: 0.2;
   animation: float 6s ease-in-out infinite;
-  z-index: 0; 
+  z-index: 0;
   pointer-events: none;
 }
 @keyframes float {
@@ -55,9 +55,9 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .hero-title .accent { color: #E8A838; }
 .hero-sub { font-size: 17px; color: #7AACAA; line-height: 1.75; max-width: 520px; margin: 0 auto 40px; position: relative; z-index: 1; }
 .hero-actions { display: flex; align-items: center; gap: 16px; justify-content: center; margin-bottom: 72px; position: relative; z-index: 1; }
-.btn-hero-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 24px rgba(15,76,92,0.22); }
-.btn-hero-main:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(15,76,92,0.3); }
-.btn-hero-text { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #4A7A80; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+.btn-hero-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 8px 24px rgba(15,76,92,0.22); }
+.btn-hero-main:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(15,76,92,0.3); }
+.btn-hero-text { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #4A7A80; background: linear-gradient(135deg,#1A6B7A,#0F4C5C); border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 .hero-social-proof { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
 .avatars { display: flex; }
 .avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; background: #C8E8E4; color: #0F4C5C; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-left: -8px; }
@@ -384,7 +384,6 @@ document.querySelectorAll('.filter').forEach(btn => {
 const obs = new IntersectionObserver(e => e.forEach(el => { if(el.isIntersecting){el.target.classList.add('visible');obs.unobserve(el.target);}}),{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// Typing effect para sa Hero Title
 const text = "One Profile. Every Scholarship.";
 const target = document.getElementById("typing-text");
 let index = 0;
@@ -399,10 +398,45 @@ function typeWriter() {
         index = 0;
         target.innerHTML = "";
         typeWriter();
-    }, 4000); // Wait 4 seconds bago ulitin
+    }, 4000);
   }
 }
 typeWriter();
+
+window.addEventListener('load', () => {
+    const icons = document.querySelectorAll('.floating-icon');
+
+    icons.forEach(icon => {
+        let leftPos = parseFloat(icon.style.left) || Math.random() * 80 + 10;
+
+        function move() {
+            leftPos += speed;
+            icon.style.left = leftPos + '%';
+
+
+            if (leftPos > 100) {
+                leftPos = -10;
+            }
+            requestAnimationFrame(move);
+        }
+        move();
+    });
+});
+
+const lenis = new Lenis({
+    lerp: 0.1,
+    wheelMultiplier: 1.2
+});
+
+function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+}
+requestAnimationFrame(raf);
+
+document.querySelector('.btn-hero-text').addEventListener('click', () => {
+    lenis.scrollTo('#how-it-works', { offset: - navHeight });
+});
 </script>
 </body>
 </html>
