@@ -19,8 +19,9 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.register');
-    }
+        return view('auth.login', [
+            'roles' => ['applicant'],
+        ]);
 
     /**
      * Handle an incoming registration request.
@@ -30,17 +31,19 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['sometimes', 'string', 'in:applicant,admin,evaluator,superadmin'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+             'password' => ['required', Rules\Password::defaults()],
+            'role' => ['required', 'string', 'in:applicant'],
+            'terms' => ['accepted'],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'applicant',
+            'role' => $request->role,
         ]);
 
         event(new Registered($user));
