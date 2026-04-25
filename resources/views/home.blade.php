@@ -237,7 +237,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
 <h1 class="hero-title" id="typing-text"></h1>
   <p class="hero-sub">Stop repeating yourself. Build your academic profile once and apply to every scholarship in the Philippines — AI-matched, just for you.</p>
   <div class="hero-actions">
-    <a href="\resources\views\applicant\applicant\index.blade.php" class="btn-hero-main">🎓 Browse Scholarships</a>
+    <a href="{{ route('scholarships.index') }}" class="btn-hero-main">🎓 Browse Scholarships</a>
     <button class="btn-hero-text">▶ Watch how it works</button>
   </div>
   <div class="hero-social-proof">
