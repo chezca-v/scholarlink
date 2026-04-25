@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; scroll-padding-top: 84px;}
+html { scroll-behavior: smooth; }
 body { font-family: 'DM Sans', sans-serif; background: #ffffff; color: #0A3040; overflow-x: hidden; }
 
 /* Floating Icons Animation */
@@ -34,7 +34,29 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .nav-links a:hover { color: #0F4C5C; }
 .nav-actions { display: flex; gap: 10px; }
 .btn-text { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 8px 18px; border: none; background: transparent; color: #0F4C5C; cursor: pointer; }
-@@ -60,66 +60,75 @@
+.btn-pill { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; padding: 9px 22px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 999px; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(15,76,92,0.2); }
+.btn-pill:hover { background: #1A6B7A; transform: translateY(-1px); }
+
+/* HERO */
+.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 48px 80px; text-align: center; background: #fff; position: relative; overflow:hidden;}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 600px;
+  background: radial-gradient(ellipse 80% 60% at 50% 0%, #F0FAFA 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-badge { display: inline-flex; align-items: center; gap: 8px; background: #F0FAFA; border: 1px solid #C8E8E4; border-radius: 999px; padding: 6px 16px; font-size: 12px; font-weight: 600; color: #4A7A80; margin-bottom: 32px; position: relative; z-index: 1; }
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #E8A838; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.6;transform:scale(0.85);} }
+.hero-title { font-family: 'Fraunces', serif; font-size: clamp(52px, 6vw, 88px); font-weight: 900; letter-spacing: -3px; line-height: 0.95; color: #0A3040; max-width: 800px; margin-bottom: 28px; position: relative; z-index: 1; }
+.hero-title em { font-style: italic; font-weight: 300; color: #0F4C5C; }
+.hero-title .accent { color: #E8A838; }
+.hero-sub { font-size: 17px; color: #7AACAA; line-height: 1.75; max-width: 520px; margin: 0 auto 40px; position: relative; z-index: 1; }
+.hero-actions { display: flex; align-items: center; gap: 16px; justify-content: center; margin-bottom: 72px; position: relative; z-index: 1; }
+.btn-hero-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 24px rgba(15,76,92,0.22); }
+.btn-hero-main:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(15,76,92,0.3); }
 .btn-hero-text { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #4A7A80; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 .hero-social-proof { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
 .avatars { display: flex; }
@@ -60,16 +82,10 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 
 /* LOGOS */
 .logos { padding: 48px; border-top: 1px solid #EAF4F3; border-bottom: 1px solid #EAF4F3; }
-.logos-inner { max-width: 1160px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.logos-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #A5D0CD; white-space: nowrap; }
-.logos-row { width: 100%; overflow: hidden; display: flex; justify-content: center; }
-.logos-track { display: flex; gap: 48px; align-items: center; width: max-content; animation: logos-slide-right 30s ease-in-out infinite alternate; }
-.logo-item { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #6EA9A5; letter-spacing: -0.5px; transition: transform 0.25s ease, color 0.25s ease, text-shadow 0.25s ease; cursor: pointer; }
-.logo-item:hover { color: #0F4C5C; transform: translateY(-2px) scale(1.03); text-shadow: 0 8px 20px rgba(15,76,92,0.18); }
-@keyframes logos-slide-right {
-  from { transform: translateX(-7%); }
-  to { transform: translateX(7%); }
-}
+.logos-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
+.logos-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C8E8E4; white-space: nowrap; }
+.logos-row { display: flex; gap: 48px; align-items: center; flex: 1; }
+.logo-item { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #C8E8E4; letter-spacing: -0.5px; }
 
 /* HOW */
 .how { padding: 112px 48px; background: #fff; }
@@ -78,14 +94,10 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .section-title { font-family: 'Fraunces', serif; font-size: clamp(32px,3vw,48px); font-weight: 800; letter-spacing: -1.5px; color: #0A3040; margin-bottom: 56px; line-height: 1.05; }
 .section-title em { font-style: italic; font-weight: 300; color: #0F4C5C; }
 .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 40px; }
-
-.step { display: flex; flex-direction: column; gap: 16px; background: #F8FCFC; border: 1px solid #DCEFED; border-radius: 18px; padding: 24px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; cursor: pointer; }
-.step:hover { transform: translateY(-6px); border-color: #9FD4CF; box-shadow: 0 14px 28px rgba(15,76,92,0.12); }
-.step-num-circle { width: 44px; height: 44px; border-radius: 50%; background: #F0FAFA; border: 1px solid #C8E8E4; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; color: #0F4C5C; transition: transform 0.3s ease, background 0.3s ease, color 0.3s ease; }
-.step:hover .step-num-circle { background: #0F4C5C; color: #F9D679; transform: scale(1.07); }
-.step-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #0A3040; transition: color 0.25s ease; }
-.step:hover .step-title { color: #0F4C5C; }
-.step-desc { font-size: 14px; color: #5F8F95; line-height: 1.75; }
+.step { display: flex; flex-direction: column; gap: 16px; }
+.step-num-circle { width: 44px; height: 44px; border-radius: 50%; background: #F0FAFA; border: 1px solid #C8E8E4; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; color: #0F4C5C; }
+.step-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #0A3040; }
+.step-desc { font-size: 14px; color: #7AACAA; line-height: 1.75; }
 .step-connector { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
 .step-line { flex: 1; height: 1px; background: #EAF4F3; }
 .step-arrow-sm { color: #C8E8E4; font-size: 12px; }
@@ -111,7 +123,35 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .sc-match { margin-top: auto; padding-top: 16px; border-top: 1px solid #EAF4F3; }
 .sc-match-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
 .sc-match-label { font-size: 11px; color: #7AACAA; }
-@@ -155,63 +164,63 @@
+.sc-match-pct { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 700; color: #E8A838; }
+.sc-bar-bg { height: 4px; background: #EAF4F3; border-radius: 999px; overflow: hidden; }
+.sc-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #0F4C5C, #E8A838); }
+
+/* FEATURES */
+.features { padding: 112px 48px; background: #fff; }
+.features-inner { max-width: 1160px; margin: 0 auto; }
+.feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 56px; }
+.feat-card { background: #F0FAFA; border: 1px solid #EAF4F3; border-radius: 20px; padding: 32px; transition: all 0.3s; }
+.feat-card:hover { border-color: #C8E8E4; box-shadow: 0 8px 24px rgba(15,76,92,0.07); }
+.feat-card.highlighted { background: #0F4C5C; border-color: transparent; grid-column: span 2; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+.feat-icon { width: 44px; height: 44px; background: #fff; border: 1px solid #C8E8E4; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 16px; }
+.feat-card.highlighted .feat-icon { background: rgba(255,255,255,0.12); border-color: transparent; }
+.feat-title { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: #0A3040; margin-bottom: 10px; }
+.feat-card.highlighted .feat-title { color: #F9D679; font-size: 24px; }
+.feat-desc { font-size: 13px; color: #4A7A80; line-height: 1.75; }
+.feat-card.highlighted .feat-desc { color: rgba(255,255,255,0.6); font-size: 14px; }
+.feat-right-items { display: flex; flex-direction: column; gap: 14px; }
+.feat-right-item { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+.fri-icon { font-size: 18px; }
+.fri-title { font-size: 13px; font-weight: 600; color: #fff; }
+.fri-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+/* CTA */
+.cta { padding: 112px 48px; background: #fff; text-align: center; }
+.cta-inner { max-width: 640px; margin: 0 auto; }
+.cta-badge { display: inline-flex; align-items: center; gap: 8px; background: #FDF4E3; border: 1px solid rgba(232,168,56,0.3); border-radius: 999px; padding: 6px 16px; font-size: 12px; font-weight: 600; color: #E8A838; margin-bottom: 28px; }
+.cta-title { font-family: 'Fraunces', serif; font-size: clamp(36px,4vw,56px); font-weight: 900; letter-spacing: -2px; color: #0A3040; line-height: 1; margin-bottom: 16px; }
+.cta-title em { font-style: italic; font-weight: 300; color: #0F4C5C; }
 .cta-sub { font-size: 15px; color: #7AACAA; line-height: 1.75; margin-bottom: 36px; }
 .cta-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
 .btn-cta-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 24px rgba(15,76,92,0.22); transition: all 0.25s; }
@@ -137,7 +177,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
 .footer-copy { font-size: 12px; color: rgba(255,255,255,0.2); }
 .footer-badge { font-size: 10px; font-weight: 700; color: #E8A838; border: 1px solid rgba(232,168,56,0.25); border-radius: 999px; padding: 4px 12px; letter-spacing: 1.5px; }
 
-.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1); }
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
 .reveal.visible { opacity: 1; transform: none; }
 .d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}
 </style>
@@ -149,7 +189,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
     <a href="#" class="logo"><div class="logo-mark">🎓</div>ScholarLink</a>
     <ul class="nav-links">
       <li><a href="#">Browse</a></li>
-      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#">How It Works</a></li>
       <li><a href="#">Organizations</a></li>
       <li><a href="#">About</a></li>
     </ul>
@@ -175,7 +215,21 @@ footer { background: #071820; padding: 64px 48px 32px; }
     <button class="btn-hero-text">▶ Watch how it works</button>
   </div>
   <div class="hero-social-proof">
-@@ -233,60 +242,62 @@
+    <div class="avatars">
+      <div class="avatar">J</div>
+      <div class="avatar">M</div>
+      <div class="avatar">A</div>
+      <div class="avatar">R</div>
+      <div class="avatar">+</div>
+    </div>
+    <p class="proof-text">Joined by <strong>8,400+ students</strong> across the Philippines</p>
+  </div>
+  <div class="hero-visual">
+    <div class="cards-row">
+      <div class="mini-schol-card">
+        <div class="msc-top"><span class="msc-org">Gabay Foundation</span><span class="msc-open">Open</span></div>
+        <div class="msc-title">Gabay Dunong Scholarship 2025</div>
+        <div class="msc-match">94%</div>
         <div class="msc-match-label">Match Score</div>
         <div class="msc-bar"><div class="msc-bar-fill" style="width:94%"></div></div>
       </div>
@@ -201,17 +255,16 @@ footer { background: #071820; padding: 64px 48px 32px; }
   <div class="logos-inner">
     <span class="logos-label">Trusted by</span>
     <div class="logos-row">
-    <div class="logos-track">
-        <span class="logo-item">Gabay Foundation</span>
-        <span class="logo-item">Abot-Kaya Inc.</span>
-        <span class="logo-item">TechBridge Corp.</span>
-        <span class="logo-item">Lumina Grants</span>
-        <span class="logo-item">PH Merit Fund</span>
-      </div>
+      <span class="logo-item">Gabay Foundation</span>
+      <span class="logo-item">Abot-Kaya Inc.</span>
+      <span class="logo-item">TechBridge Corp.</span>
+      <span class="logo-item">Lumina Grants</span>
+      <span class="logo-item">PH Merit Fund</span>
     </div>
   </div>
 </div>
-<section class="how" id="how-it-works">
+
+<section class="how">
   <div class="how-inner">
     <div class="section-eyebrow reveal">How It Works</div>
     <h2 class="section-title reveal">From profile to scholarship —<br><em>simplified.</em></h2>
@@ -237,7 +290,94 @@ footer { background: #071820; padding: 64px 48px 32px; }
 
 <section class="scholarships">
   <div class="scholarships-inner">
-@@ -381,28 +392,38 @@
+    <div class="sch-top reveal">
+      <div><div class="section-eyebrow">Featured Scholarships</div><h2 class="section-title" style="margin-bottom:0;font-size:clamp(28px,3vw,40px);">Find yours today.</h2></div>
+      <div class="filters">
+        <button class="filter active">All</button>
+        <button class="filter">Merit-Based</button>
+        <button class="filter">Need-Based</button>
+        <button class="filter">STEM</button>
+        <button class="filter">Arts</button>
+      </div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card reveal d1">
+        <div class="sc-org"><span>Gabay Foundation</span><span class="sc-status open">Open</span></div>
+        <div class="sc-title">Gabay Dunong Scholarship 2025</div>
+        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 1.75 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>Family income ≤ ₱250,000/yr</div><div class="sc-detail"><span class="sc-detail-dot"></span>50 available slots</div></div>
+        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">94%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:94%"></div></div></div>
+      </div>
+      <div class="s-card reveal d2">
+        <div class="sc-org"><span>Abot-Kaya Inc.</span><span class="sc-status open">Open</span></div>
+        <div class="sc-title">Abot-Kaya Excellence Grant</div>
+        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 1.50 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>Open income bracket</div><div class="sc-detail"><span class="sc-detail-dot"></span>30 available slots</div></div>
+        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">87%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:87%"></div></div></div>
+      </div>
+      <div class="s-card reveal d3">
+        <div class="sc-org"><span>TechBridge Corp.</span><span class="sc-status closing">Closing</span></div>
+        <div class="sc-title">TechBridge STEM Scholarship</div>
+        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 2.00 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>STEM course only</div><div class="sc-detail"><span class="sc-detail-dot"></span>40 available slots</div></div>
+        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">78%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:78%"></div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="features-inner">
+    <div class="section-eyebrow reveal">Platform Features</div>
+    <h2 class="section-title reveal">Built for fairness,<br>accessibility, <em>and you.</em></h2>
+    <div class="feat-grid">
+      <div class="feat-card highlighted reveal">
+        <div>
+          <div class="feat-icon" style="font-size:24px;width:52px;height:52px;">🤖</div>
+          <div class="feat-title">AI-Powered Scholarship Matching</div>
+          <div class="feat-desc">Our engine analyzes your GPA, income, course, and location — then ranks every scholarship by how likely you are to qualify. Stop applying blindly.</div>
+        </div>
+        <div class="feat-right-items">
+          <div class="feat-right-item"><span class="fri-icon">⚡</span><div><div class="fri-title">Instant Match Calculation</div><div class="fri-sub">Results in under 2 seconds</div></div></div>
+          <div class="feat-right-item"><span class="fri-icon">🎯</span><div><div class="fri-title">86% Average Accuracy</div><div class="fri-sub">Powered by Gemini AI</div></div></div>
+          <div class="feat-right-item"><span class="fri-icon">🔄</span><div><div class="fri-title">Auto-Updates</div><div class="fri-sub">Re-matches as you update profile</div></div></div>
+        </div>
+      </div>
+      <div class="feat-card reveal d1"><div class="feat-icon">🙈</div><div class="feat-title">Blind Screening</div><div class="feat-desc">Evaluators review without seeing your name, gender, or school — promoting merit-based, bias-free selection.</div></div>
+      <div class="feat-card reveal d2"><div class="feat-icon">⚖️</div><div class="feat-title">Dynamic Weighted Scoring</div><div class="feat-desc">Organizations customize GPA vs. financial need weighting — every scholarship plays by its own fair rules.</div></div>
+      <div class="feat-card reveal d1"><div class="feat-icon">📡</div><div class="feat-title">SMS Hardware Gateway</div><div class="feat-desc">Critical updates via SMS even without internet — powered by ESP32 + GSM. No student left behind.</div></div>
+      <div class="feat-card reveal d2"><div class="feat-icon">🗂️</div><div class="feat-title">Student Document Wallet</div><div class="feat-desc">Upload your documents once. Use them for every application. No more re-scanning the same transcripts.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="cta-inner">
+    <div class="cta-badge">✨ Free for all Filipino students</div>
+    <h2 class="cta-title reveal">Your scholarship<br>is <em>waiting for you.</em></h2>
+    <p class="cta-sub reveal">Join thousands of Filipino students who found their funding through ScholarLink.</p>
+    <div class="cta-btns reveal">
+      <button class="btn-cta-main">🎓 Create Free Account</button>
+      <button class="btn-cta-sec">Browse Scholarships →</button>
+    </div>
+    <div class="stats-row reveal">
+      <div class="stat"><div class="stat-num">120+</div><div class="stat-label">Active Scholarships</div></div>
+      <div class="stat"><div class="stat-num">8,400</div><div class="stat-label">Students Helped</div></div>
+      <div class="stat"><div class="stat-num">₱2.1M</div><div class="stat-label">Grants Facilitated</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div><div class="footer-logo">ScholarLink</div><div class="footer-tagline">Bridging Filipino students to scholarship opportunities — one profile, every scholarship.</div></div>
+      <div><div class="footer-col-title">Platform</div><ul class="footer-links"><li>Browse</li><li>How It Works</li><li>For Organizations</li><li>AI Matching</li></ul></div>
+      <div><div class="footer-col-title">Account</div><ul class="footer-links"><li>Sign Up</li><li>Log In</li><li>My Applications</li><li>Document Wallet</li></ul></div>
+      <div><div class="footer-col-title">Legal</div><ul class="footer-links"><li>Privacy Policy</li><li>Terms of Service</li><li>Data Privacy Act</li><li>Contact</li></ul></div>
+    </div>
+    <div class="footer-bottom"><div class="footer-copy">© 2026 ScholarLink. Philippines 🇵🇭</div><div class="footer-badge">SOFTWARE DESIGN PROJECT</div></div>
+  </div>
+</footer>
+
+<script>
 document.querySelectorAll('.filter').forEach(btn => {
   btn.addEventListener('click', () => { document.querySelectorAll('.filter').forEach(b => b.classList.remove('active')); btn.classList.add('active'); });
 });
@@ -263,16 +403,6 @@ function typeWriter() {
   }
 }
 typeWriter();
-
-const watchButton = document.querySelector('.btn-hero-text');
-watchButton?.addEventListener('click', () => {
-  const howSection = document.getElementById('how-it-works');
-  const navHeight = document.querySelector('nav')?.offsetHeight ?? 0;
-  if (!howSection) return;
-
-  const targetY = howSection.getBoundingClientRect().top + window.scrollY - navHeight - 16;
-  window.scrollTo({ top: targetY, behavior: 'smooth' });
-});
 </script>
 </body>
 </html>
