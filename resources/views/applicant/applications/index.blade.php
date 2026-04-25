@@ -274,7 +274,14 @@
         <div class="top-actions">
             <div class="icon-btn">🔔<span class="notif-dot"></span></div>
             <div class="icon-btn">📧</div>
-            <div class="avatar-btn">JD</div>
+            <div class="avatar-btn">
+                {{
+                    strtoupper(
+                        substr(auth()->user()->first_name ?? 'J', 0, 1) .
+                        substr(auth()->user()->last_name ?? 'D', 0, 1)
+                    )
+                }}
+            </div>
         </div>
     </header>
 
@@ -284,12 +291,12 @@
     </section>
 
     <section class="stats-grid">
-        <button class="stat-card active" data-filter="all" type="button"><p>TOTAL APPLIED</p><div class="stat-value">6</div><p class="stat-note">scholarship</p></button>
-        <button class="stat-card" data-filter="under-review" type="button"><p>UNDER REVIEW</p><div class="stat-value">1</div><p class="stat-note">in progress</p></button>
-        <button class="stat-card" data-filter="approved" type="button"><p>APPROVED</p><div class="stat-value">2</div><p class="stat-note">awarded</p></button>
-        <button class="stat-card" data-filter="rejected" type="button"><p>REJECTED</p><div class="stat-value">1</div><p class="stat-note">not selected</p></button>
-        <button class="stat-card" data-filter="shortlisted" type="button"><p>SHORTLISTED</p><div class="stat-value">1</div><p class="stat-note">missing requirements</p></button>
-        <button class="stat-card" data-filter="action-needed" type="button"><p>ACTION NEEDED</p><div class="stat-value">1</div><p class="stat-note">missing requirements</p></button>
+        <button class="stat-card active" data-filter="all" type="button"><p>TOTAL APPLIED</p><div class="stat-value">{{ $stats['totalApplied'] }}</div><p class="stat-note">scholarship</p></button>
+        <button class="stat-card" data-filter="under-review" type="button"><p>UNDER REVIEW</p><div class="stat-value">{{ $stats['underReview'] }}</div><p class="stat-note">in progress</p></button>
+        <button class="stat-card" data-filter="approved" type="button"><p>APPROVED</p><div class="stat-value">{{ $stats['approved'] }}</div><p class="stat-note">awarded</p></button>
+        <button class="stat-card" data-filter="rejected" type="button"><p>REJECTED</p><div class="stat-value">{{ $stats['rejected'] }}</div><p class="stat-note">not selected</p></button>
+        <button class="stat-card" data-filter="shortlisted" type="button"><p>SHORTLISTED</p><div class="stat-value">{{ $stats['shortlisted'] }}</div><p class="stat-note">qualified</p></button>
+        <button class="stat-card" data-filter="action-needed" type="button"><p>ACTION NEEDED</p><div class="stat-value">{{ $stats['actionNeeded'] }}</div><p class="stat-note">missing requirements</p></button>
     </section>
 
     <section class="table-wrap">
@@ -306,62 +313,32 @@
             </tr>
             </thead>
             <tbody>
-            <tr data-status="submitted">
-                <td><div class="sch-title">CHED Merit Scholarship Program</div><div class="org">Commission on Higher Educations (CHED)</div></td>
-                <td>APP-2025-0311</td>
-                <td>December XX, 20XX</td>
-                <td>Queued for Screening</td>
-                <td><span class="status-pill submitted">Submitted</span></td>
-            </tr>
-            <tr data-status="approved">
-                <td><div class="sch-title">PLM Scholarship for Academic Excellence</div><div class="org">Pamantasan ng Lungsod ng Maynila</div></td>
-                <td>APP-2025-0312</td>
-                <td>December XX, 20XX</td>
-                <td>Scholarship Awarded</td>
-                <td><span class="status-pill approved">Approved</span></td>
-            </tr>
-            <tr data-status="under-review">
-                <td><div class="sch-title">DOST Science & Technology Scholarship</div><div class="org">Dept. of Science & Technology - SEI</div></td>
-                <td>APP-2025-0313</td>
-                <td>December XX, 20XX</td>
-                <td>Blind Evaluation</td>
-                <td><span class="status-pill under-review">Under Review</span></td>
-            </tr>
-            <tr data-status="rejected">
-                <td><div class="sch-title">Gokongwei Brothers Foundation Scholarship</div><div class="org">GBF Higher Education Program</div></td>
-                <td>APP-2025-0314</td>
-                <td>December XX, 20XX</td>
-                <td>Application Rejected</td>
-                <td><span class="status-pill rejected">Rejected</span></td>
-            </tr>
-            <tr data-status="action-needed">
-                <td><div class="sch-title">Metrobank Foundation Scholarship</div><div class="org">Metrobank Foundation Scholarship</div></td>
-                <td>APP-2025-0315</td>
-                <td>December XX, 20XX</td>
-                <td>Awaiting Documents</td>
-                <td><span class="status-pill pending">Pending</span></td>
-            </tr>
-            <tr data-status="shortlisted">
-                <td><div class="sch-title">SM Foundation College - Scholarship</div><div class="org">SM Foundation Inc. - Education Program</div></td>
-                <td>APP-2025-0316</td>
-                <td>December XX, 20XX</td>
-                <td>Shortlisted</td>
-                <td><span class="status-pill shortlisted">Shortlisted</span></td>
-            </tr>
-            <tr data-status="submitted">
-                <td><div class="sch-title">Organization Scholarship</div><div class="org">Corporation Name</div></td>
-                <td>APP-2025-0317</td>
-                <td>December XX, 20XX</td>
-                <td>Current Stage</td>
-                <td><span class="status-pill submitted">Submitted</span></td>
-            </tr>
-            <tr data-status="submitted">
-                <td><div class="sch-title">Governmet Scholarship</div><div class="org">Government Department</div></td>
-                <td>APP-2025-0318</td>
-                <td>December XX, 20XX</td>
-                <td>Current Stage</td>
-                <td><span class="status-pill submitted">Submitted</span></td>
-            </tr>
+            @forelse ($applications as $application)
+                @php
+                    $mappedStatus = $statusMap[$application->status] ?? $statusMap['submitted'];
+                    if ($application->status === 'under_review' && $application->stage === 'scoring') {
+                        $mappedStatus = ['filter' => 'shortlisted', 'class' => 'shortlisted', 'label' => 'Shortlisted'];
+                    }
+                @endphp
+                <tr data-status="{{ $mappedStatus['filter'] }}">
+                    <td>
+                        <div class="sch-title">{{ $application->scholarship?->name ?? 'Scholarship name unavailable' }}</div>
+                        <div class="org">{{ $application->scholarship?->provider_name ?? 'Organization unavailable' }}</div>
+                    </td>
+                    <td>{{ $application->reference_code ?? '—' }}</td>
+                    <td>{{ optional($application->submitted_at ?? $application->created_at)?->format('F d, Y') ?? '—' }}</td>
+                    <td>{{ $remarksByStage[$application->stage] ?? 'No current stage available' }}</td>
+                    <td><span class="status-pill {{ $mappedStatus['class'] }}">{{ $mappedStatus['label'] }}</span></td>
+                </tr>
+            @empty
+                <tr data-status="submitted">
+                    <td><div class="sch-title">No applications yet</div><div class="org">Your submitted applications will appear here</div></td>
+                    <td>—</td>
+                    <td>—</td>
+                    <td>No records found</td>
+                    <td>—</td>
+                </tr>
+            @endforelse
             </tbody>
         </table>
     </section>
