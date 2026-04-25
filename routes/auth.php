@@ -37,20 +37,27 @@ Route::middleware('guest')->group(function () {
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-    Route::get('/auth/{provider}/redirect', function ($provider) {
+    Route::get('/auth/{provider}/redirect', function (string $provider) {
         return Socialite::driver($provider)->redirect();
-    })->name('social.login');
+    })->whereIn('provider', ['google', 'facebook', 'microsoft'])->name('socialite.redirect');
 
-    Route::get('/auth/{provider}/callback', function ($provider) {
-        try {
+
+    Route::get('/auth/{provider}/callback', function (string $provider) {        try {
             $socialUser = Socialite::driver($provider)->user();
+            $fullName = trim((string) ($socialUser->name ?? ''));
+            $firstName = $fullName !== '' ? strtok($fullName, ' ') : 'Scholar';
+            $lastName = $fullName !== '' ? trim(substr($fullName, strlen($firstName))) : 'Link';
+            $lastName = $lastName !== '' ? $lastName : 'User';
 
             $user = User::updateOrCreate([
                 'email' => $socialUser->email,
             ], [
-                'name' => $socialUser->name,
+                'first_name' => $firstName,
+                'last_name' => $lastName,
                 'password' => bcrypt(str()->random(24)),
                 'role' => 'applicant', // Scholars are applicants by default
+                'oauth_provider' => $provider,
+                'oauth_id' => (string) $socialUser->id,
             ]);
 
             Auth::login($user);
@@ -58,9 +65,8 @@ Route::middleware('guest')->group(function () {
         } catch (\Exception $e) {
             return redirect('/login')->with('error', "Authentication with {$provider} failed.");
         }
-    });
+        })->whereIn('provider', ['google', 'facebook', 'microsoft'])->name('socialite.callback');
 });
-
 
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
@@ -83,23 +89,4 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
-
-Route::get('/auth/google/redirect', function () {
-    return Socialite::driver('google')->redirect();
-})->name('google.login');
-
-Route::get('/auth/google/callback', function () {
-    $googleUser = Socialite::driver('google')->user();
-
-    $user = User::updateOrCreate([
-        'email' => $googleUser->email,
-    ], [
-        'name' => $googleUser->name,
-        'password' => bcrypt(str()->random(24)),
-        'role' => 'applicant', // Default role for OAuth
-    ]);
-
-    Auth::login($user);
-    return redirect('/dashboard');
-});
 });
