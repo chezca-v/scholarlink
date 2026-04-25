@@ -1,41 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScholarLink — Forgot Password</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  /* Base reset and shared variables */
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:#0A3040;padding:40px;}
-  :root{
-    --teal:#0F4C5C;--teal-mid:#1A6B7A;--amber:#E8A838;--amber-light:#F9D679;
-    --white:#FFFFFF;--ink:#0A3040;--slate:#4A7A80;--muted:#7AACAA;--border:#DFF0EE;
-    --r-md:10px;--r-xl:20px;--shadow-m:0 8px 24px rgba(15,76,92,0.10);
-  }
-  
-  /* Component Styles */
-  .page-frame{background:var(--white);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-m);max-width:900px;margin:0 auto;}
-  .auth-split{display:grid;grid-template-columns:1fr 1fr;min-height:540px;}
-  .auth-left{background:linear-gradient(160deg,var(--teal),var(--teal-mid));padding:48px 40px;display:flex;flex-direction:column;justify-content:center;position:relative;}
-  .auth-brand{font-family:'Fraunces',serif;font-size:40px;font-weight:900;color:#fff;line-height:1;}
-  .auth-brand em{font-style:italic;font-weight:300;color:var(--amber-light);}
-  .auth-desc{font-size:13px;color:rgba(255,255,255,0.6);margin-top:14px;}
-  .auth-right{padding:40px 44px;display:flex;flex-direction:column;justify-content:center;}
-  .auth-title{font-family:'Fraunces',serif;font-size:26px;font-weight:800;color:var(--ink);margin-bottom:4px;}
-  .auth-sub{font-size:13px;color:var(--slate);margin-bottom:28px;}
-  .auth-link{font-size:12px;font-weight:600;color:var(--teal);cursor:pointer;text-decoration:underline;}
-  .auth-centered{display:flex;flex-direction:column;align-items:center;text-align:center;}
-  .auth-icon-big{font-size:48px;margin-bottom:16px;}
-  
-  .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
-  .form-label{font-size:12px;font-weight:600;color:var(--ink);}
-  .input{font-size:13px;color:var(--ink);border:1.5px solid var(--border);border-radius:var(--r-md);padding:9px 13px;width:100%;}
-  .btn{font-weight:700;cursor:pointer;border-radius:var(--r-md);font-size:13px;padding:9px 20px;border:none;width:100%;}
-  .btn-primary{background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:var(--amber-light);}
-  .btn-ghost{background:var(--white);color:var(--slate);border:1px solid var(--border);}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password | ScholarLink</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Reset */
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        body{font-family:'DM Sans',sans-serif;background:#F0FAFA;display:flex;justify-content:center;align-items:center;min-height:100vh;}
+        
+        /* Layout Component (Split Screen) */
+        .page-frame{
+            background:#FFFFFF;
+            border:1px solid #DFF0EE;
+            border-radius:20px;
+            overflow:hidden;
+            box-shadow:0 8px 24px rgba(15,76,92,0.10);
+            max-width:900px;
+            width:100%;
+        }
+        .auth-split{display:grid;grid-template-columns:1fr 1fr;min-height:540px;}
+        
+        /* Left Panel (Teal) */
+        .auth-left{
+            background:linear-gradient(160deg,#0F4C5C,#1A6B7A);
+            padding:48px 40px;
+            display:flex;
+            flex-direction:column;
+            justify-content:center;
+            color:#FFFFFF;
+            position:relative;
+        }
+        .auth-brand{
+            font-family:'Fraunces',serif;
+            font-size:40px;
+            font-weight:900;
+            line-height:1;
+        }
+        .auth-brand em{font-style:italic;font-weight:300;color:#F9D679;}
+        .auth-desc{font-size:13px;color:rgba(255,255,255,0.6);margin-top:14px;line-height:1.6;}
+        
+        /* Right Panel (Form) */
+        .auth-right{padding:40px 44px;display:flex;flex-direction:column;justify-content:center;}
+        .auth-title{font-family:'Fraunces',serif;font-size:26px;font-weight:800;color:#0A3040;margin-bottom:4px;}
+        .auth-sub{font-size:13px;color:#4A7A80;margin-bottom:28px;}
+        .auth-link{font-size:12px;font-weight:600;color:#0F4C5C;cursor:pointer;text-decoration:underline;display:inline-flex;align-items:center;}
+        
+        /* Form Components */
+        .form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+        .form-label{font-size:12px;font-weight:600;color:#0A3040;}
+        .input{font-size:13px;color:#0A3040;border:1.5px solid #DFF0EE;border-radius:10px;padding:9px 13px;width:100%;transition:border-color 0.2s;}
+        .input:focus{border-color:#0F4C5C;outline:none;}
+        .btn{font-weight:700;cursor:pointer;border-radius:10px;font-size:13px;padding:9px 20px;border:none;width:100%;transition:opacity 0.2s;}
+        .btn:hover{opacity:0.9;}
+        .btn-primary{background:linear-gradient(135deg,#0F4C5C,#1A6B7A);color:#F9D679;}
+    </style>
 </head>
 <body>
 
@@ -43,44 +63,35 @@
   <div class="auth-split">
     <div class="auth-left">
       <div class="auth-brand">Forgot<br>your <em>pass&shy;word?</em></div>
-      <div class="auth-desc">No worries. Enter your email and we'll send you a reset link within a few seconds.</div>
+      <div class="auth-desc">No worries. Enter your email and we'll send a reset link to your account within a few seconds.</div>
     </div>
     
-    <div class="auth-right" id="forgot-right">
+    <div class="auth-right">
       <div class="auth-title">Reset your password</div>
-      <div class="auth-sub">Enter the email address linked to your ScholarLink account.</div>
-      <div class="form-group">
-        <label class="form-label">Email Address *</label>
-        <input class="input" placeholder="juan@university.edu.ph" value="juan.delacruz@plm.edu.ph">
-      </div>
-      <button class="btn btn-primary" onclick="showForgotSuccess()">Send Reset Link</button>
-      <div style="text-align:center;margin-top:16px;"><a class="auth-link">← Back to Login</a></div>
-    </div>
+      <div class="auth-sub">Enter the PLM email address linked to your ScholarLink account.</div>
+      
+      @if (session('status'))
+          <div style="color:green; font-size:12px; margin-bottom:10px; text-align:center;">{{ session('status') }}</div>
+      @endif
 
-    <div class="auth-right" id="forgot-success" style="display:none;">
-      <div class="auth-centered">
-        <div class="auth-icon-big">📬</div>
-        <div class="auth-title">Check your inbox!</div>
-        <div class="auth-sub" style="max-width:280px;">We sent a reset link to <strong>juan.delacruz@plm.edu.ph</strong>.</div>
-        <div style="width:100%;display:flex;flex-direction:column;gap:10px;">
-          <button class="btn btn-primary">Open Gmail →</button>
-          <button class="btn btn-ghost" onclick="showForgotForm()">Resend email</button>
+      <form action="{{ route('password.email') }}" method="POST">
+        @csrf
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input class="input" type="email" name="email" value="{{ old('email') }}" placeholder="nycfrigillana2024@plm.edu.ph" required>
+          @error('email')
+              <div style="color:red; font-size:11px; margin-top:3px;">{{ $message }}</div>
+          @enderror
         </div>
-        <div style="margin-top:16px;"><a class="auth-link">← Back to Login</a></div>
+        <button type="submit" class="btn btn-primary">Send Reset Link</button>
+      </form>
+
+      <div style="text-align:center;margin-top:16px;">
+        <a href="{{ route('login') }}" class="auth-link">← Back to Login</a>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  function showForgotSuccess(){
-    document.getElementById('forgot-right').style.display='none';
-    document.getElementById('forgot-success').style.display='flex';
-  }
-  function showForgotForm(){
-    document.getElementById('forgot-right').style.display='flex';
-    document.getElementById('forgot-success').style.display='none';
-  }
-</script>
 </body>
 </html>

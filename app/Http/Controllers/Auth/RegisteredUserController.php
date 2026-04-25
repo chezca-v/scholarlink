@@ -11,15 +11,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Support\RedirectsUsersByRole;
 
 class RegisteredUserController extends Controller
 {
+    use RedirectsUsersByRole;
     /**
      * Display the registration view.
      */
     public function create(): View
     {
-        return view('auth.register');
+        return view('auth.login', [
+            'roles' => ['applicant', 'evaluator', 'admin', 'superadmin'],        ]);
     }
 
     /**
@@ -30,23 +33,36 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['sometimes', 'string', 'in:applicant,admin,evaluator,superadmin'],
+            'password' => ['required', Rules\Password::defaults()],
+            'role' => ['required', 'string', 'in:applicant,evaluator,admin,superadmin'],
+            'terms' => ['accepted'],
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role ?? 'applicant',
+            'first_name' => $request->string('first_name')->toString(),
+            'last_name' => $request->string('last_name')->toString(),
+            'email' => $request->string('email')->lower()->toString(),
+            'password' => Hash::make($request->string('password')->toString()),
+            'role' => $request->string('role')->lower()->toString(),
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect($this->dashboardRouteFor($user));
+    }
+
+    private function dashboardRouteFor(User $user): string
+    {
+        return match ($user->role) {
+            'admin' => route('admin.dashboard', absolute: false),
+            'evaluator' => route('evaluator.dashboard', absolute: false),
+            'superadmin' => route('superadmin.dashboard', absolute: false),
+            default => route('dashboard', absolute: false),
+        };
     }
 }
