@@ -306,8 +306,16 @@
     </a>
     
     <div class="sidebar-section">Account</div>
-    <a href="#" onclick="alert('Notifications coming soon!'); return false;" class="sidebar-link"><span class="icon">🔔</span> Notifications <span class="badge">3</span></a>
-    <a href="#" onclick="alert('Profile management coming soon!'); return false;" class="sidebar-link"><span class="icon">👤</span> My Profile</a>
+    <a href="{{ route('evaluator.notifications') }}" class="sidebar-link {{ request()->routeIs('evaluator.notifications') ? 'active' : '' }}">
+      <span class="icon">🔔</span> Notifications 
+      @php $unreadNotifs = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+      @if($unreadNotifs > 0)
+        <span class="badge">{{ $unreadNotifs }}</span>
+      @endif
+    </a>
+    <a href="{{ route('evaluator.profile') }}" class="sidebar-link {{ request()->routeIs('evaluator.profile') ? 'active' : '' }}">
+      <span class="icon">👤</span> My Profile
+    </a>
     
     <div class="sidebar-footer">
       <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
