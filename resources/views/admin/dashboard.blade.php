@@ -604,31 +604,35 @@
             <div class="logo-icon">🎓</div>
             <div>
                 <h3 style="font-family:'Fraunces'; font-size: 16px;">Scholar<span style="color:var(--warm-amber)">Link</span></h3>
-                <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">Admin Panel</p>
+                <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">{{ auth()->user()?->organization?->name ?? 'Admin Panel' }}</p>
             </div>
         </div>
 
         <nav class="side-nav">
             <div class="nav-label">Overview</div>
-            <div class="nav-item active"><span>📊</span> Dashboard</div>
-            <div class="nav-item"><span>📈</span> Analytics</div>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><span>📊</span> Dashboard</a>
+            <a href="{{ route('admin.analytics') ?? '#' }}" class="nav-item"><span>📈</span> Analytics</a>
 
             <div class="nav-label">Scholarships</div>
-            <div class="nav-item"><span>📋</span> Scholarship List</div>
-            <div class="nav-item"><span>➕</span> Create Scholarship</div>
-            <div class="nav-item"><span>📅</span> Deadline Calendar</div>
+            <a href="{{ route('admin.scholarships.index') ?? '#' }}" class="nav-item"><span>📋</span> Scholarship List</a>
+            <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="nav-item"><span>➕</span> Create Scholarship</a>
+            <a href="{{ route('admin.calendar') ?? '#' }}" class="nav-item"><span>📅</span> Deadline Calendar</a>
 
             <div class="nav-label">Applications</div>
-            <div class="nav-item"><span>📂</span> All Applications <span class="badge-nav" style="background:var(--warm-amber); color:var(--deep-teal)">14</span></div>
-            <div class="nav-item"><span>⚠️</span> Pending Reviews <span class="badge-nav" style="background:var(--red-alert); color:white">7</span></div>
+            @php
+                $allApplicationsCount = \App\Models\Application::count();
+                $pendingReviewsCount = \App\Models\Application::where('status', 'pending')->count();
+            @endphp
+            <a href="{{ route('admin.applications.index') ?? '#' }}" class="nav-item"><span>📂</span> All Applications <span class="badge-nav" style="background:var(--warm-amber); color:var(--deep-teal)">{{ $allApplicationsCount }}</span></a>
+            <a href="{{ route('admin.applications.pending') ?? '#' }}" class="nav-item"><span>⚠️</span> Pending Reviews <span class="badge-nav" style="background:var(--red-alert); color:white">{{ $pendingReviewsCount }}</span></a>
 
             <div class="nav-label">Management</div>
-            <div class="nav-item">
+            <a href="{{ route('admin.users.index') ?? '#' }}" class="nav-item">
                 <span>👥</span> User Management
-            </div>
-            <div class="nav-item">
+            </a>
+            <a href="{{ route('admin.settings') ?? '#' }}" class="nav-item">
                 <span>⚙️</span> Settings
-            </div>
+            </a>
         </nav>
 
         <div class="side-user">
@@ -644,11 +648,11 @@
         <header class="header-bar">
             <div class="breadcrumb">ScholarLink <span style="opacity:0.3">›</span> <b style="color:white">Dashboard</b></div>
             <nav class="tab-group">
-                <div class="tab-link active">Overview</div>
-                <div class="tab-link">Applications</div>
-                <div class="tab-link">Scholarships</div>
-                <div class="tab-link">Evaluators</div>
-                <div class="tab-link">Reports</div>
+                <a href="{{ route('admin.dashboard') ?? '#' }}" class="tab-link active">Overview</a>
+                <a href="{{ route('admin.applications.index') ?? '#' }}" class="tab-link">Applications</a>
+                <a href="{{ route('admin.scholarships.index') ?? '#' }}" class="tab-link">Scholarships</a>
+                <a href="{{ route('admin.evaluators.index') ?? '#' }}" class="tab-link">Evaluators</a>
+                <a href="{{ route('admin.reports.index') ?? '#' }}" class="tab-link">Reports</a>
             </nav>
             <div class="topbar-right">
                 <div class="admin-pill">Admin</div>
@@ -665,13 +669,19 @@
         <main class="dashboard-body">
             <div class="dashboard-heading">
                 <div>
-                    <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">PLM Scholarship Office</p>
+                    @php
+                        $organization = auth()->user()->organization ?? null;
+                    @endphp
+                    <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">{{ $organization?->name ?? 'ScholarLink' }}</p>
                     <h2 style="font-family:'Fraunces'; font-size:28px; font-weight:700;">Admin Dashboard</h2>
                     <p style="font-size:12px; color:var(--muted); margin-top:2px;">{{ $now->format('l, F j, Y') }} · Academic Year {{ $now->year }}–{{ $now->copy()->addYear()->year }}</p>
                 </div>
                 <div class="heading-actions">
-                    <button class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
-                    <button class="btn-pri">New Scholarship</button>
+                    <form method="POST" action="{{ route('admin.reports.export') ?? '#' }}" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
+                    </form>
+                    <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="btn-pri" style="text-decoration:none; display:inline-block;">New Scholarship</a>
                 </div>
             </div>
 
@@ -695,7 +705,7 @@
                     <p class="stat-card-foot">This academic year</p>
                 </div>
                 <div class="stat-card">
-                    <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">↑ 8%</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">{{ $awardedGrowth >= 0 ? '↑' : '↓' }} {{ abs($awardedGrowth) ?? 0 }}%</span></div>
                     <h1>{{ $approvedAwarded }}</h1>
                     <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Approved / Awarded</p>
                     <p class="stat-card-foot">{{ $approvalRate }}% approval rate</p>
@@ -712,25 +722,25 @@
                         <div class="alert-row alert-red">
                             <div style="font-size:18px;">🚨</div>
                             <div>
-                                <b style="font-size:13px;">{{ $unassignedApplications }} Applications Unassigned for 4+ Days</b>
+                                <b style="font-size:13px;">{{ $unassignedApplications ?? 0 }} Applications Unassigned for 4+ Days</b>
                                 <p style="font-size:12px; opacity:0.8;">Applications with no evaluations assigned yet. Risk of missing SLA.</p>
-                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Assign Evaluators →</a>
+                                <a href="{{ route('admin.applications.unassigned') ?? '#' }}" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Assign Evaluators →</a>
                             </div>
                         </div>
                         <div class="alert-row alert-orange">
                             <div style="font-size:18px;">⏳</div>
                             <div>
-                                <b style="font-size:13px;">Upcoming Deadlines — {{ $incompleteDocsApplications }} Applicants with Incomplete Docs</b>
+                                <b style="font-size:13px;">Upcoming Deadlines — {{ $incompleteDocsApplications ?? 0 }} Applicants with Incomplete Docs</b>
                                 <p style="font-size:12px; opacity:0.8;">Applicants still missing at least one required document.</p>
-                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">View Applicants →</a>
+                                <a href="{{ route('admin.applications.incomplete_docs') ?? '#' }}" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">View Applicants →</a>
                             </div>
                         </div>
                         <div class="alert-row alert-blue">
                             <div style="font-size:18px;">📢</div>
                             <div>
-                                <b style="font-size:13px;">{{ $awaitingApprovalScholarships }} Scholarships Awaiting Approval</b>
+                                <b style="font-size:13px;">{{ $awaitingApprovalScholarships ?? 0 }} Scholarships Awaiting Approval</b>
                                 <p style="font-size:12px; opacity:0.8;">Draft scholarships are ready for review and publication.</p>
-                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Review Drafts →</a>
+                                <a href="{{ route('admin.scholarships.drafts') ?? '#' }}" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Review Drafts →</a>
                             </div>
                         </div>
                     </div>
@@ -738,7 +748,7 @@
                     <div class="activity-section">
                         <div class="section-header">
                             <h3>Recent Activity</h3>
-                            <span class="subtitle">View all →</span>
+                            <a href="{{ route('admin.activity.index') ?? '#' }}" class="subtitle" style="text-decoration: none; color: inherit;">View all →</a>
                         </div>
 
                         <div class="activity-list">
@@ -768,7 +778,7 @@
                     <div class="box-container">
                         <div class="box-header">
                             <h3 class="box-title">Scholarship Overview</h3>
-                            <a href="#" style="font-size:12px; color:var(--teal-mid); font-weight:700;">Manage all →</a>
+                            <a href="{{ route('admin.scholarships.index') ?? '#' }}" style="font-size:12px; color:var(--teal-mid); font-weight:700;">Manage all →</a>
                         </div>
                         <table style="width: 100%;">
                             <thead>
@@ -814,22 +824,22 @@
                     <div class="box-container">
                         <h3 class="box-title" style="margin-bottom:12px;">Quick Actions</h3>
                         <div class="action-grid">
-                            <div class="action-card">
+                            <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">➕</div>
                                 <b style="font-size:11px;">New Scholarship</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.applications.pending') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">👥</div>
                                 <b style="font-size:11px;">Assign</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.settings') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">⚙️</div>
                                 <b style="font-size:11px;">Weight Config</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.reports.index') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">📊</div>
                                 <b style="font-size:11px;">Analytics</b>
-                            </div>
+                            </a>
                         </div>
                     </div>
 
@@ -884,7 +894,7 @@
                     <div class="alerts-section" style="margin-top: 20px;">
                         <div class="section-header">
                             <h3>Upcoming Deadlines</h3>
-                            <span class="subtitle">Calendar →</span>
+                            <a href="{{ route('admin.calendar') ?? '#' }}" class="subtitle" style="text-decoration: none; color: inherit;">Calendar →</a>
                         </div>
 
                         <div>
