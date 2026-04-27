@@ -13,7 +13,13 @@ class PublicController extends Controller
      */
     public function landing()
     {
-        return view('home'); // Renders the public landing page
+        // Fetch featured scholarships (open status, ordered by posted_at)
+        $scholarships = Scholarship::where('status', 'open')
+            ->orderBy('posted_at', 'desc')
+            ->limit(6)
+            ->get();
+
+        return view('home', compact('scholarships')); // Renders the public landing page with scholarships
     }
 
     /**
