@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Application;
 use App\Models\Evaluation;
 use Illuminate\Http\Request;
-use App\Models\Application;
-use App\Models\Evaluation;
 use App\Models\EvaluationSuggestion;
 use App\Models\Scholarship;
 use Carbon\Carbon;
