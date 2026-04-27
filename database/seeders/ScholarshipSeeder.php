@@ -13,7 +13,7 @@ class ScholarshipSeeder extends Seeder
             // 1 — Gabay Dunong Scholarship
             [
                 'provider_name'     => 'Gabay Foundation PH',
-                'created_by'        => null,
+                'created_by'        => 27,
                 'name'              => 'Gabay Dunong Scholarship',
                 'tagline'           => 'Guiding Every Filipino Towards a Brighter Tomorrow.',
                 'description'       => 'The Gabay Dunong Scholarship by Gabay Foundation PH is a community-centered program dedicated to supporting deserving Filipino students from low-income households in pursuing their education. Designed to ease financial burdens while nurturing academic excellence and character, the scholarship provides comprehensive assistance—including tuition support, stipends, and learning resources.' . "\n\n" . 'More than financial aid, Gabay Dunong serves as a guiding force, empowering scholars to stay committed to their studies, uphold strong values, and actively engage in opportunities that foster growth. By investing in education, the program aims to uplift individuals, strengthen communities, and build a brighter, more inclusive future for the next generation.',
@@ -43,7 +43,7 @@ class ScholarshipSeeder extends Seeder
             // 2 — AccessED College Support Grant
             [
                 'provider_name'     => 'AccessED Philippines Foundation',
-                'created_by'        => null,
+                'created_by'        => 27,
                 'name'              => 'AccessED College Support Grant',
                 'tagline'           => 'Access to Education — No Exceptions',
                 'description'       => 'The AccessED College Support Grant by AccessED Philippines Foundation is a student-focused initiative that empowers academically capable yet financially challenged college students to pursue higher education. It is designed to bridge the gap between potential and opportunity by providing essential financial and academic support.' . "\n\n" . 'Beyond tuition assistance and monthly stipends, the program fosters continuous growth through mentoring, tutoring, and academic resources. It aims to equip scholars with the tools they need not only to succeed in school but also to thrive in their future careers and communities.',
@@ -73,7 +73,7 @@ class ScholarshipSeeder extends Seeder
             // 3 — Summit Scholars Grant
             [
                 'provider_name'     => 'Summit Educational Support Foundation',
-                'created_by'        => null,
+                'created_by'        => 27,
                 'name'              => 'Summit Scholars Grant',
                 'tagline'           => 'Elevating Filipino Scholars to New Heights',
                 'description'       => 'The Summit Scholars Grant by Summit Educational Support Foundation is a forward-looking program that invests in the next generation of STEM leaders. It supports high-achieving students who demonstrate both academic excellence and a strong commitment to innovation and progress.' . "\n\n" . 'Through full tuition coverage, research support, and mentorship opportunities, the program goes beyond financial aid by preparing scholars for real-world challenges. It nurtures their potential by connecting them with industry professionals and providing platforms for growth, leadership, and discovery.',
@@ -103,7 +103,7 @@ class ScholarshipSeeder extends Seeder
             // 4 — Lingap Kabataan Scholarship
             [
                 'provider_name'     => 'Bayanihan Community Development Foundation',
-                'created_by'        => null,
+                'created_by'        => 28,
                 'name'              => 'Lingap Kabataan Scholarship',
                 'tagline'           => 'Building Communities, Building Futures',
                 'description'       => 'The Lingap Kabataan Scholarship by Bayanihan Community Development Foundation is a community-driven initiative that provides educational support to students from underserved backgrounds. It seeks to ensure that financial limitations do not hinder access to quality education.' . "\n\n" . 'In addition to tuition assistance and stipends, the program promotes holistic development through career guidance and community engagement activities. It empowers scholars to become active contributors to society while pursuing their academic goals.',
@@ -133,7 +133,7 @@ class ScholarshipSeeder extends Seeder
             // 5 — Bukas Palad Scholarship
             [
                 'provider_name'     => 'Palad ng Pagbabago Social Foundation',
-                'created_by'        => null,
+                'created_by'        => 28,
                 'name'              => 'Bukas Palad Scholarship',
                 'tagline'           => 'A Helping Hand for Every Filipino Dream',
                 'description'       => 'The Bukas Palad Scholarship by Palad ng Pagbabago Social Foundation is a compassionate initiative that extends educational opportunities to students from indigent families. It is built on the belief that every student deserves a chance to succeed regardless of financial circumstances.' . "\n\n" . 'By offering financial support and requiring demonstrated need, the program encourages resilience, responsibility, and perseverance. It serves as a lifeline for students striving to complete their education and build a better future for themselves and their families.',
@@ -163,7 +163,7 @@ class ScholarshipSeeder extends Seeder
             // 6 — EmpowerED Academic Scholarship
             [
                 'provider_name'     => 'EmpowerED Community Foundation',
-                'created_by'        => null,
+                'created_by'        => 28,
                 'name'              => 'EmpowerED Academic Scholarship',
                 'tagline'           => 'Empowering Families Through Education',
                 'description'       => 'The EmpowerED Academic Scholarship by EmpowerED Community Foundation is dedicated to uplifting students from extremely low-income households, particularly those facing unstable family income conditions. It recognizes the importance of education in breaking cycles of poverty.' . "\n\n" . 'Beyond tuition support and stipends, the program extends its impact by providing mentoring, career guidance, and livelihood opportunities for families. It empowers scholars not only academically but also socially and economically.',
@@ -193,7 +193,7 @@ class ScholarshipSeeder extends Seeder
             // 7 — STEM Forward Scholars Program
             [
                 'provider_name'     => 'Philippine Science Advancement Initiative',
-                'created_by'        => null,
+                'created_by'        => 29,
                 'name'              => 'STEM Forward Scholars Program',
                 'tagline'           => 'Fueling the Next Generation of Filipino Scientists',
                 'description'       => 'The STEM Forward Scholars Program by the Philippine Science Advancement Initiative is a prestigious program designed for top-performing students in science and technology fields. It aims to cultivate future innovators who will contribute to national and global development.' . "\n\n" . 'With comprehensive benefits such as full tuition coverage, research grants, and internships, the program creates an environment where scholars can excel. It also offers mentorship and exposure to industry leaders, shaping well-rounded professionals ready to lead in STEM fields.',
@@ -223,7 +223,7 @@ class ScholarshipSeeder extends Seeder
             // 8 — Bright Horizons Academic Grant
             [
                 'provider_name'     => 'Bright Horizons Development Foundation',
-                'created_by'        => null,
+                'created_by'        => 29,
                 'name'              => 'Bright Horizons Academic Grant',
                 'tagline'           => 'Lighting the Path to Opportunity',
                 'description'       => 'The Bright Horizons Academic Grant by Bright Horizons Development Foundation supports students who demonstrate both academic excellence and active community involvement. It emphasizes the importance of balancing education with social responsibility.' . "\n\n" . 'In addition to financial assistance, the program provides health support, training opportunities, and community engagement activities. It aims to develop scholars who are not only knowledgeable but also compassionate and community-oriented leaders.',
@@ -253,7 +253,7 @@ class ScholarshipSeeder extends Seeder
             // 9 — ExcelEdge Merit Scholarship
             [
                 'provider_name'     => 'ExcelEdge Academic Foundation',
-                'created_by'        => null,
+                'created_by'        => 29,
                 'name'              => 'ExcelEdge Merit Scholarship',
                 'tagline'           => 'Leaders in Learning, Champions in Life',
                 'description'       => 'The ExcelEdge Merit Scholarship by ExcelEdge Academic Foundation recognizes students who embody leadership, initiative, and academic excellence. It is designed for individuals who actively contribute to their communities and organizations.' . "\n\n" . 'Through financial support, leadership training, and networking opportunities, the program nurtures scholars to become confident and capable leaders. It encourages them to use their skills and knowledge to create meaningful impact in their chosen fields.',
@@ -283,7 +283,7 @@ class ScholarshipSeeder extends Seeder
             // 10 — Bayanihan Scholars Grant Program
             [
                 'provider_name'     => 'Bayanihan Educational Foundation, Inc.',
-                'created_by'        => null,
+                'created_by'        => 30,
                 'name'              => 'Bayanihan Scholars Grant Program',
                 'tagline'           => 'Empowering Dreams Through Collective Support',
                 'description'       => 'The Bayanihan Scholars Grant Program is designed to support academically deserving students from low-income families across the Philippines. This initiative provides financial assistance for tuition, school supplies, and basic educational needs, ensuring that students can focus on their studies without the burden of financial constraints. The program reflects the Filipino spirit of bayanihan by encouraging collective action in uplifting the lives of young learners.' . "\n\n" . 'Beyond financial aid, the program fosters personal growth and social responsibility among its scholars. Recipients are encouraged to participate in community service, leadership activities, and mentorship programs that help them develop both academically and socially. Through this holistic approach, the scholarship aims to produce graduates who are not only successful in their fields but also committed to giving back to their communities.',
@@ -313,7 +313,7 @@ class ScholarshipSeeder extends Seeder
             // 11 — Unity Scholars Financial Aid Program
             [
                 'provider_name'     => 'Unity for Education Foundation PH',
-                'created_by'        => null,
+                'created_by'        => 30,
                 'name'              => 'Unity Scholars Financial Aid Program',
                 'tagline'           => 'Together We Learn, Together We Rise',
                 'description'       => 'The Unity Scholars Financial Aid Program by Unity for Education Foundation PH is committed to helping financially challenged students achieve academic success. It provides a strong support system for students striving to complete their college education.' . "\n\n" . 'Beyond financial assistance, the program offers mentoring, tutoring, and community service opportunities. It aims to develop well-rounded individuals who are academically capable and socially responsible.',
@@ -343,7 +343,7 @@ class ScholarshipSeeder extends Seeder
             // 12 — LiftED Youth Scholarship Grant
             [
                 'provider_name'     => 'LiftED Philippines Foundation',
-                'created_by'        => null,
+                'created_by'        => 30,
                 'name'              => 'LiftED Youth Scholarship Grant',
                 'tagline'           => 'Lifting Families Out of Poverty Through Education',
                 'description'       => 'The LiftED Youth Scholarship Grant by LiftED Philippines Foundation is designed to support students from low-income families in overcoming financial and personal challenges. It seeks to empower youth through education and life skills development.' . "\n\n" . 'With financial assistance, career counseling, and skills training, the program prepares scholars for both academic success and real-world responsibilities. It promotes growth, resilience, and long-term empowerment.',
@@ -373,7 +373,7 @@ class ScholarshipSeeder extends Seeder
             // 13 — Paglaum Scholarship Program
             [
                 'provider_name'     => 'Paglaum at Pag-ibig ng Bayan Foundation',
-                'created_by'        => null,
+                'created_by'        => 30,
                 'name'              => 'Paglaum Scholarship Program',
                 'tagline'           => 'Hope and Love for Every Filipino Student',
                 'description'       => 'The Paglaum Scholarship Program by Paglaum at Pag-ibig ng Bayan Foundation focuses on supporting students from specific communities who demonstrate both academic potential and good character. It emphasizes holistic well-being alongside education.' . "\n\n" . 'In addition to financial aid, the program offers health-related benefits and community engagement opportunities. It aims to nurture students who are not only academically capable but also socially aware and active.',
@@ -403,7 +403,7 @@ class ScholarshipSeeder extends Seeder
             // 14 — Catalyst Scholars Program
             [
                 'provider_name'     => 'Catalyst for Education Foundation',
-                'created_by'        => null,
+                'created_by'        => 31,
                 'name'              => 'Catalyst Scholars Program',
                 'tagline'           => 'Catalyzing Change Through Accessible Education',
                 'description'       => 'The Catalyst Scholars Program by Catalyst for Education Foundation is a transformative initiative that supports students with strong academic potential and leadership qualities. It is designed to prepare scholars for meaningful contributions in their chosen careers.' . "\n\n" . 'Through full tuition support, stipends, and professional development programs, the scholarship fosters both academic and personal growth. It also provides networking and mentorship opportunities that open doors for future success.',
@@ -433,7 +433,7 @@ class ScholarshipSeeder extends Seeder
             // 15 — AccessPlus Financial Aid Program
             [
                 'provider_name'     => 'AccessPlus Opportunities Foundation',
-                'created_by'        => null,
+                'created_by'        => 31,
                 'name'              => 'AccessPlus Financial Aid Program',
                 'tagline'           => 'More Access, More Opportunities, More Futures',
                 'description'       => 'The AccessPlus Financial Aid Program by AccessPlus Opportunities Foundation supports students from indigent households by providing financial assistance and essential resources. It aims to remove barriers that prevent students from completing their education.' . "\n\n" . 'In addition to tuition support and stipends, the program offers financial literacy training and life skills workshops. It empowers scholars to manage their resources effectively and build sustainable futures.',
@@ -463,7 +463,7 @@ class ScholarshipSeeder extends Seeder
             // 16 — CHED Merit Scholarship Program (CMSP)
             [
                 'provider_name'     => 'CHED Scholarship',
-                'created_by'        => null,
+                'created_by'        => 31,
                 'name'              => 'CHED Merit Scholarship Program (CMSP)',
                 'tagline'           => 'Enabling Filipinos to Achieve Quality Higher Education',
                 'description'       => 'The CHED Merit Scholarship Program is a government-funded initiative that supports academically outstanding Filipino students in pursuing higher education. It aims to make quality education accessible to deserving individuals across the country.' . "\n\n" . 'By covering tuition, stipends, and academic allowances, the program ensures that scholars can focus on their studies without financial strain. It plays a vital role in developing future professionals who will contribute to national progress.',
@@ -493,7 +493,7 @@ class ScholarshipSeeder extends Seeder
             // 17 — Charity First Foundation, Inc.
             [
                 'provider_name'     => 'Charity First Foundation, Inc.',
-                'created_by'        => null,
+                'created_by'        => 31,
                 'name'              => 'Charity First Foundation, Inc.',
                 'tagline'           => 'Helping People, Help Themselves',
                 'description'       => 'The Charity First Foundation Scholarship provides comprehensive support to students enrolled in partner universities, focusing on both academic and personal development. It is designed for students who demonstrate dedication and commitment to their education.' . "\n\n" . 'Beyond financial aid, the program offers housing, allowances, and life skills training. It requires active participation in foundation activities, fostering discipline, responsibility, and a strong sense of community.',
@@ -523,7 +523,7 @@ class ScholarshipSeeder extends Seeder
             // 18 — Ayala Foundation Scholarship
             [
                 'provider_name'     => 'Ayala Foundation',
-                'created_by'        => null,
+                'created_by'        => 31,
                 'name'              => 'Ayala Foundation Scholarship',
                 'tagline'           => 'We envision communities where people are productive, creative, self-reliant, and proud to be Filipino.',
                 'description'       => 'The Ayala Foundation Scholarship is a transformative program that empowers female students in public universities to pursue their educational goals. It promotes leadership, integrity, and community involvement among its scholars.' . "\n\n" . 'Through financial support and development opportunities, the program encourages women to become agents of change. It aims to create a generation of empowered female leaders who will contribute meaningfully to society.',
@@ -553,7 +553,7 @@ class ScholarshipSeeder extends Seeder
             // 19 — Panasonic Scholarship
             [
                 'provider_name'     => 'Panasonic Holdings Corporation',
-                'created_by'        => null,
+                'created_by'        => 31,
                 'name'              => 'Panasonic Scholarship',
                 'tagline'           => 'Unleash your potential and let education light up your brightest future!',
                 'description'       => 'The Panasonic Scholarship supports college students nearing graduation by providing financial assistance and monthly allowances. It aims to help scholars successfully complete their degrees and transition into professional careers.' . "\n\n" . 'By easing financial pressures during critical academic years, the program enables students to focus on their studies and career preparation. It serves as a stepping stone toward achieving long-term professional goals.',
@@ -583,7 +583,7 @@ class ScholarshipSeeder extends Seeder
             // 20 — Security Bank Regalo Mo Kinabukasan Ko Scholarship
             [
                 'provider_name'     => 'Security Bank Foundation, Inc.',
-                'created_by'        => null,
+                'created_by'        => 31,
                 'name'              => 'Security Bank Regalo Mo Kinabukasan Ko Scholarship',
                 'tagline'           => 'Scholars for Better Communities',
                 'description'       => 'The Security Bank "Regalo Mo, Kinabukasan Ko" Scholarship is a program that supports the education of students connected to Security Bank personnel. It reflects the organization\'s commitment to investing in education and community development.' . "\n\n" . 'The program provides financial assistance, stipends, and opportunities for internships and learning sessions. It helps scholars pursue their chosen paths while preparing them for future careers through exposure and experience.',
@@ -613,7 +613,7 @@ class ScholarshipSeeder extends Seeder
             // 21 — Bagong Alab Scholars Fund
             [
                 'provider_name'     => 'Bagong Alab Youth Foundation',
-                'created_by'        => null,
+                'created_by'        => 32,
                 'name'              => 'Bagong Alab Scholars Fund',
                 'tagline'           => 'Igniting the Fire of Filipino Excellence',
                 'description'       => 'The Bagong Alab Scholars Fund supports incoming first-year college students who graduated Senior High School with distinction. Designed for high-achieving SHS graduates transitioning into college, it eases the financial burden of the critical first year. Beyond tuition aid and stipends, scholars receive mentorship and career orientation to help them navigate college life with confidence and purpose.',
@@ -643,7 +643,7 @@ class ScholarshipSeeder extends Seeder
             // 22 — Sindak ng Pag-asa Scholarship
             [
                 'provider_name'     => 'Sindak Foundation PH',
-                'created_by'        => null,
+                'created_by'        => 32,
                 'name'              => 'Sindak ng Pag-asa Scholarship',
                 'tagline'           => 'From Hope to Achievement, One Scholar at a Time',
                 'description'       => 'The Sindak ng Pag-asa Scholarship is committed to giving deserving SHS graduates a strong college start. It targets students from low-income households who have demonstrated academic perseverance throughout their senior high school years. The program provides financial support alongside personal development sessions, ensuring scholars are equipped not just financially but emotionally and academically for the demands of college.',
@@ -673,7 +673,7 @@ class ScholarshipSeeder extends Seeder
             // 23 — Talino at Puso Grant
             [
                 'provider_name'     => 'Talino at Puso Foundation',
-                'created_by'        => null,
+                'created_by'        => 32,
                 'name'              => 'Talino at Puso Grant',
                 'tagline'           => 'Heart and Mind in Every Filipino Dream',
                 'description'       => 'The Talino at Puso Grant by Talino at Puso Foundation recognizes SHS graduates who excel both academically and in character. It values the whole student — intellect, values, and community involvement — and provides comprehensive support for their first year in college. Scholars are connected with mentors and peers who share the same commitment to excellence and service.',
@@ -703,7 +703,7 @@ class ScholarshipSeeder extends Seeder
             // 24 — Lakbay Dunong Scholarship
             [
                 'provider_name'     => 'Lakbay Dunong Inc.',
-                'created_by'        => null,
+                'created_by'        => 32,
                 'name'              => 'Lakbay Dunong Scholarship',
                 'tagline'           => 'Every Journey to Knowledge Deserves Support',
                 'description'       => 'The Lakbay Dunong Scholarship supports incoming college students who come from remote or underserved areas. Recognizing that geography and poverty should never be barriers to education, the program covers essential academic expenses and provides a monthly allowance to help scholars sustain themselves as they begin their college journey far from home.',
@@ -733,7 +733,7 @@ class ScholarshipSeeder extends Seeder
             // 25 — Haligi ng Bayan Academic Award
             [
                 'provider_name'     => 'Haligi ng Bayan Foundation',
-                'created_by'        => null,
+                'created_by'        => 32,
                 'name'              => 'Haligi ng Bayan Academic Award',
                 'tagline'           => 'Pillars of the Nation Start in the Classroom',
                 'description'       => 'The Haligi ng Bayan Academic Award is a prestigious scholarship for top-performing SHS graduates who aspire to become pillars of Filipino society. It supports students with exceptional academic records and a demonstrated commitment to their communities. The program pairs financial assistance with leadership development activities designed to shape future professionals and community leaders.',
