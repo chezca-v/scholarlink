@@ -305,7 +305,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
       <div class="step reveal d3">
         <div class="step-num-circle">03</div>
         <div class="step-title">Track in Real-Time</div>
-        <div class="step-desc">Follow every stage of your application. Get notified via in-app, email, or SMS — even with limited internet access.</div>
+        <div class="step-desc">Follow every stage of your application. Get notified via in-app, and email — even with limited internet access.</div>
       </div>
     </div>
   </div>
@@ -383,7 +383,6 @@ footer { background: #071820; padding: 64px 48px 32px; }
       </div>
       <div class="feat-card reveal d1"><div class="feat-icon">🙈</div><div class="feat-title">Blind Screening</div><div class="feat-desc">Evaluators review without seeing your name, gender, or school — promoting merit-based, bias-free selection.</div></div>
       <div class="feat-card reveal d2"><div class="feat-icon">⚖️</div><div class="feat-title">Dynamic Weighted Scoring</div><div class="feat-desc">Organizations customize GPA vs. financial need weighting — every scholarship plays by its own fair rules.</div></div>
-      <div class="feat-card reveal d1"><div class="feat-icon">📡</div><div class="feat-title">SMS Hardware Gateway</div><div class="feat-desc">Critical updates via SMS even without internet — powered by ESP32 + GSM. No student left behind.</div></div>
       <div class="feat-card reveal d2"><div class="feat-icon">🗂️</div><div class="feat-title">Student Document Wallet</div><div class="feat-desc">Upload your documents once. Use them for every application. No more re-scanning the same transcripts.</div></div>
     </div>
   </div>
