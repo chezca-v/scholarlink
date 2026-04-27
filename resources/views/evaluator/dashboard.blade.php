@@ -98,12 +98,17 @@
     $evaluator = $evaluator ?? ['initials' => 'EP', 'role' => 'Evaluator'];
 @endphp
 
-{{-- ════════════════════════════════════════════════════════════════════════
-     STYLES
-════════════════════════════════════════════════════════════════════════ --}}
-@push('styles')
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap');
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ScholarLink — Evaluator Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
 
 /* ── CSS Variables ──────────────────────────────────────────────────── */
 :root {
@@ -215,6 +220,69 @@
     transition:      transform var(--sl-transition), box-shadow var(--sl-transition);
 }
 .sl-nav__avatar:hover { transform: scale(1.07); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   USER DROPDOWN MENU
+════════════════════════════════════════════════════════════════════════ */
+.sl-dropdown {
+    position: relative;
+}
+.sl-dropdown__menu {
+    position:       absolute;
+    top:            100%;
+    right:          0;
+    margin-top:     8px;
+    background:     var(--sl-surface);
+    border:         1px solid var(--sl-border);
+    border-radius:  var(--sl-radius-md);
+    box-shadow:     var(--sl-shadow-md);
+    min-width:      180px;
+    opacity:        0;
+    pointer-events: none;
+    transform:      translateY(-8px);
+    transition:     opacity .2s ease, transform .2s ease;
+    z-index:        1000;
+}
+.sl-dropdown__menu.is-open {
+    opacity:        1;
+    pointer-events: auto;
+    transform:      translateY(0);
+}
+.sl-dropdown__item {
+    display:       block;
+    width:         100%;
+    padding:       12px 16px;
+    text-align:    left;
+    border:        none;
+    background:    transparent;
+    color:         var(--sl-text-dark);
+    font-family:   var(--sl-font);
+    font-size:     14px;
+    cursor:        pointer;
+    transition:    background .15s ease;
+}
+.sl-dropdown__item:hover {
+    background:    var(--sl-teal-xlight);
+    color:         var(--sl-teal-dark);
+}
+.sl-dropdown__item:first-child {
+    border-radius:  var(--sl-radius-md) var(--sl-radius-md) 0 0;
+}
+.sl-dropdown__item:last-child {
+    border-radius:  0 0 var(--sl-radius-md) var(--sl-radius-md);
+}
+.sl-dropdown__divider {
+    height:        1px;
+    background:    var(--sl-border);
+    margin:        4px 0;
+}
+.sl-dropdown__logout {
+    color: var(--sl-red);
+}
+.sl-dropdown__logout:hover {
+    background: #fde7e7;
+    color: var(--sl-red);
+}
 
 /* ════════════════════════════════════════════════════════════════════════
    LAYOUT — two-column grid
@@ -618,7 +686,8 @@
 /* ── Spacing utility ── */
 .sl-mt { margin-top: 16px; }
 </style>
-@endpush
+</head>
+<body>
 
 
 {{-- ════════════════════════════════════════════════════════════════════════
@@ -634,8 +703,22 @@
         </div>
         <div class="sl-nav__right">
             <span class="sl-nav__role-badge">{{ $evaluator['role'] }}</span>
-            <div class="sl-nav__avatar" title="{{ $evaluator['role'] }}">
-                {{ $evaluator['initials'] }}
+            <div class="sl-dropdown">
+                <div class="sl-nav__avatar" id="userMenuBtn" title="Open menu" style="cursor: pointer;">
+                    {{ $evaluator['initials'] }}
+                </div>
+                <div class="sl-dropdown__menu" id="userMenu">
+                    <button class="sl-dropdown__item" onclick="window.location.href='{{ route('profile.setup') }}'">
+                        Profile Settings
+                    </button>
+                    <div class="sl-dropdown__divider"></div>
+                    <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="sl-dropdown__item sl-dropdown__logout">
+                            Log Out
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
@@ -872,7 +955,6 @@
 {{-- ════════════════════════════════════════════════════════════════════════
      JAVASCRIPT — ScholarDash namespace
 ════════════════════════════════════════════════════════════════════════ --}}
-@push('scripts')
 <script>
 (function () {
     'use strict';
@@ -970,5 +1052,129 @@
         },
     };
 })();
+
+/**
+ * User dropdown menu toggle
+ */
+(function() {
+    const btn = document.getElementById('userMenuBtn');
+    const menu = document.getElementById('userMenu');
+
+    if (btn && menu) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('is-open');
+        });
+
+        document.addEventListener('click', () => {
+            menu.classList.remove('is-open');
+        });
+
+        menu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+})();
+
+/**
+ * Session Timeout Tracker
+ */
+document.addEventListener('alpine:init', () => {
+    Alpine.data('sessionTracker', () => ({
+        idleSeconds: 0,
+        warningLimit: 13 * 60,
+        timeoutLimit: 15 * 60,
+        interval: null,
+        isWarningShown: false,
+
+        init() {
+            this.resetIdleTime();
+            const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+            events.forEach(event => {
+                window.addEventListener(event, () => this.resetIdleTime(), true);
+            });
+
+            this.interval = setInterval(() => {
+                this.idleSeconds++;
+                if (this.idleSeconds === this.warningLimit && !this.isWarningShown) {
+                    this.isWarningShown = true;
+                    const modal = document.getElementById('session-timeout-modal');
+                    if (modal) modal.style.display = 'flex';
+                }
+                if (this.idleSeconds >= this.timeoutLimit) {
+                    clearInterval(this.interval);
+                    document.getElementById('auto-logout-form').submit();
+                }
+            }, 1000);
+        },
+
+        resetIdleTime() {
+            this.idleSeconds = 0;
+            this.isWarningShown = false;
+            const modal = document.getElementById('session-timeout-modal');
+            if (modal) modal.style.display = 'none';
+        },
+
+        logout() {
+            document.getElementById('auto-logout-form').submit();
+        },
+
+        stayLoggedIn() {
+            this.resetIdleTime();
+            const modal = document.getElementById('session-timeout-modal');
+            if (modal) modal.style.display = 'none';
+        }
+    }));
+});
+
+// Make tracker globally available
+window.sessionTracker = null;
+document.addEventListener('alpine:init', () => {
+    const root = document.querySelector('[x-data]');
+    if (root && root.__x && root.__x.$data) {
+        window.sessionTracker = root.__x.$data;
+    }
+});
+
+// Countdown timer
+setInterval(() => {
+    const modal = document.getElementById('session-timeout-modal');
+    if (modal && modal.style.display !== 'none') {
+        const countdownEl = document.getElementById('session-timeout-countdown');
+        const text = countdownEl.textContent;
+        const [minutes, seconds] = text.split(':').map(Number);
+        let totalSeconds = minutes * 60 + seconds - 1;
+        if (totalSeconds < 0) totalSeconds = 0;
+        const newMinutes = Math.floor(totalSeconds / 60);
+        const newSeconds = totalSeconds % 60;
+        countdownEl.textContent = `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+    }
+}, 1000);
 </script>
-@endpush
+
+<!-- Session Timeout Modal -->
+<div id="session-timeout-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); animation: slideUp 0.3s ease-out;">
+        <div style="text-align: center; margin-bottom: 20px; font-size: 48px;">⏱️</div>
+        <h2 style="font-size: 20px; font-weight: 700; color: #1a2e2c; margin-bottom: 12px; text-align: center;">Session Expiring Soon</h2>
+        <p style="font-size: 14px; color: #4a6460; line-height: 1.6; margin-bottom: 24px; text-align: center;">You've been inactive for 13 minutes. Your session will expire in 2 minutes for your security. Please click "Stay Logged In" to continue.</p>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="if (window.sessionTracker) window.sessionTracker.stayLoggedIn(); else location.reload();" style="flex: 1; padding: 12px 16px; background: linear-gradient(135deg, #1a6b63, #2a8a80); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Stay Logged In</button>
+            <button onclick="if (window.sessionTracker) window.sessionTracker.logout(); else document.getElementById('auto-logout-form').submit();" style="flex: 1; padding: 12px 16px; background: #f5f5f5; color: #1a2e2c; border: 1px solid #e2e8e6; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Log Out</button>
+        </div>
+        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #8aaba6;">Automatically logging out in <span id="session-timeout-countdown">2:00</span></div>
+    </div>
+</div>
+
+<!-- Auto Logout Form -->
+<form id="auto-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
