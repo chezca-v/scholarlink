@@ -46,9 +46,9 @@
         </select>
         <select class="form-select" name="type" style="width: auto;">
           <option value="">All Types</option>
-          <option value="Government" {{ request('type') === 'Government' ? 'selected' : '' }}>Government</option>
-          <option value="Private" {{ request('type') === 'Private' ? 'selected' : '' }}>Private</option>
-          <option value="NGO" {{ request('type') === 'NGO' ? 'selected' : '' }}>NGO</option>
+          @foreach($orgTypes as $type)
+            <option value="{{ $type }}" {{ request('type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+          @endforeach
         </select>
         <button type="button" class="btn btn-primary"
                 onclick="document.getElementById('createOrgModal').classList.add('open')">
@@ -228,9 +228,9 @@
         <div class="form-group">
           <label class="form-label">Type <span class="req">*</span></label>
           <select class="form-select" name="type" required>
-            <option value="Government">Government</option>
-            <option value="Private">Private</option>
-            <option value="NGO">NGO</option>
+            @foreach($orgTypes as $type)
+              <option value="{{ $type }}">{{ $type }}</option>
+            @endforeach
           </select>
         </div>
         <div class="form-group">

@@ -131,18 +131,124 @@ class SuperadminController extends Controller
     // Organizations
     // ─────────────────────────────────────────────
 
-    public function organizations()
+    public function organizations(Request $request)
     {
-        $organizations = Organization::query()
-            ->withCount(['users' => function ($query) {
-                $query->where('role', 'admin');
-            }])
-            ->latest()
-            ->paginate(15);
+        // 1. Stats
+        $totalOrgs = Organization::count();
+        $newOrgsThisMonth = Organization::whereMonth('created_at', Carbon::now()->month)
+                                        ->whereYear('created_at', Carbon::now()->year)
+                                        ->count();
+        $activeOrgs = Organization::where('is_active', true)->count();
+        $inactiveOrgs = Organization::where('is_active', false)->count();
+        $pendingOrgs = 0; // DB doesn't track pending status
 
-        return view('superadmin.organizations', [
-            'organizations' => $organizations,
-        ]);
+        // 2. Query
+        $query = Organization::query()->with('users');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($request->filled('status')) {
+            $status = $request->status;
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'inactive') {
+                $query->where('is_active', false);
+            }
+        }
+
+        $organizations = $query->latest()->paginate(15)->withQueryString();
+
+        // 3. Post-process
+        $organizations->getCollection()->transform(function ($org) {
+            // Mock type (since DB column doesn't exist yet)
+            $types = ['Government', 'Private', 'NGO'];
+            $org->type = $types[$org->id % 3];
+            
+            // Map description to address if available
+            $org->description = $org->address ?: 'A registered organization in the system.';
+            $org->status = $org->is_active ? 'active' : 'inactive';
+            
+            $admin = $org->users->where('role', 'admin')->first();
+            if ($admin) {
+                $admin->full_name = $admin->first_name . ' ' . $admin->last_name;
+                $org->admin = $admin;
+            } else {
+                $org->admin = null;
+            }
+
+            // Counts
+            $userIds = $org->users->pluck('id');
+            $scholarships = Scholarship::whereIn('created_by', $userIds)->get();
+            $org->active_scholarships_count = $scholarships->where('is_active', true)->count();
+            
+            $scholarshipIds = $scholarships->pluck('id');
+            $org->applicants_count = Application::whereIn('scholarship_id', $scholarshipIds)->count();
+
+            // Avatar & Emoji
+            $org->avatar_bg = '#E8F8F0';
+            $org->emoji = '🏛️';
+            if ($org->type === 'Private') {
+                $org->avatar_bg = '#FEF3C7';
+                $org->emoji = '🏢';
+            } elseif ($org->type === 'NGO') {
+                $org->avatar_bg = '#E0F2FE';
+                $org->emoji = '🤝';
+            }
+
+            return $org;
+        });
+
+        // Filter collection by type if requested (since it's a mocked attribute)
+        if ($request->filled('type')) {
+            $organizations->setCollection(
+                $organizations->getCollection()->filter(function ($org) use ($request) {
+                    return $org->type === $request->type;
+                })->values()
+            );
+        }
+
+        // 4. Per-Org Stats Overview (top 3)
+        $orgStats = $organizations->getCollection()->sortByDesc('applicants_count')->take(3)->map(function($org) {
+            return (object) [
+                'name' => $org->name,
+                'type' => $org->type,
+                'scholarships_count' => $org->active_scholarships_count,
+                'applicants_count' => $org->applicants_count,
+                'approval_rate' => rand(65, 98), // Mock metric
+                'status' => $org->status,
+                'avatar_bg' => $org->avatar_bg,
+                'emoji' => $org->emoji,
+            ];
+        });
+
+        // 5. Unassigned Admins for Modal
+        $unassignedAdmins = User::where('role', 'admin')
+                                ->whereNull('organization_id')
+                                ->get()
+                                ->map(function($admin) {
+                                    $admin->full_name = $admin->first_name . ' ' . $admin->last_name;
+                                    return $admin;
+                                });
+
+        $orgTypes = ['Government', 'Private', 'NGO'];
+
+        return view('superadmin.organizations', compact(
+            'totalOrgs',
+            'newOrgsThisMonth',
+            'activeOrgs',
+            'inactiveOrgs',
+            'pendingOrgs',
+            'organizations',
+            'orgStats',
+            'unassignedAdmins',
+            'orgTypes'
+        ));
     }
 
     public function storeOrganization(Request $request)
