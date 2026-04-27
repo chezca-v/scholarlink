@@ -352,6 +352,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="fg">
       <div class="fgl">Income Bracket</div>
       @php
+      
         $activeIncomes = (array) ($filters['income'] ?? ['Below ₱100K/yr', '₱100K–₱250K']);
         $incomeOptions = ['Below ₱100K/yr', '₱100K–₱250K', '₱250K–₱500K', 'Open / Any'];
       @endphp
