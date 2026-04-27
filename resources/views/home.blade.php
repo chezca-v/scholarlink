@@ -13,16 +13,31 @@ body { font-family: 'DM Sans', sans-serif; background: #ffffff; color: #0A3040; 
 
 /* Floating Icons Animation */
 .floating-icon {
-  position: absolute;
-  opacity: 0.2;
-  animation: float 6s ease-in-out infinite;
-  z-index: 0; 
-  pointer-events: none;
+    position: absolute;
+    opacity: 0.15;
+    animation: float 8s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+    font-size: 50px;
 }
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-20px); }
-  100% { transform: translateY(0px); }
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(5deg); }
+}
+
+/*:hover EFFECTS*/
+.btn-hero-main, .btn-pill, .btn-cta-main {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-hero-main:hover, .btn-pill:hover, .btn-cta-main:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(15,76,92,0.2);
+}
+.btn-hero-text {
+    transition: transform 0.3s ease;
+}
+.btn-hero-text:hover {
+    transform: translateX(5px);
 }
 /* NAV */
 nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid #EAF4F3; }
@@ -38,8 +53,19 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .btn-pill:hover { background: #1A6B7A; transform: translateY(-1px); }
 
 /* HERO */
-.hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 120px 48px 80px; text-align: center; background: #fff; position: relative; overflow:hidden;}
-.hero::before {
+.hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 120px 48px 80px;
+    text-align: center;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.accent::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -81,11 +107,12 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .msc-bar-fill { height: 100%; background: linear-gradient(90deg, #0F4C5C, #E8A838); border-radius: 999px; }
 
 /* LOGOS */
-.logos { padding: 48px; border-top: 1px solid #EAF4F3; border-bottom: 1px solid #EAF4F3; }
-.logos-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
-.logos-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C8E8E4; white-space: nowrap; }
-.logos-row { display: flex; gap: 48px; align-items: center; flex: 1; }
-.logo-item { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #C8E8E4; letter-spacing: -0.5px; }
+.logos { padding: 48px; border-top: 1px solid #EAF4F3; border-bottom: 1px solid #EAF4F3; overflow: hidden; }
+.logos-inner { max-width: 100%; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
+.logos-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C8E8E4; white-space: nowrap; padding-left: 48px; }
+.logos-row { display: flex; gap: 48px; align-items: center; flex: 1; animation: slideRight 30s linear infinite; }
+.logo-item { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #C8E8E4; letter-spacing: -0.5px; white-space: nowrap; }
+@keyframes slideRight { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
 /* HOW */
 .how { padding: 112px 48px; background: #fff; }
@@ -211,7 +238,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
 <h1 class="hero-title" id="typing-text"></h1>
   <p class="hero-sub">Stop repeating yourself. Build your academic profile once and apply to every scholarship in the Philippines — AI-matched, just for you.</p>
   <div class="hero-actions">
-    <a href="/scholarships" class="btn-hero-main">🎓 Browse Scholarships</a>
+    <a href="{{ route('scholarships.index') }}" class="btn-hero-main">🎓 Browse Scholarships</a>
     <button class="btn-hero-text">▶ Watch how it works</button>
   </div>
   <div class="hero-social-proof">
@@ -226,27 +253,23 @@ footer { background: #071820; padding: 64px 48px 32px; }
   </div>
   <div class="hero-visual">
     <div class="cards-row">
-      <div class="mini-schol-card">
-        <div class="msc-top"><span class="msc-org">Gabay Foundation</span><span class="msc-open">Open</span></div>
-        <div class="msc-title">Gabay Dunong Scholarship 2025</div>
-        <div class="msc-match">94%</div>
-        <div class="msc-match-label">Match Score</div>
-        <div class="msc-bar"><div class="msc-bar-fill" style="width:94%"></div></div>
-      </div>
-      <div class="mini-schol-card">
-        <div class="msc-top"><span class="msc-org">Abot-Kaya Inc.</span><span class="msc-open">Open</span></div>
-        <div class="msc-title">Abot-Kaya Excellence Grant</div>
-        <div class="msc-match">87%</div>
-        <div class="msc-match-label">Match Score</div>
-        <div class="msc-bar"><div class="msc-bar-fill" style="width:87%"></div></div>
-      </div>
-      <div class="mini-schol-card">
-        <div class="msc-top"><span class="msc-org">TechBridge Corp.</span><span class="msc-open warn">Closing</span></div>
-        <div class="msc-title">TechBridge STEM Scholarship</div>
-        <div class="msc-match">78%</div>
-        <div class="msc-match-label">Match Score</div>
-        <div class="msc-bar"><div class="msc-bar-fill" style="width:78%"></div></div>
-      </div>
+      @forelse($scholarships->slice(0, 3) as $scholarship)
+        <div class="mini-schol-card">
+          <div class="msc-top">
+            <span class="msc-org">{{ Str::limit($scholarship->provider_name, 15) }}</span>
+            <span class="msc-open {{ $scholarship->status === 'closing' ? 'warn' : '' }}">{{ ucfirst($scholarship->status) }}</span>
+          </div>
+          <div class="msc-title">{{ Str::limit($scholarship->name, 40) }}</div>
+          <div class="msc-match">{{ rand(75, 95) }}%</div>
+          <div class="msc-match-label">Match Score</div>
+          <div class="msc-bar"><div class="msc-bar-fill" style="width:{{ rand(75, 95) }}%"></div></div>
+        </div>
+      @empty
+        <div class="mini-schol-card">
+          <div class="msc-top"><span class="msc-org">No Scholarships</span></div>
+          <div class="msc-title">Check back soon</div>
+        </div>
+      @endforelse
     </div>
   </div>
 </section>
@@ -255,11 +278,11 @@ footer { background: #071820; padding: 64px 48px 32px; }
   <div class="logos-inner">
     <span class="logos-label">Trusted by</span>
     <div class="logos-row">
-      <span class="logo-item">Gabay Foundation</span>
-      <span class="logo-item">Abot-Kaya Inc.</span>
-      <span class="logo-item">TechBridge Corp.</span>
-      <span class="logo-item">Lumina Grants</span>
-      <span class="logo-item">PH Merit Fund</span>
+      @forelse($scholarships as $scholarship)
+        <span class="logo-item">{{ $scholarship->provider_name }}</span>
+      @empty
+        <span class="logo-item">Loading scholarships...</span>
+      @endforelse
     </div>
   </div>
 </div>
@@ -282,7 +305,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
       <div class="step reveal d3">
         <div class="step-num-circle">03</div>
         <div class="step-title">Track in Real-Time</div>
-        <div class="step-desc">Follow every stage of your application. Get notified via in-app, email, or SMS — even with limited internet access.</div>
+        <div class="step-desc">Follow every stage of your application. Get notified via in-app, and email — even with limited internet access.</div>
       </div>
     </div>
   </div>
@@ -301,24 +324,42 @@ footer { background: #071820; padding: 64px 48px 32px; }
       </div>
     </div>
     <div class="s-grid">
-      <div class="s-card reveal d1">
-        <div class="sc-org"><span>Gabay Foundation</span><span class="sc-status open">Open</span></div>
-        <div class="sc-title">Gabay Dunong Scholarship 2025</div>
-        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 1.75 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>Family income ≤ ₱250,000/yr</div><div class="sc-detail"><span class="sc-detail-dot"></span>50 available slots</div></div>
-        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">94%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:94%"></div></div></div>
-      </div>
-      <div class="s-card reveal d2">
-        <div class="sc-org"><span>Abot-Kaya Inc.</span><span class="sc-status open">Open</span></div>
-        <div class="sc-title">Abot-Kaya Excellence Grant</div>
-        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 1.50 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>Open income bracket</div><div class="sc-detail"><span class="sc-detail-dot"></span>30 available slots</div></div>
-        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">87%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:87%"></div></div></div>
-      </div>
-      <div class="s-card reveal d3">
-        <div class="sc-org"><span>TechBridge Corp.</span><span class="sc-status closing">Closing</span></div>
-        <div class="sc-title">TechBridge STEM Scholarship</div>
-        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 2.00 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>STEM course only</div><div class="sc-detail"><span class="sc-detail-dot"></span>40 available slots</div></div>
-        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">78%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:78%"></div></div></div>
-      </div>
+      @forelse($scholarships as $scholarship)
+        <div class="s-card reveal">
+          <div class="sc-org">
+            <span>{{ Str::limit($scholarship->provider_name, 20) }}</span>
+            <span class="sc-status {{ $scholarship->status === 'open' ? 'open' : 'closing' }}">{{ ucfirst($scholarship->status) }}</span>
+          </div>
+          <div class="sc-title">{{ Str::limit($scholarship->name, 50) }}</div>
+          <div class="sc-details">
+            <div class="sc-detail">
+              <span class="sc-detail-dot"></span>
+              GPA {{ $scholarship->gpa_requirement }} or higher
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-dot"></span>
+              Income bracket: {{ $scholarship->income_bracket }}
+            </div>
+            <div class="sc-detail">
+              <span class="sc-detail-dot"></span>
+              {{ $scholarship->slots }} available slots
+            </div>
+          </div>
+          <div class="sc-match">
+            <div class="sc-match-row">
+              <span class="sc-match-label">Your Match Score</span>
+              <span class="sc-match-pct">{{ rand(65, 95) }}%</span>
+            </div>
+            <div class="sc-bar-bg">
+              <div class="sc-bar-fill" style="width:{{ rand(65, 95) }}%"></div>
+            </div>
+          </div>
+        </div>
+      @empty
+        <div class="s-card">
+          <p style="text-align: center; color: #7AACAA;">No scholarships available at the moment. Check back soon!</p>
+        </div>
+      @endforelse
     </div>
   </div>
 </section>
@@ -342,7 +383,6 @@ footer { background: #071820; padding: 64px 48px 32px; }
       </div>
       <div class="feat-card reveal d1"><div class="feat-icon">🙈</div><div class="feat-title">Blind Screening</div><div class="feat-desc">Evaluators review without seeing your name, gender, or school — promoting merit-based, bias-free selection.</div></div>
       <div class="feat-card reveal d2"><div class="feat-icon">⚖️</div><div class="feat-title">Dynamic Weighted Scoring</div><div class="feat-desc">Organizations customize GPA vs. financial need weighting — every scholarship plays by its own fair rules.</div></div>
-      <div class="feat-card reveal d1"><div class="feat-icon">📡</div><div class="feat-title">SMS Hardware Gateway</div><div class="feat-desc">Critical updates via SMS even without internet — powered by ESP32 + GSM. No student left behind.</div></div>
       <div class="feat-card reveal d2"><div class="feat-icon">🗂️</div><div class="feat-title">Student Document Wallet</div><div class="feat-desc">Upload your documents once. Use them for every application. No more re-scanning the same transcripts.</div></div>
     </div>
   </div>
@@ -384,7 +424,6 @@ document.querySelectorAll('.filter').forEach(btn => {
 const obs = new IntersectionObserver(e => e.forEach(el => { if(el.isIntersecting){el.target.classList.add('visible');obs.unobserve(el.target);}}),{threshold:0.1});
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
-// Typing effect para sa Hero Title
 const text = "One Profile. Every Scholarship.";
 const target = document.getElementById("typing-text");
 let index = 0;
