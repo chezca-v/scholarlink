@@ -225,14 +225,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </head>
 <body>
 
-{{-- ═══════════════════════════════════════════════════ NAVBAR ══════════════ --}}
+//═══════════════════════════════════════════════════ NAVBAR ══════════════ //
 <nav class="navbar">
-  <a class="nav-logo" href="{{ route('home') }}">
+  <a class="nav-logo" href="{{ route('landing') }}">
     <div class="logo-box">🎓</div>
     <span class="logo-text">ScholarLink</span>
   </a>
 
-  {{-- Search form — submits GET to same page --}}
+  //Search form — submits GET to same page //
   <form class="nav-search" method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
     <span class="si">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -243,7 +243,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
            value="{{ $filters['q'] ?? '' }}"
            placeholder="Search scholarships, organizations…"
            autocomplete="off">
-    <div class="skb"><span class="kb">⌘</span><span class="kb">K</span></div>
   </form>
 
   <div class="nav-right">
@@ -262,7 +261,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     </button>
 
     @auth
-      {{-- Show initials from the logged-in user's name --}}
+     //Show initials from the logged-in user's name //
       <div class="nav-av" title="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
         {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name, 0, 1)) }}
       </div>
@@ -272,17 +271,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </div>
 </nav>
 
-{{-- ═══════════════════════════════════════════════════ LAYOUT ═════════════ --}}
+// ═══════════════════════════════════════════════════ LAYOUT ═════════════ //
 <div class="layout">
 
-  {{-- ───────────────────────────────────── SIDEBAR / FILTERS ─────────────── --}}
+ // ───────────────────────────────────── SIDEBAR / FILTERS ───────────────//
   <aside class="sidebar">
     <div class="sb-hd">
       <span class="sb-title">Filters</span>
       <a href="{{ route('scholarships.index') }}" class="btn-clr">Clear all</a>
     </div>
 
-    {{-- Status --}}
+    // Status //
     <div class="fg">
       <div class="fgl">Status</div>
       @php
@@ -495,25 +494,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
     </div>
 
-    {{-- ─────────────────── SCHOLARSHIP CARDS GRID ──────────────────────── --}}
+    // ─────────────────── SCHOLARSHIP CARDS GRID ──────────────────────── //
     <div class="cgrid" id="cgrid">
 
       @forelse($scholarships as $scholarship)
         @php
-          {{--
-            ai_match_score lives on the applications table (per applicant).
+        /* ai_match_score lives on the applications table (per applicant).
             If the user is logged in and has applied, pull it from the
             eager-loaded relationship. Otherwise show no score.
-          --}}
+       */
           $userApplication = $user
               ? $scholarship->applications->first()
               : null;
           $matchScore = $userApplication?->ai_match_score ?? null;
 
-          {{--
+          /*
             Determine badge type from scholarships.status (ENUM).
             Values from DB: open, closing_soon, coming_soon, closed
-          --}}
+          */
           $statusLabel = match($scholarship->status) {
               'open'         => 'Open',
               'closing_soon' => 'Closing Soon',
@@ -522,16 +520,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
               default        => ucfirst($scholarship->status),
           };
 
-          {{--
+          /*
             "New" badge: posted within the last 14 days
-          --}}
+          */
           $isNew = $scholarship->posted_at &&
                    \Carbon\Carbon::parse($scholarship->posted_at)->diffInDays(now()) <= 14;
 
-          {{--
-            Tags: scholarships.tags is stored as JSON array.
-            Cast it to array; handle null gracefully.
-          --}}
+
           $tags = $scholarship->tags ?? [];
           if (is_string($tags)) {
               $tags = json_decode($tags, true) ?? [];

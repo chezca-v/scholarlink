@@ -5,14 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>{{ config('app.name', 'ScholarLink') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
         <!-- Scripts -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased" x-data="sessionTracker()">
@@ -33,7 +32,35 @@
                 {{ $slot }}
             </main>
         </div>
+        <x-modal name="confirm-logout" maxWidth="sm">
+            <div class="bg-white rounded-2xl overflow-hidden shadow-[0_4px_24px_rgba(15,76,92,0.08)]">
 
+                <div class="px-7 py-7 pb-5 text-center">
+                    <h2 class="text-[25px] font-bold text-[#0F4C5C] mb-2.5 leading-tight font-serif">
+                        Log Out
+                    </h2>
+                    <p class="text-[13px] text-[#0F4C5C] leading-relaxed font-sans">
+                        Are you sure you want to log out?<br>
+                        You'll need to sign in again to continue.
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-center gap-10 px-7 py-4 border-t border-[#C8E8E4] bg-white">
+
+                    <button x-on:click="$dispatch('close-modal', 'confirm-logout')" type="button" class="px-5 py-2 rounded-lg text-[13.5px] font-medium text-[#0F4C5C] border border-[#C8E8E4] hover:bg-[#F4F6FA] transition-colors font-sans">
+                        Cancel
+                    </button>
+
+                    <form method="POST" action="{{ route('logout') }}" class="m-0 p-0">
+                        @csrf
+                        <button type="submit" class="px-5 py-2 rounded-lg text-[13.5px] font-medium text-[#F9D679] bg-gradient-to-br from-[#0F4C5C] to-[#1A6B7A] shadow-[0_4px_12px_rgba(15,76,92,0.25)] hover:-translate-y-0.5 transition-all font-sans">
+                            Log Out
+                        </button>
+                    </form>
+
+                </div>
+            </div>
+        </x-modal>
         <!-- Session Timeout Modal -->
         @include('components.modals.session-timeout')
 
