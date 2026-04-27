@@ -782,9 +782,9 @@
                     <label for="role" class="field-label-rp">Role <span class="req">*</span></label>
                     <select id="role" name="role" class="form-select-rp" required>
                         <option value="" disabled {{ old('role') ? '' : 'selected' }}>Select your role</option>
-                        @foreach ($roles ?? ['Applicant', 'Evaluator', 'Admin'] as $role)
-                            <option value="{{ $role }}" {{ old('role') === $role ? 'selected' : '' }}>
-                                {{ $role }}
+                        @foreach ($roles ?? ['applicant', 'evaluator', 'admin', 'superadmin'] as $role)
+                            <option value="{{ strtolower($role) }}" {{ old('role') === strtolower($role) ? 'selected' : '' }}>
+                                {{ ucfirst($role) }}
                             </option>
                         @endforeach
                     </select>
