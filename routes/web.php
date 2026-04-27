@@ -58,6 +58,8 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::post('/scholarships/{id}/save', [SavedScholarshipController::class, 'store'])->name('scholarships.save');
     Route::delete('/scholarships/{id}/unsave', [SavedScholarshipController::class, 'destroy'])->name('scholarships.unsave');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.markRead');
 });
 
 /*
