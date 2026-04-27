@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,10 +17,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login', [
-            'roles' => ['applicant'],
-        ]);
+        return view('auth.login');
     }
+
     /**
      * Handle an incoming authentication request.
      */
@@ -29,7 +29,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirect based on the user's role
+        return redirect()->intended($this->dashboardRouteFor($request->user()));
     }
 
     /**
@@ -44,5 +45,18 @@ class AuthenticatedSessionController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/');
+    }
+
+    /**
+     * Determine the correct dashboard route based on the user's role.
+     */
+    private function dashboardRouteFor(?User $user): string
+    {
+        return match ($user?->role) {
+            'admin' => route('admin.dashboard', absolute: false),
+            'evaluator' => route('evaluator.dashboard', absolute: false),
+            'superadmin' => route('superadmin.dashboard', absolute: false),
+            default => route('dashboard', absolute: false),
+        };
     }
 }
