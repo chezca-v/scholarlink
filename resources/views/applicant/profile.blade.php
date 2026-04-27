@@ -25,41 +25,63 @@
 --}}
 
 @php
-    /* ── Prop defaults ─────────────────────────────────────────────── */
+    /* ── Database-Driven Data ─────────────────────────────────────── */
+    
+    // User data from applicant
+    $applicantUser = auth()->user();
+    $applicantProfile = $applicantUser?->applicantProfile;
+    
     $user = $user ?? [
-        'name'        => 'Ysa Frigillana',
-        'initials'    => 'YD',          // shown on avatar
+        'name'        => $applicantUser?->name ?? 'Applicant',
+        'initials'    => strtoupper(substr($applicantUser?->name ?? 'A', 0, 1)) . strtoupper(substr(explode(' ', $applicantUser?->name ?? 'A')[1] ?? '', 0, 1)),
         'role'        => 'Applicant',
-        'program'     => 'BS Computer Engineering',
-        'school'      => 'Pamantasan ng Lungsod ng Maynila',
-        'last_updated'=> 'Oct 10, 2025',
-        'avatar'      => null,           // URL or null → initials fallback
+        'program'     => $applicantProfile?->program ?? 'Unknown Program',
+        'school'      => $applicantProfile?->school ?? 'Unknown School',
+        'last_updated'=> $applicantProfile?->updated_at?->format('M d, Y') ?? now()->format('M d, Y'),
+        'avatar'      => $applicantUser?->avatar_url ?? null,
     ];
 
     $personal = $personal ?? [
-        'full_name'   => 'Ysa Frigillana',
-        'dob'         => 'October 9, 2005',
-        'contact'     => '09532282006',
-        'email'       => 'nycfrigillana2024@plm.edu.ph',
-        'address'     => 'Block 9 Lot 20 Cabatuhan Compound 1 Gen. T. Deleon Valenzuela',
+        'full_name'   => $applicantUser?->name ?? 'Not provided',
+        'dob'         => $applicantProfile?->date_of_birth?->format('F j, Y') ?? 'Not provided',
+        'contact'     => $applicantProfile?->phone_number ?? 'Not provided',
+        'email'       => $applicantUser?->email ?? 'Not provided',
+        'address'     => $applicantProfile?->address ?? 'Not provided',
     ];
 
     $academic = $academic ?? [
-        'school'      => 'Pamantasan ng Lungsod ng Maynila',
-        'program'     => 'BS Computer Engineering',
-        'year_level'  => '2nd Year',
-        'gpa'         => '1.62',
+        'school'      => $applicantProfile?->school ?? 'Not provided',
+        'program'     => $applicantProfile?->program ?? 'Not provided',
+        'year_level'  => $applicantProfile?->year_level ?? 'Not provided',
+        'gpa'         => $applicantProfile?->gpa ?? 'N/A',
     ];
 
-    $documents = $documents ?? [
-        ['name' => 'Transcript of Records',    'status' => 'verified'],
-        ['name' => 'Certificate of Enrollment','status' => 'verified'],
-        ['name' => 'Cert. of Indigency',       'status' => 'expired'],
-    ];
+    // Fetch documents from database
+    $documents = $documents ?? \App\Models\ApplicationDocument::where('user_id', auth()->id())
+        ->get()
+        ->map(fn($doc) => [
+            'name'   => $doc->document_type,
+            'status' => $doc->status,
+        ])
+        ->toArray();
 
+    // Calculate profile completion from applicant profile
+    $profileFields = [
+        $applicantProfile?->date_of_birth,
+        $applicantProfile?->phone_number,
+        $applicantProfile?->address,
+        $applicantProfile?->school,
+        $applicantProfile?->program,
+        $applicantProfile?->year_level,
+        $applicantProfile?->gpa,
+    ];
+    $completedFields = count(array_filter($profileFields, fn($f) => !is_null($f)));
+    $totalFields = count($profileFields);
+    $percent = $totalFields > 0 ? round(($completedFields / $totalFields) * 100) : 0;
+    
     $completion = $completion ?? [
-        'percent'            => 82,
-        'incomplete_sections'=> 2,
+        'percent'            => $percent,
+        'incomplete_sections'=> $totalFields - $completedFields,
     ];
 
     /* ── Nav ── */
