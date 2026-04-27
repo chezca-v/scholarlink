@@ -55,6 +55,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     });
 
     // Saved Scholarships & Notifications
+    Route::get('/applicant/saved', [SavedScholarshipController::class, 'index'])->name('applicant.saved');
     Route::post('/scholarships/{id}/save', [SavedScholarshipController::class, 'store'])->name('scholarships.save');
     Route::delete('/scholarships/{id}/unsave', [SavedScholarshipController::class, 'destroy'])->name('scholarships.unsave');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
