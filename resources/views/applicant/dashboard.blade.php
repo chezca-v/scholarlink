@@ -33,10 +33,31 @@
         .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
         .chip { border: 1px solid #d9e8ec; border-radius: 999px; background: #fff; padding: 4px 8px; font-size: 10px; color: #496b79; text-decoration: none; display: inline-block; }
         .chip.active { background: #0b6378; color: #fff; border-color: #0b6378; }
-        .mini-profile { margin-top: 16px; border: 1px solid #e2ecf0; border-radius: 10px; background: #fff; padding: 10px; display: flex; align-items: center; gap: 8px; }
+
+        /* ─── Mini profile card ─── */
+        .mini-profile { margin-top: 16px; border: 1px solid #e2ecf0; border-radius: 10px; background: #fff; padding: 10px; }
+        .mini-profile-top { display: flex; align-items: center; gap: 8px; }
         .mini-profile .photo { width: 28px; height: 28px; border-radius: 50%; background: #0b6378; color: #fff; font-size: 10px; font-weight: 700; display: grid; place-items: center; flex-shrink: 0; }
         .mini-profile strong { font-size: 12px; color: #244c5d; }
         .mini-profile small { font-size: 9px; color: #8ba4ad; display: block; }
+
+        /* ─── Profile completeness ring ─── */
+        .completeness-wrap { margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+        .ring-svg { flex-shrink: 0; }
+        .ring-track { fill: none; stroke: #e7eff2; stroke-width: 3; }
+        .ring-fill  { fill: none; stroke: #C9A84C; stroke-width: 3; stroke-linecap: round;
+                      transition: stroke-dashoffset 0.6s ease; transform-origin: center;
+                      transform: rotate(-90deg); }
+        .completeness-text { font-size: 9px; color: #6f8e9a; line-height: 1.4; }
+        .completeness-text strong { font-size: 11px; color: #C9A84C; font-weight: 700; display: block; }
+
+        /* ─── Quick-stats row ─── */
+        .quick-stats { margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
+        .qs-item { background: #f0f8fa; border: 1px solid #ddeef2; border-radius: 8px; padding: 6px 4px; text-align: center; }
+        .qs-num  { font-family: "Fraunces", serif; font-size: 18px; font-weight: 700; color: #0b6378; line-height: 1; }
+        .qs-label { font-size: 8px; color: #89a2ac; margin-top: 2px; text-transform: uppercase; letter-spacing: .08em; }
+        .qs-item.notif .qs-num { color: #C9A84C; }
+
         .main { padding: 16px 18px 24px; }
         .eyebrow { font-size: 10px; letter-spacing: .2em; color: #cb9f3e; font-weight: 700; text-transform: uppercase; }
         .page-title { margin-top: 1px; font-family: "Fraunces", serif; font-size: 46px; line-height: 1.05; color: #1d4254; font-weight: 800; }
@@ -111,7 +132,7 @@
                     <a href="{{ route('scholarships.index') }}" class="clear">Clear all</a>
                 </div>
 
-                {{-- Status filter — values from scholarships.status ENUM: open, closed --}}
+                {{-- Status filter --}}
                 <div class="group">
                     <h4>Status</h4>
                     @foreach($statusCounts as $statusValue => $count)
@@ -127,7 +148,7 @@
                     @endforeach
                 </div>
 
-                {{-- Income bracket filter — values from scholarships.income_bracket (plain text) --}}
+                {{-- Income bracket filter --}}
                 <div class="group">
                     <h4>Income Bracket</h4>
                     @foreach($incomeBrackets as $bracket)
@@ -155,7 +176,7 @@
                     </div>
                 </div>
 
-                {{-- Min match score — only for logged-in users, uses applications.ai_match_score --}}
+                {{-- Min match score --}}
                 @auth
                 <div class="group">
                     <h4>Min. Match Score</h4>
@@ -173,16 +194,110 @@
 
             </form>
 
-            {{-- Mini profile — uses applicant_profiles.gwa --}}
             @auth
-            @php $authProfile = auth()->user()->applicantProfile; @endphp
+            @php
+                $authProfile  = auth()->user()->applicantProfile;
+
+                {{--
+                    Profile completeness — 10 fields tracked.
+                    Each filled field = 10 points.
+
+                    Fields checked (from applicant_profiles table):
+                      1.  date_of_birth
+                      2.  sex
+                      3.  home_address
+                      4.  city
+                      5.  province
+                      6.  mobile_number
+                      7.  university_name
+                      8.  course_program
+                      9.  gwa
+                      10. monthly_household_income
+
+                    avatar_url, profile_completed_at are excluded — they are
+                    system/optional fields, not user-fillable checklist items.
+                --}}
+                $profileFields = [
+                    'date_of_birth',
+                    'sex',
+                    'home_address',
+                    'city',
+                    'province',
+                    'mobile_number',
+                    'university_name',
+                    'course_program',
+                    'gwa',
+                    'monthly_household_income',
+                ];
+
+                $filledCount = 0;
+                if ($authProfile) {
+                    foreach ($profileFields as $field) {
+                        if (!empty($authProfile->$field)) {
+                            $filledCount++;
+                        }
+                    }
+                }
+                $totalFields = count($profileFields);
+                $profilePct  = $totalFields > 0 ? (int) round(($filledCount / $totalFields) * 100) : 0;
+
+                {{--
+                    SVG ring math.
+                    r = 14, circumference = 2π × 14 ≈ 87.96
+                    dashoffset = circumference × (1 − pct/100)
+                --}}
+                $ringCircumference = 2 * M_PI * 14;
+                $ringOffset        = $ringCircumference * (1 - $profilePct / 100);
+            @endphp
+
             <div class="mini-profile">
-                <div class="photo">
-                    {{ strtoupper(substr(auth()->user()->first_name, 0, 1) . substr(auth()->user()->last_name, 0, 1)) }}
+                <div class="mini-profile-top">
+                    <div class="photo">
+                        {{ strtoupper(substr(auth()->user()->first_name, 0, 1) . substr(auth()->user()->last_name, 0, 1)) }}
+                    </div>
+                    <div>
+                        <strong>{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</strong>
+                        <small>Applicant · GPA {{ $authProfile->gwa ?? 'N/A' }}</small>
+                    </div>
                 </div>
-                <div>
-                    <strong>{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</strong>
-                    <small>Applicant · GPA {{ $authProfile->gwa ?? 'N/A' }}</small>
+
+                {{-- Profile completeness ring --}}
+                <div class="completeness-wrap">
+                    <svg class="ring-svg" width="36" height="36" viewBox="0 0 36 36">
+                        <circle class="ring-track" cx="18" cy="18" r="14"/>
+                        <circle class="ring-fill"
+                                cx="18" cy="18" r="14"
+                                stroke-dasharray="{{ number_format($ringCircumference, 2) }}"
+                                stroke-dashoffset="{{ number_format($ringOffset, 2) }}"
+                        />
+                        <text x="18" y="18" text-anchor="middle" dominant-baseline="central"
+                              font-size="7" font-weight="700" fill="#C9A84C"
+                              font-family="DM Sans, sans-serif">
+                            {{ $profilePct }}%
+                        </text>
+                    </svg>
+                    <div class="completeness-text">
+                        <strong>{{ $profilePct }}% Complete</strong>
+                        {{ $filledCount }}/{{ $totalFields }} profile fields filled
+                        @if($profilePct < 100)
+                            — <a href="{{ route('profile.edit') }}" style="color:#0b6378;font-size:9px;">Complete now</a>
+                        @endif
+                    </div>
+                </div>
+                
+                <div class="quick-stats">
+                    <div class="qs-item">
+                        <div class="qs-num">{{ $applicationCount ?? 0 }}</div>
+                        <div class="qs-label">Applied</div>
+                    </div>
+                    <div class="qs-item">
+                        <div class="qs-num">{{ $savedCount ?? 0 }}</div>
+                        <div class="qs-label">Saved</div>
+                    </div>
+                    <div class="qs-item notif">
+                        <div class="qs-num">{{ $unreadCount ?? 0 }}</div>
+                        <div class="qs-label">Notifs</div>
+                    </div>
                 </div>
             </div>
             @endauth
@@ -239,40 +354,31 @@
                 @endphp
                 <article class="card {{ $isFeatured ? 'featured' : '' }}">
                     <div class="org-row">
-                        {{-- scholarships.provider_name --}}
                         <span>{{ strtoupper($scholarship->provider_name) }}</span>
-                        {{-- scholarships.status --}}
                         <span class="status {{ $statusClass }}">{{ ucfirst($scholarship->status) }}</span>
                     </div>
 
-                    {{-- scholarships.name --}}
                     <h3>{{ $scholarship->name }}</h3>
 
                     <p class="meta">
-                        {{-- scholarships.deadline --}}
                         Deadline: {{ \Carbon\Carbon::parse($scholarship->deadline)->format('M d, Y') }}
                     </p>
 
                     <div class="kpis">
-                        {{-- scholarships.gpa_requirement --}}
                         @if($scholarship->gpa_requirement)
                             <span class="kpi">GPA {{ $scholarship->gpa_requirement }}+</span>
                         @endif
-                        {{-- scholarships.income_bracket --}}
                         @if($scholarship->income_bracket)
                             <span class="kpi">{{ $scholarship->income_bracket }}</span>
                         @endif
-                        {{-- scholarships.slots --}}
                         @if($scholarship->slots)
                             <span class="kpi">{{ $scholarship->slots }} slots</span>
                         @endif
-                        {{-- scholarships.benefit_snippet_1 --}}
                         @if($scholarship->benefit_snippet_1)
                             <span class="kpi">{{ $scholarship->benefit_snippet_1 }}</span>
                         @endif
                     </div>
 
-                    {{-- applications.ai_match_score — only shown when logged in --}}
                     @auth
                     @if(isset($scholarship->ai_match_score))
                     <div class="score">
