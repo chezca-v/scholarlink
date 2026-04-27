@@ -252,6 +252,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
   </div>
   <div class="hero-visual">
     <div class="cards-row">
+<<<<<<< HEAD
       @forelse($scholarships->slice(0, 3) as $scholarship)
         <div class="mini-schol-card">
           <div class="msc-top">
@@ -269,6 +270,29 @@ footer { background: #071820; padding: 64px 48px 32px; }
           <div class="msc-title">Check back soon</div>
         </div>
       @endforelse
+=======
+      <div class="mini-schol-card">
+        <div class="msc-top"><span class="msc-org">Gabay Foundation</span><span class="msc-open">Open</span></div>
+        <div class="msc-title">Gabay Dunong Scholarship 2025</div>
+        <div class="msc-match">94%</div>
+        <div class="msc-match-label">Match Score</div>
+        <div class="msc-bar"><div class="msc-bar-fill" style="width:94%"></div></div>
+      </div>
+      <div class="mini-schol-card">
+        <div class="msc-top"><span class="msc-org">Abot-Kaya Inc.</span><span class="msc-open">Open</span></div>
+        <div class="msc-title">Abot-Kaya Excellence Grant</div>
+        <div class="msc-match">87%</div>
+        <div class="msc-match-label">Match Score</div>
+        <div class="msc-bar"><div class="msc-bar-fill" style="width:87%"></div></div>
+      </div>
+      <div class="mini-schol-card">
+        <div class="msc-top"><span class="msc-org">TechBridge Corp.</span><span class="msc-open warn">Closing</span></div>
+        <div class="msc-title">TechBridge STEM Scholarship</div>
+        <div class="msc-match">78%</div>
+        <div class="msc-match-label">Match Score</div>
+        <div class="msc-bar"><div class="msc-bar-fill" style="width:78%"></div></div>
+      </div>
+>>>>>>> 1bd4c7381f62a82b781d3509b9dfb1e77731222c
     </div>
   </div>
 </section>
@@ -323,6 +347,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
       </div>
     </div>
     <div class="s-grid">
+<<<<<<< HEAD
       @forelse($scholarships as $scholarship)
         <div class="s-card reveal">
           <div class="sc-org">
@@ -359,6 +384,26 @@ footer { background: #071820; padding: 64px 48px 32px; }
           <p style="text-align: center; color: #7AACAA;">No scholarships available at the moment. Check back soon!</p>
         </div>
       @endforelse
+=======
+      <div class="s-card reveal d1">
+        <div class="sc-org"><span>Gabay Foundation</span><span class="sc-status open">Open</span></div>
+        <div class="sc-title">Gabay Dunong Scholarship 2025</div>
+        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 1.75 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>Family income ≤ ₱250,000/yr</div><div class="sc-detail"><span class="sc-detail-dot"></span>50 available slots</div></div>
+        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">94%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:94%"></div></div></div>
+      </div>
+      <div class="s-card reveal d2">
+        <div class="sc-org"><span>Abot-Kaya Inc.</span><span class="sc-status open">Open</span></div>
+        <div class="sc-title">Abot-Kaya Excellence Grant</div>
+        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 1.50 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>Open income bracket</div><div class="sc-detail"><span class="sc-detail-dot"></span>30 available slots</div></div>
+        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">87%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:87%"></div></div></div>
+      </div>
+      <div class="s-card reveal d3">
+        <div class="sc-org"><span>TechBridge Corp.</span><span class="sc-status closing">Closing</span></div>
+        <div class="sc-title">TechBridge STEM Scholarship</div>
+        <div class="sc-details"><div class="sc-detail"><span class="sc-detail-dot"></span>GPA 2.00 or higher</div><div class="sc-detail"><span class="sc-detail-dot"></span>STEM course only</div><div class="sc-detail"><span class="sc-detail-dot"></span>40 available slots</div></div>
+        <div class="sc-match"><div class="sc-match-row"><span class="sc-match-label">Your Match Score</span><span class="sc-match-pct">78%</span></div><div class="sc-bar-bg"><div class="sc-bar-fill" style="width:78%"></div></div></div>
+      </div>
+>>>>>>> 1bd4c7381f62a82b781d3509b9dfb1e77731222c
     </div>
   </div>
 </section>
