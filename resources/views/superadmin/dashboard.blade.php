@@ -22,52 +22,6 @@
 
 @php
     $activePage = 'dashboard';
-
-    $stats = $stats ?? [
-        ['icon' => '🏛️', 'icon_bg' => '#E8F8F0',          'label' => 'Organizations',      'value' => '24',    'delta' => '▲ 3 this month',   'delta_class' => 'up'],
-        ['icon' => '🎓', 'icon_bg' => '#FDF4E3',          'label' => 'Active Applicants',  'value' => '8,412', 'delta' => '▲ 12% vs last sem', 'delta_class' => 'up'],
-        ['icon' => '📋', 'icon_bg' => 'rgba(15,76,92,.08)','label' => 'Total Applications', 'value' => '31,587','delta' => 'Across all orgs',   'delta_class' => 'neutral'],
-        ['icon' => '⚠️', 'icon_bg' => '#FEF2F2',          'label' => 'Fraud Alerts',       'value' => '7',     'delta' => '▲ 2 unreviewed',    'delta_class' => 'down'],
-    ];
-
-    $orgPerformance = $orgPerformance ?? [
-        ['name' => 'CHED NCR',        'pct' => 92, 'count' => '9,234', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
-        ['name' => 'DOST-SEI',        'pct' => 78, 'count' => '7,812', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
-        ['name' => 'SM Foundation',   'pct' => 60, 'count' => '6,020', 'color' => 'linear-gradient(90deg,#E8A838,#F9D679)'],
-        ['name' => 'Ayala Foundation','pct' => 48, 'count' => '4,801', 'color' => 'linear-gradient(90deg,#E8A838,#F9D679)'],
-        ['name' => 'GMA Kapuso',      'pct' => 35, 'count' => '3,498', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
-        ['name' => 'PCSO Scholars',   'pct' => 22, 'count' => '2,188', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
-    ];
-
-    $fraudAlerts     = $fraudAlerts     ?? [
-        ['dot' => 'red',    'title' => 'Duplicate document detected',       'meta' => 'App #A-2241 vs #A-2304 · DOST-SEI · 2 min ago'],
-        ['dot' => 'red',    'title' => 'Conflicting scholarship enrollment', 'meta' => 'Juan dela Cruz · CHED + SM · 18 min ago'],
-        ['dot' => 'yellow', 'title' => 'GPA discrepancy flagged',           'meta' => 'App #A-1987 · Ayala Foundation · 1h ago'],
-        ['dot' => 'teal',   'title' => 'Mass application pattern detected', 'meta' => '3 accounts · GMA Kapuso · 3h ago'],
-    ];
-    $fraudAlertCount = $fraudAlertCount ?? 7;
-
-    $systemHealth = $systemHealth ?? [
-        ['label' => 'API Uptime',  'value' => '99.8%', 'status' => 'ok',   'status_text' => '● Operational'],
-        ['label' => 'SMS Gateway', 'value' => 'Online', 'status' => 'ok',   'status_text' => '● ESP32 Active'],
-        ['label' => 'DB Storage',  'value' => '68%',    'status' => 'warn', 'status_text' => '⚠ 4.8 GB used'],
-        ['label' => 'AI Matching', 'value' => 'Active', 'status' => 'ok',   'status_text' => '● Gemini API'],
-    ];
-
-    $chartMonths = $chartMonths ?? [
-        ['month' => 'May', 'pct' => 52,  'accent' => false],
-        ['month' => 'Jun', 'pct' => 61,  'accent' => false],
-        ['month' => 'Jul', 'pct' => 45,  'accent' => false],
-        ['month' => 'Aug', 'pct' => 70,  'accent' => false],
-        ['month' => 'Sep', 'pct' => 88,  'accent' => false],
-        ['month' => 'Oct', 'pct' => 75,  'accent' => false],
-        ['month' => 'Nov', 'pct' => 38,  'accent' => true],
-        ['month' => 'Dec', 'pct' => 42,  'accent' => true],
-        ['month' => 'Jan', 'pct' => 92,  'accent' => false],
-        ['month' => 'Feb', 'pct' => 100, 'accent' => false],
-        ['month' => 'Mar', 'pct' => 82,  'accent' => false],
-        ['month' => 'Apr', 'pct' => 68,  'accent' => false],
-    ];
 @endphp
 
 @section('content')
