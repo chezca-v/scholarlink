@@ -60,26 +60,18 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .kb{background:rgba(255,255,255,0.14);border:1px solid rgba(15, 76, 92, 0.5);border-radius:3px;color:#0c3f4d;font-size:10px;font-weight:600;padding:0 4px;line-height:16px;}
 .nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
 .nav-ibtn{
-  width: 35px;
-  height:35px;
+  width: 35px;height:35px;
   border-radius:10px;
-  background:var(--light-green); /* soft teal tint */
+  background:var(--light-green);
   border:2px solid rgba(15, 76, 92, 0.12);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  position:relative;
-  transition:all 0.2s ease;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;position:relative;transition:all 0.2s ease;
 }
-.nav-ibtn:hover{
-  background:rgba(15, 76, 92, 0.12);
-  border-color:rgba(15, 76, 92, 0.25);
-}
+.nav-ibtn:hover{background:rgba(15, 76, 92, 0.12);border-color:rgba(15, 76, 92, 0.25);}
 .nbadge{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background: #F9D679;border:1.5px solid var(--teal);}
 .nav-av{width:34px;height:34px;border-radius:50%;background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#F9D679;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(255,255,255,0.35);}
 
-.layout{display:flex;align-items:flex-start;}
+.layout{display:flex;align-items:stretch;}
 
 .sidebar{
   width:256px;flex-shrink:0;
@@ -87,7 +79,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
   padding:22px 18px 16px 22px;
   display:flex;flex-direction:column;gap:22px;
   position:sticky;top:56px;
-  height:100vh;
+  height:calc(100vh - 56px);
   overflow-y:auto;
 }
 .layout {
@@ -121,7 +113,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .pill.active{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:600;}
 .pill:not(.active):hover{border-color:var(--slate);}
 
-.sb-user{ margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 14px;background: var(--light-green); border: 2px solid rgba(15, 76, 92, 0.20);border-radius: 20px;}
+.sb-user{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 14px;background: var(--light-green); border: 2px solid rgba(15, 76, 92, 0.20);border-radius: 20px;}
 .sb-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg, #0F4C5C, #1A6B7A);color: #F9D679;font-size:12.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sb-name{font-size:13px;font-weight:600;color:var(--ink);}
 .sb-sub{font-size:11.5px;color:var(--slate);}
@@ -131,7 +123,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .eyebrow{font-size:11px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;color:var(--amber);margin-bottom:2px;}
 .ptitle{font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:var(--ink);letter-spacing:-0.5px;margin-bottom:18px;line-height:1.2;}
 
-/* Chips */
+/* Active filter chips */
 .chips-bar{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-bottom:16px;}
 .chips-lbl{font-size:13px;color:var(--ink);}
 .chip{display:inline-flex;align-items:center;gap:4px;background:#fff;border:1.5px solid var(--mist);border-radius:20px;padding:3px 10px 3px 11px;font-size:12.5px;font-weight:500;color:var(--ink);cursor:pointer;}
@@ -186,7 +178,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .mpct{font-size:14px;font-weight:700;color:var(--amber);min-width:36px;text-align:right;}
 
 .cact{display:flex;gap:7px;margin-top:auto;}
-.btn-apply{flex:1;background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:var(--amber-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;border-radius:8px;padding:9px 0;cursor:pointer;transition:background .12s;}
+.btn-apply{flex:1;background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:var(--amber-light);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;border-radius:8px;padding:9px 0;cursor:pointer;transition:background .12s;text-decoration:none;display:flex;align-items:center;justify-content:center;}
 .btn-apply:hover{background: linear-gradient(135deg, #0F4C5C, #1A6B7A);}
 .btn-bm{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:var(--cloud);border:1.5px solid var(--mist);border-radius:8px;cursor:pointer;color:var(--slate);transition:all .12s;flex-shrink:0;}
 .btn-bm:hover{border-color:var(--amber);color:var(--amber);}
@@ -197,17 +189,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
 /* Pagination */
 .pagi{display:flex;justify-content:center;align-items:center;gap:5px;padding-bottom:24px;}
-.pbtn{min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1.5px solid var(--mist);background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink);cursor:pointer;transition:all .12s;padding:0 6px;}
-.pbtn:hover:not(:disabled):not(.active){border-color:var(--teal);color:var(--teal);}
+.pbtn{min-width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:8px;border:1.5px solid var(--mist);background:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;color:var(--ink);cursor:pointer;transition:all .12s;padding:0 6px;text-decoration:none;}
+.pbtn:hover{border-color:var(--teal);color:var(--teal);}
 .pbtn.active{background:var(--teal);border-color:var(--teal);color:#fff;font-weight:700;}
-.pbtn:disabled{opacity:.3;cursor:default;}
+.pbtn.disabled{opacity:.3;pointer-events:none;}
 .psep{color:var(--slate);font-size:13px;padding:0 2px;}
 
-/* List view */
+/* List view overrides */
 .cgrid.lv .card{flex-direction:row;align-items:stretch;padding:14px 18px;}
 .lvl{flex:1;min-width:0;padding-right:20px;display:flex;flex-direction:column;}
 .lvr{width:200px;flex-shrink:0;display:flex;flex-direction:column;justify-content:flex-end;}
 
+/* Toast */
 .toast{
   position:fixed;right:20px;bottom:20px;z-index:500;
   background:#0e2f39;color:#fff;border:1px solid rgba(255,255,255,0.2);
@@ -224,425 +217,536 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .cgrid{grid-template-columns:repeat(2,1fr);}
 }
 @media (max-width: 820px){
-  .layout{
-    display:flex; /* keep sidebar + main side-by-side */
-  }
-
-  .sidebar{
-    width:220px; /* slightly smaller for tight space */
-    position:sticky;
-    top:56px;
-    height:calc(100vh - 56px);
-  }
-
-  .main{
-    padding:16px;
-  }
-
-  .cgrid{
-    grid-template-columns:1fr; /* cards stack, not sidebar */
-  }
+  .sidebar{width:220px;position:sticky;top:56px;height:calc(100vh - 56px);}
+  .main{padding:16px;}
+  .cgrid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 <body>
 
+{{-- ═══════════════════════════════════════════════════ NAVBAR ══════════════ --}}
 <nav class="navbar">
-  <a class="nav-logo" href="#">
-  <div class="logo-box">🎓</div>
-  <span class="logo-text">ScholarLink</span>
-</a>
-  <div class="nav-search">
-    <span class="si"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-    <input type="text" id="nav-search" placeholder="Search scholarships, organizations…">
+  <a class="nav-logo" href="{{ route('home') }}">
+    <div class="logo-box">🎓</div>
+    <span class="logo-text">ScholarLink</span>
+  </a>
+
+  {{-- Search form — submits GET to same page --}}
+  <form class="nav-search" method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
+    <span class="si">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </span>
+    <input type="text" name="q" id="nav-search"
+           value="{{ $filters['q'] ?? '' }}"
+           placeholder="Search scholarships, organizations…"
+           autocomplete="off">
     <div class="skb"><span class="kb">⌘</span><span class="kb">K</span></div>
-  </div>
+  </form>
+
   <div class="nav-right">
-    <button class="nav-ibtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <button class="nav-ibtn" type="button" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
       <span class="nbadge"></span>
     </button>
-    <button class="nav-ibtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    <button class="nav-ibtn" type="button" title="Settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      </svg>
     </button>
-    <div class="nav-av">YF</div>
+
+    @auth
+      {{-- Show initials from the logged-in user's name --}}
+      <div class="nav-av" title="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
+        {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name, 0, 1)) }}
+      </div>
+    @else
+      <a href="{{ route('login') }}" class="pbtn" style="text-decoration:none;padding:0 14px;">Log in</a>
+    @endauth
   </div>
 </nav>
 
+{{-- ═══════════════════════════════════════════════════ LAYOUT ═════════════ --}}
 <div class="layout">
+
+  {{-- ───────────────────────────────────── SIDEBAR / FILTERS ─────────────── --}}
   <aside class="sidebar">
     <div class="sb-hd">
       <span class="sb-title">Filters</span>
-      <button class="btn-clr" id="btn-ca">Clear all</button>
+      <a href="{{ route('scholarships.index') }}" class="btn-clr">Clear all</a>
     </div>
 
+    {{-- Status --}}
     <div class="fg">
       <div class="fgl">Status</div>
-      <label class="cbr"><input type="checkbox" name="status" value="Open" checked><span class="cbl">Open</span><span class="cbc">86</span></label>
-      <label class="cbr"><input type="checkbox" name="status" value="Closing Soon"><span class="cbl">Closing Soon</span><span class="cbc">14</span></label>
-      <label class="cbr"><input type="checkbox" name="status" value="Coming Soon"><span class="cbl">Coming Soon</span><span class="cbc">20</span></label>
+      @php
+        $activeStatuses = (array) ($filters['status'] ?? ['open', 'closing_soon', 'coming_soon']);
+      @endphp
+      <label class="cbr">
+        <input type="checkbox" name="status[]" value="open"
+               {{ in_array('open', $activeStatuses) ? 'checked' : '' }}
+               onchange="submitFilters()">
+        <span class="cbl">Open</span>
+      </label>
+      <label class="cbr">
+        <input type="checkbox" name="status[]" value="closing_soon"
+               {{ in_array('closing_soon', $activeStatuses) ? 'checked' : '' }}
+               onchange="submitFilters()">
+        <span class="cbl">Closing Soon</span>
+      </label>
+      <label class="cbr">
+        <input type="checkbox" name="status[]" value="coming_soon"
+               {{ in_array('coming_soon', $activeStatuses) ? 'checked' : '' }}
+               onchange="submitFilters()">
+        <span class="cbl">Coming Soon</span>
+      </label>
     </div>
 
+    {{-- Category (tags) --}}
     <div class="fg">
       <div class="fgl">Category</div>
-      <label class="cbr"><input type="checkbox" name="category" value="STEM" checked><span class="cbl">STEM</span><span class="cbc">42</span></label>
-      <label class="cbr"><input type="checkbox" name="category" value="Merit-Based"><span class="cbl">Merit-Based</span><span class="cbc">38</span></label>
-      <label class="cbr"><input type="checkbox" name="category" value="Need-Based"><span class="cbl">Need-Based</span><span class="cbc">31</span></label>
-      <label class="cbr"><input type="checkbox" name="category" value="Arts & Humanities"><span class="cbl">Arts & Humanities</span><span class="cbc">15</span></label>
-      <label class="cbr"><input type="checkbox" name="category" value="Medicine & Health"><span class="cbl">Medicine & Health</span><span class="cbc">19</span></label>
+      @php
+        $activeCategories = (array) ($filters['category'] ?? []);
+        $categoryOptions = [
+          'STEM'             => 'STEM',
+          'Merit-Based'      => 'Merit-Based',
+          'Need-Based'       => 'Need-Based',
+          'Arts & Humanities'=> 'Arts & Humanities',
+          'Medicine & Health'=> 'Medicine & Health',
+        ];
+      @endphp
+      @foreach($categoryOptions as $value => $label)
+        <label class="cbr">
+          <input type="checkbox" name="category[]" value="{{ $value }}"
+                 {{ in_array($value, $activeCategories) ? 'checked' : '' }}
+                 onchange="submitFilters()">
+          <span class="cbl">{{ $label }}</span>
+        </label>
+      @endforeach
     </div>
 
+    {{-- GPA / QPI slider --}}
     <div class="fg">
       <div class="fgl">Minimum GPA / QPI</div>
       <div class="sw">
-        <div class="swr"><span>1.00</span><span class="swc" id="gpa-d">≥ 1.75</span><span>5.00</span></div>
-        <input type="range" id="gpa-s" min="1" max="5" step="0.25" value="1.75">
+        @php $gpaVal = $filters['gpa'] ?? 1.75; @endphp
+        <div class="swr">
+          <span>1.00</span>
+          <span class="swc" id="gpa-d">≥ {{ number_format($gpaVal, 2) }}</span>
+          <span>5.00</span>
+        </div>
+        <input type="range" id="gpa-s" name="gpa" min="1" max="5" step="0.25"
+               value="{{ $gpaVal }}"
+               oninput="document.getElementById('gpa-d').textContent='≥ '+parseFloat(this.value).toFixed(2);"
+               onchange="submitFilters()">
       </div>
     </div>
 
+    {{-- Income bracket --}}
     <div class="fg">
       <div class="fgl">Income Bracket</div>
-      <label class="cbr"><input type="checkbox" name="income" value="Below ₱100K/yr" checked><span class="cbl">Below ₱100K/yr</span></label>
-      <label class="cbr"><input type="checkbox" name="income" value="₱100K–₱250K" checked><span class="cbl">₱100K – ₱250K</span></label>
-      <label class="cbr"><input type="checkbox" name="income" value="₱250K–₱500K"><span class="cbl">₱250K – ₱500K</span></label>
-      <label class="cbr"><input type="checkbox" name="income" value="Open / Any"><span class="cbl">Open / Any</span></label>
+      @php
+        $activeIncomes = (array) ($filters['income'] ?? ['Below ₱100K/yr', '₱100K–₱250K']);
+        $incomeOptions = ['Below ₱100K/yr', '₱100K–₱250K', '₱250K–₱500K', 'Open / Any'];
+      @endphp
+      @foreach($incomeOptions as $incVal)
+        <label class="cbr">
+          <input type="checkbox" name="income[]" value="{{ $incVal }}"
+                 {{ in_array($incVal, $activeIncomes) ? 'checked' : '' }}
+                 onchange="submitFilters()">
+          <span class="cbl">{{ $incVal }}</span>
+        </label>
+      @endforeach
     </div>
 
-    <div class="fg">
-      <div class="fgl">Location</div>
-      <div class="pg">
-        <button class="pill active" data-g="location" data-v="Nationwide">Nationwide</button>
-        <button class="pill" data-g="location" data-v="NCR">NCR</button>
-        <button class="pill" data-g="location" data-v="Luzon">Luzon</button>
-        <button class="pill" data-g="location" data-v="Visayas">Visayas</button>
-        <button class="pill" data-g="location" data-v="Mindanao">Mindanao</button>
-      </div>
-    </div>
-
+    {{-- Deadline pill group --}}
     <div class="fg">
       <div class="fgl">Deadline</div>
+      @php
+        $activeDl = $filters['deadline'] ?? 'This month';
+        $deadlineOptions = ['This week', 'This month', 'Next 3 months', 'Any time'];
+      @endphp
       <div class="pg">
-        <button class="pill" data-g="deadline" data-v="This week">This week</button>
-        <button class="pill active" data-g="deadline" data-v="This month">This month</button>
-        <button class="pill" data-g="deadline" data-v="Next 3 months">Next 3 months</button>
-        <button class="pill" data-g="deadline" data-v="Any time">Any time</button>
+        @foreach($deadlineOptions as $dlOpt)
+          <button type="button"
+                  class="pill {{ $activeDl === $dlOpt ? 'active' : '' }}"
+                  onclick="setPill('deadline', '{{ $dlOpt }}')">
+            {{ $dlOpt }}
+          </button>
+        @endforeach
+        {{-- Hidden input carries the selected value --}}
+        <input type="hidden" name="deadline" id="deadline-val" value="{{ $activeDl }}">
       </div>
     </div>
 
+    {{-- Match score slider (only shown to authenticated users) --}}
+    @auth
     <div class="fg">
       <div class="fgl">Min. Match Score</div>
       <div class="sw">
-        <div class="swr"><span>0%</span><span class="swc" id="match-d">≥ 60%</span><span>100%</span></div>
-        <input type="range" id="match-s" min="0" max="100" step="5" value="60">
+        @php $matchVal = $filters['match'] ?? 60; @endphp
+        <div class="swr">
+          <span>0%</span>
+          <span class="swc" id="match-d">≥ {{ $matchVal }}%</span>
+          <span>100%</span>
+        </div>
+        <input type="range" id="match-s" name="match" min="0" max="100" step="5"
+               value="{{ $matchVal }}"
+               oninput="document.getElementById('match-d').textContent='≥ '+this.value+'%';"
+               onchange="submitFilters()">
       </div>
     </div>
+    @endauth
 
+    {{-- Sort (hidden on sidebar, controlled by top bar) --}}
+    <input type="hidden" name="sort" id="sort-val" value="{{ $filters['sort'] ?? 'match' }}">
+
+    {{-- User profile card (bottom of sidebar) --}}
+    @auth
     <div class="sb-user">
-      <div class="sb-av">YF</div>
-      <div><div class="sb-name">Ysa Frigillana</div><div class="sb-sub">Applicant · GPA 1.62</div></div>
+      <div class="sb-av">
+        {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name, 0, 1)) }}
+      </div>
+      <div>
+        <div class="sb-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
+        @if(Auth::user()->applicantProfile)
+          <div class="sb-sub">
+            Applicant · GPA {{ number_format(Auth::user()->applicantProfile->gwa, 2) }}
+          </div>
+        @else
+          <div class="sb-sub">Applicant</div>
+        @endif
+      </div>
     </div>
+    @endauth
+
   </aside>
 
+  {{-- ───────────────────────────────────────────────── MAIN CONTENT ──────── --}}
   <main class="main">
     <div class="eyebrow">BROWSE</div>
     <h1 class="ptitle">Scholarship Opportunities</h1>
-    <div class="chips-bar" id="cbar"></div>
+
+    {{-- Active filter chips --}}
+    @php
+      $chips = [];
+      if (!empty($filters['status'])) {
+          foreach ((array) $filters['status'] as $s) {
+              $chips[] = ['label' => ucwords(str_replace('_', ' ', $s)), 'remove' => 'status'];
+          }
+      }
+      if (!empty($filters['category'])) {
+          foreach ((array) $filters['category'] as $c) {
+              $chips[] = ['label' => $c, 'remove' => 'category'];
+          }
+      }
+      if (!empty($filters['income'])) {
+          foreach ((array) $filters['income'] as $i) {
+              $chips[] = ['label' => $i, 'remove' => 'income'];
+          }
+      }
+      if (!empty($filters['q'])) {
+          $chips[] = ['label' => '"' . $filters['q'] . '"', 'remove' => 'q'];
+      }
+    @endphp
+
+    @if(count($chips))
+    <div class="chips-bar">
+      <span class="chips-lbl">Active:</span>
+      @foreach($chips as $chip)
+        <span class="chip">{{ $chip['label'] }} <span class="cx">×</span></span>
+      @endforeach
+      <a href="{{ route('scholarships.index') }}" class="btn-clrchips">Clear all</a>
+    </div>
+    @endif
+
+    {{-- Results bar --}}
     <div class="rbar">
-      <div class="rtxt" id="rtxt"><strong>48</strong> scholarships match your filters</div>
+      <div class="rtxt" id="rtxt">
+        <strong>{{ $scholarships->total() }}</strong>
+        scholarship{{ $scholarships->total() !== 1 ? 's' : '' }} match your filters
+      </div>
       <div class="rright">
-        <select class="sort-sel" id="sort-sel">
-          <option value="match">Best Match</option>
-          <option value="deadline">Deadline (Soonest)</option>
-          <option value="slots">Most Slots</option>
-          <option value="alpha">A – Z</option>
+        <select class="sort-sel" id="sort-sel" onchange="setSort(this.value)">
+          <option value="match"    {{ ($filters['sort'] ?? 'match') === 'match'    ? 'selected' : '' }}>Best Match</option>
+          <option value="deadline" {{ ($filters['sort'] ?? '') === 'deadline' ? 'selected' : '' }}>Deadline (Soonest)</option>
+          <option value="slots"    {{ ($filters['sort'] ?? '') === 'slots'    ? 'selected' : '' }}>Most Slots</option>
+          <option value="alpha"    {{ ($filters['sort'] ?? '') === 'alpha'    ? 'selected' : '' }}>A – Z</option>
         </select>
         <div class="vtgl">
-          <button class="vbtn active" id="bg" title="Grid">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          <button class="vbtn active" id="btn-grid" onclick="setView('grid')" title="Grid">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+              <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
           </button>
-          <button class="vbtn" id="bl" title="List">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          <button class="vbtn" id="btn-list" onclick="setView('list')" title="List">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
           </button>
         </div>
       </div>
     </div>
-    <div class="cgrid" id="cgrid"></div>
-    <div class="pagi" id="pagi"></div>
+
+    {{-- ─────────────────── SCHOLARSHIP CARDS GRID ──────────────────────── --}}
+    <div class="cgrid" id="cgrid">
+
+      @forelse($scholarships as $scholarship)
+        @php
+          {{--
+            ai_match_score lives on the applications table (per applicant).
+            If the user is logged in and has applied, pull it from the
+            eager-loaded relationship. Otherwise show no score.
+          --}}
+          $userApplication = $user
+              ? $scholarship->applications->first()
+              : null;
+          $matchScore = $userApplication?->ai_match_score ?? null;
+
+          {{--
+            Determine badge type from scholarships.status (ENUM).
+            Values from DB: open, closing_soon, coming_soon, closed
+          --}}
+          $statusLabel = match($scholarship->status) {
+              'open'         => 'Open',
+              'closing_soon' => 'Closing Soon',
+              'coming_soon'  => 'Coming Soon',
+              'closed'       => 'Closed',
+              default        => ucfirst($scholarship->status),
+          };
+
+          {{--
+            "New" badge: posted within the last 14 days
+          --}}
+          $isNew = $scholarship->posted_at &&
+                   \Carbon\Carbon::parse($scholarship->posted_at)->diffInDays(now()) <= 14;
+
+          {{--
+            Tags: scholarships.tags is stored as JSON array.
+            Cast it to array; handle null gracefully.
+          --}}
+          $tags = $scholarship->tags ?? [];
+          if (is_string($tags)) {
+              $tags = json_decode($tags, true) ?? [];
+          }
+        @endphp
+
+        <div class="card {{ $userApplication && $userApplication->status === 'approved' ? 'saved' : '' }}"
+             data-id="{{ $scholarship->id }}">
+
+          {{-- Card top: org name + badges --}}
+          <div class="ctop">
+            <span class="corg">{{ $scholarship->provider_name }}</span>
+            <div class="cbdg">
+              @if($isNew)
+                <span class="bdg bdg-new">+ New</span>
+              @endif
+              @if($scholarship->status === 'open')
+                <span class="bdg bdg-open">Open</span>
+              @elseif($scholarship->status === 'closing_soon')
+                <span class="bdg bdg-closing">Closing Soon</span>
+              @elseif($scholarship->status === 'coming_soon')
+                <span class="bdg bdg-coming">Coming Soon</span>
+              @elseif($scholarship->status === 'closed')
+                <span class="bdg" style="background:var(--mist);color:var(--slate);border-radius:20px;">Closed</span>
+              @endif
+            </div>
+          </div>
+
+          {{-- Scholarship name --}}
+          <div class="ctitle">{{ $scholarship->name }}</div>
+
+          {{-- Deadline + location meta --}}
+          <div class="cmeta">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+            <span>
+              Deadline:
+              {{ $scholarship->deadline
+                  ? \Carbon\Carbon::parse($scholarship->deadline)->format('M d, Y')
+                  : 'Rolling / Open' }}
+            </span>
+          </div>
+
+          {{-- Tags: gpa_requirement, income_bracket, slots + category tags --}}
+          <div class="ctags">
+            @if($scholarship->gpa_requirement)
+              <span class="tag">GPA {{ $scholarship->gpa_requirement }}+</span>
+            @endif
+            @if($scholarship->income_bracket)
+              <span class="tag">{{ $scholarship->income_bracket }}</span>
+            @endif
+            <span class="tag">{{ number_format($scholarship->slots) }} slots</span>
+            @foreach($tags as $tag)
+              <span class="tag">{{ $tag }}</span>
+            @endforeach
+          </div>
+
+          {{-- Benefit snippets (short highlights from DB) --}}
+          @if($scholarship->benefit_snippet_1 || $scholarship->benefit_snippet_2)
+            <div style="margin-bottom:14px;">
+              @if($scholarship->benefit_snippet_1)
+                <div style="font-size:11.5px;color:var(--teal);margin-bottom:3px;">
+                  ✓ {{ $scholarship->benefit_snippet_1 }}
+                </div>
+              @endif
+              @if($scholarship->benefit_snippet_2)
+                <div style="font-size:11.5px;color:var(--teal);">
+                  ✓ {{ $scholarship->benefit_snippet_2 }}
+                </div>
+              @endif
+            </div>
+          @endif
+
+          <div class="cdiv"></div>
+
+          {{-- Match score (only shown to logged-in users with an AI score) --}}
+          @auth
+            @if($matchScore !== null)
+              <div class="mlbl">Your Match Score</div>
+              <div class="mrow">
+                <div class="btrack">
+                  <div class="bfill" style="width:{{ $matchScore }}%"></div>
+                </div>
+                <span class="mpct">{{ number_format($matchScore, 0) }}%</span>
+              </div>
+            @else
+              <div class="mlbl" style="margin-bottom:13px;opacity:.6;">Match score not yet computed</div>
+            @endif
+          @endauth
+
+          {{-- Actions --}}
+          <div class="cact">
+            <a href="{{ route('scholarships.show', $scholarship->id) }}"
+               class="btn-apply">
+              View & Apply
+            </a>
+            {{-- Bookmark / save button (wired to a POST route) --}}
+            <form method="POST" action="{{ route('scholarships.bookmark', $scholarship->id) }}" style="display:contents;">
+              @csrf
+              <button type="submit" class="btn-bm" title="Save scholarship">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+                </svg>
+              </button>
+            </form>
+          </div>
+
+        </div>{{-- /card --}}
+
+      @empty
+        <div class="no-res">
+          <strong>No scholarships found</strong>
+          <span>Try adjusting your filters or
+            <a href="{{ route('scholarships.index') }}" style="color:var(--teal);">reset all</a>.
+          </span>
+        </div>
+      @endforelse
+
+    </div>{{-- /cgrid --}}
+
+    {{-- ───────────────────────────────── PAGINATION ──────────────────────── --}}
+    @if($scholarships->hasPages())
+    <div class="pagi">
+      {{-- Previous --}}
+      @if($scholarships->onFirstPage())
+        <span class="pbtn disabled">‹</span>
+      @else
+        <a class="pbtn" href="{{ $scholarships->previousPageUrl() }}">‹</a>
+      @endif
+
+      {{-- Page numbers --}}
+      @foreach($scholarships->getUrlRange(1, $scholarships->lastPage()) as $page => $url)
+        @if($page == $scholarships->currentPage())
+          <span class="pbtn active">{{ $page }}</span>
+        @elseif(abs($page - $scholarships->currentPage()) <= 2 || $page == 1 || $page == $scholarships->lastPage())
+          <a class="pbtn" href="{{ $url }}">{{ $page }}</a>
+        @elseif(abs($page - $scholarships->currentPage()) == 3)
+          <span class="psep">…</span>
+        @endif
+      @endforeach
+
+      {{-- Next --}}
+      @if($scholarships->hasMorePages())
+        <a class="pbtn" href="{{ $scholarships->nextPageUrl() }}">›</a>
+      @else
+        <span class="pbtn disabled">›</span>
+      @endif
+    </div>
+    @endif
+
   </main>
-</div>
+</div>{{-- /layout --}}
+
 <div class="toast" id="toast"></div>
 
 <script>
-const D=[
-  {id:1,org:'GABAY FOUNDATION PH',t:'Gabay Dunong Scholarship 2025',loc:'Nationwide',dl:'Dec 31, 2025',ds:'2025-12-31',gpa:'GPA 1.75+',amt:'₱250K/yr',sl:50,tags:['STEM'],st:'Open',nx:true,m:94,cat:'STEM',inc:'Below ₱100K/yr'},
-  {id:2,org:'APF',t:'AccessED College Support Grant',loc:'Luzon',dl:'Nov 15, 2025',ds:'2025-11-15',gpa:'GPA 1.50+',amt:'Open Income',sl:30,tags:['Merit-Based'],st:'Open',nx:false,m:87,cat:'Merit-Based',inc:'Open / Any'},
-  {id:3,org:'SESF',t:'Summit Scholars Grant',loc:'Nationwide',dl:'Oct 30, 2025',ds:'2025-10-30',gpa:'GPA 2.00+',amt:'STEM Only',sl:40,tags:['STEM'],st:'Closing Soon',nx:false,m:78,cat:'STEM',inc:'Open / Any'},
-  {id:4,org:'BAYANIHAN COMMUNITY',t:'Lingap Kabataan Scholarship',loc:'NCR',dl:'Jan 15, 2026',ds:'2026-01-15',gpa:'GPA 1.25+',amt:'₱150K/yr',sl:20,tags:['Need-Based'],st:'Open',nx:false,m:71,cat:'Need-Based',inc:'Below ₱100K/yr'},
-  {id:5,org:'PALAD NG PAGBABAGO',t:'Bukas Palad',loc:'Nationwide',dl:'Dec 1, 2025',ds:'2025-12-01',gpa:'GPA 1.50+',amt:'Any Income',sl:100,tags:['Need-Based'],st:'Open',nx:false,m:66,cat:'Need-Based',inc:'₱100K–₱250K'},
-  {id:6,org:'DOST-SEI',t:'DOST Merit Scholarship Program',loc:'Nationwide',dl:'Feb 28, 2026',ds:'2026-02-28',gpa:'GPA 1.75+',amt:'₱400K/yr',sl:200,tags:['STEM'],st:'Open',nx:true,m:91,cat:'STEM',inc:'₱100K–₱250K'},
-  {id:7,org:'SM FOUNDATION',t:'SM College Scholarship',loc:'Nationwide',dl:'Mar 15, 2026',ds:'2026-03-15',gpa:'GPA 1.50+',amt:'₱180K/yr',sl:150,tags:['Merit-Based'],st:'Open',nx:false,m:83,cat:'Merit-Based',inc:'Below ₱100K/yr'},
-  {id:8,org:'AYALA FOUNDATION',t:'Ayala Young Leaders Scholarship',loc:'NCR',dl:'Dec 20, 2025',ds:'2025-12-20',gpa:'GPA 1.25+',amt:'₱300K/yr',sl:25,tags:['Merit-Based'],st:'Closing Soon',nx:false,m:75,cat:'Merit-Based',inc:'₱100K–₱250K'},
-  {id:9,org:'CHED',t:'UniFAST Tertiary Education Subsidy',loc:'Nationwide',dl:'Any time',ds:'2099-01-01',gpa:'Any GPA',amt:'Open / Any',sl:5000,tags:['Need-Based'],st:'Open',nx:false,m:62,cat:'Need-Based',inc:'Below ₱100K/yr'},
-  {id:10,org:'METROBANK FOUNDATION',t:'Metrobank Foundation Scholarship',loc:'Nationwide',dl:'Jan 31, 2026',ds:'2026-01-31',gpa:'GPA 1.50+',amt:'₱250K/yr',sl:60,tags:['STEM'],st:'Open',nx:false,m:88,cat:'STEM',inc:'₱100K–₱250K'},
-  {id:11,org:'JOLLIBEE GROUP FOUNDATION',t:'Busog, Lusog, Talino Program',loc:'Visayas',dl:'Nov 30, 2025',ds:'2025-11-30',gpa:'GPA 2.00+',amt:'₱120K/yr',sl:80,tags:['Need-Based'],st:'Closing Soon',nx:false,m:69,cat:'Need-Based',inc:'Below ₱100K/yr'},
-  {id:12,org:'GLOBE TELECOM FOUNDATION',t:'Globe Bridging the Digital Divide',loc:'Mindanao',dl:'Mar 1, 2026',ds:'2026-03-01',gpa:'GPA 1.75+',amt:'₱200K/yr',sl:35,tags:['STEM'],st:'Coming Soon',nx:true,m:80,cat:'STEM',inc:'₱250K–₱500K'},
-  {id:13,org:'CCP & NCCA',t:'Filipino Arts & Culture Scholarship',loc:'Nationwide',dl:'Feb 14, 2026',ds:'2026-02-14',gpa:'GPA 1.50+',amt:'₱160K/yr',sl:15,tags:['Arts & Humanities'],st:'Open',nx:false,m:61,cat:'Arts & Humanities',inc:'Open / Any'},
-  {id:14,org:'PRC & DOH',t:'Allied Health Sciences Grant',loc:'Luzon',dl:'Jan 10, 2026',ds:'2026-01-10',gpa:'GPA 1.50+',amt:'₱350K/yr',sl:45,tags:['Medicine & Health'],st:'Open',nx:true,m:85,cat:'Medicine & Health',inc:'Below ₱100K/yr'},
-  {id:15,org:'BDO FOUNDATION',t:'BDO Kabalikat sa Tagumpay',loc:'NCR',dl:'Dec 10, 2025',ds:'2025-12-10',gpa:'GPA 2.00+',amt:'₱140K/yr',sl:70,tags:['Merit-Based'],st:'Open',nx:false,m:73,cat:'Merit-Based',inc:'₱100K–₱250K'},
-  {id:16,org:'PHILHEALTH FOUNDATION',t:'PhilHealth Medical Scholars',loc:'Nationwide',dl:'Apr 30, 2026',ds:'2026-04-30',gpa:'GPA 1.25+',amt:'₱500K/yr',sl:20,tags:['Medicine & Health'],st:'Coming Soon',nx:true,m:90,cat:'Medicine & Health',inc:'Below ₱100K/yr'},
-  {id:17,org:'ABOITIZ FOUNDATION',t:'Aboitiz Technical Scholars',loc:'Visayas',dl:'Feb 20, 2026',ds:'2026-02-20',gpa:'GPA 1.75+',amt:'₱220K/yr',sl:30,tags:['STEM'],st:'Open',nx:false,m:76,cat:'STEM',inc:'₱100K–₱250K'},
-  {id:18,org:'YESPINOY FOUNDATION',t:'YesPinoy Foundation Grant',loc:'Mindanao',dl:'Mar 31, 2026',ds:'2026-03-31',gpa:'GPA 1.50+',amt:'₱175K/yr',sl:55,tags:['Need-Based'],st:'Open',nx:false,m:64,cat:'Need-Based',inc:'Below ₱100K/yr'},
-];
-const PP=6;
-let cp=1,lv=false,sv=new Set();
-let toastTimer;
-let renderTimer;
-const bookmarkIcon=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`;
-const defaults={
-  status:['Open','Closing Soon','Coming Soon'],
-  category:[],
-  income:['Below ₱100K/yr','₱100K–₱250K'],
-  location:'Nationwide',
-  deadline:'This month',
-  gpa:1.75,
-  match:60
-};
+// ── View toggle (grid vs list) ─────────────────────────────────────────────
+function setView(mode) {
+  const grid = document.getElementById('cgrid');
+  const btnGrid = document.getElementById('btn-grid');
+  const btnList = document.getElementById('btn-list');
+  if (mode === 'list') {
+    grid.classList.add('lv');
+    btnList.classList.add('active');
+    btnGrid.classList.remove('active');
+  } else {
+    grid.classList.remove('lv');
+    btnGrid.classList.add('active');
+    btnList.classList.remove('active');
+  }
+}
 
-function showToast(message){
-  const t=document.getElementById('toast');
-  clearTimeout(toastTimer);
-  t.textContent=message;
-  t.classList.add('show');
-  toastTimer=setTimeout(()=>t.classList.remove('show'),1700);
+// ── Sort select — updates hidden input and submits ─────────────────────────
+function setSort(value) {
+  document.getElementById('sort-val').value = value;
+  submitFilters();
 }
-function deadlineMode(){return document.querySelector('.pill.active[data-g=deadline]')?.dataset.v||'Any time';}
-function gF(){return{
-  sts:[...document.querySelectorAll('input[name=status]:checked')].map(x=>x.value),
-  cats:[...document.querySelectorAll('input[name=category]:checked')].map(x=>x.value),
-  incs:[...document.querySelectorAll('input[name=income]:checked')].map(x=>x.value),
-  gpa:parseFloat(document.getElementById('gpa-s').value),
-  mm:parseInt(document.getElementById('match-s').value,10),
-  loc:document.querySelector('.pill.active[data-g=location]')?.dataset.v||null,
-  dl:deadlineMode(),
-  q:document.getElementById('nav-search').value.trim().toLowerCase(),
-};}
-function gv(s){return(!s||s==='Any GPA')?0:parseFloat(s.replace('GPA ','').replace('+',''));}
-function daysUntil(iso){return Math.floor((new Date(iso).getTime()-Date.now())/86400000);}
-function passDeadline(mode,s){
-  if(mode==='Any time')return true;
-  if (s.ds === '2099-01-01') return true;
-  const d=daysUntil(s.ds);
-  if(mode==='This week')return d>=0&&d<=7;
-  if(mode==='This month')return d>=0&&d<=31;
-  if(mode==='Next 3 months')return d>=0&&d<=92;
-  return true;
+
+// ── Deadline pill toggle ───────────────────────────────────────────────────
+function setPill(group, value) {
+  document.querySelectorAll(`.pill[data-g="${group}"]`).forEach(p => p.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('deadline-val').value = value;
+  submitFilters();
 }
-function filt(){
-  const f=gF();
-  return D.filter(s=>{
-    if(f.sts.length&&!f.sts.includes(s.st))return false;
-    if(f.cats.length&&!f.cats.includes(s.cat))return false;
-    if (f.incs.length) { const ok = f.incs.includes(s.inc)
-    || s.inc === 'Open / Any'
-    || s.inc === 'Any Income';
-    if (!ok) return false;}
-    if(s.m<f.mm)return false;
-   const required = gv(s.gpa);
-   if (required > f.gpa) return false;
-    if (f.loc && f.loc !== 'Nationwide') {
-  if (s.loc !== f.loc) return false;
+
+// ── Submit the filter form (debounced for range inputs) ────────────────────
+let submitTimer;
+function submitFilters(delay = 400) {
+  clearTimeout(submitTimer);
+  submitTimer = setTimeout(() => {
+    document.getElementById('filter-form').submit();
+  }, delay);
 }
-    if(!passDeadline(f.dl,s))return false;
-    if(f.q){const h=(s.t+s.org+s.tags.join(' ')).toLowerCase();if(!h.includes(f.q))return false;}
-    return true;
-  });
-}
-function srt(arr){
-  const v=document.getElementById('sort-sel').value;
-  return[...arr].sort((a,b)=>{
-    if(v==='match')return b.m-a.m;
-    if(v==='slots')return b.sl-a.sl;
-    if(v==='alpha')return a.t.localeCompare(b.t);
-    if(v==='deadline')return a.ds.localeCompare(b.ds);
-    return 0;
-  });
-}
-function bdg(s){
-  if(s.st==='Open')return`<span class="bdg bdg-open">Open</span>`;
-  if(s.st==='Closing Soon')return`<span class="bdg bdg-closing">Closing Soon</span>`;
-  if(s.st==='Coming Soon')return`<span class="bdg bdg-coming">Coming Soon</span>`;
-  return'';
-}
-function cardBody(s,bm){
-  const tags=[s.gpa,s.amt,s.sl+' slots',...s.tags].map(t=>`<span class="tag">${t}</span>`).join('');
-  return `<div class="ctop"><span class="corg">${s.org}</span><div class="cbdg">${s.nx?'<span class="bdg bdg-new">+ New</span>':''}${bdg(s)}</div></div>
-    <div class="ctitle">${s.t}</div>
-    <div class="cmeta"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${s.loc} · Deadline: ${s.dl}</span></div>
-    <div class="ctags">${tags}</div>`;
-}
-function actionBlock(s,bm){
-  return `<div class="mlbl">Your Match Score</div>
-    <div class="mrow"><div class="btrack"><div class="bfill" style="width:${s.m}%"></div></div><span class="mpct">${s.m}%</span></div>
-    <div class="cact"><button class="btn-apply" data-aid="${s.id}">Apply Now</button><button class="btn-bm${bm?' saved':''}" data-id="${s.id}">${bookmarkIcon}</button></div>`;
-}
-function cHTML(s){
-  const bm=sv.has(s.id);
-  return `<div class="card${bm?' saved':''}" data-id="${s.id}">
-    ${cardBody(s,bm)}
-    <div class="cdiv"></div>
-    ${actionBlock(s,bm)}
-  </div>`;
-}
-function cHTMLlv(s){
-  const bm=sv.has(s.id);
-  return `<div class="card${bm?' saved':''}" data-id="${s.id}" style="flex-direction:row;align-items:stretch;padding:14px 18px;">
-    <div class="lvl">${cardBody(s,bm)}</div>
-    <div class="lvr">${actionBlock(s,bm)}</div>
-  </div>`;
-}
-function skelHTML(){
-  return`<div class="card-skel">
-    <div style="display:flex;justify-content:space-between;align-items:center;"><div class="sk" style="width:48%;height:11px;"></div><div class="sk" style="width:22%;height:20px;border-radius:20px;"></div></div>
-    <div class="sk" style="width:82%;height:19px;margin-top:4px;"></div>
-    <div class="sk" style="width:58%;height:11px;"></div>
-    <div style="display:flex;gap:6px;margin-top:3px;"><div class="sk" style="width:22%;height:22px;border-radius:5px;"></div><div class="sk" style="width:22%;height:22px;border-radius:5px;"></div><div class="sk" style="width:16%;height:22px;border-radius:5px;"></div></div>
-    <div style="height:1px;background:var(--mist);margin:10px 0;"></div>
-    <div class="sk" style="width:36%;height:11px;"></div>
-    <div style="display:flex;align-items:center;gap:8px;margin-top:6px;"><div class="sk" style="flex:1;height:6px;border-radius:20px;"></div><div class="sk" style="width:34px;height:11px;"></div></div>
-    <div class="sk" style="width:100%;height:34px;border-radius:8px;margin-top:9px;"></div>
-  </div>`;
-}
-function renderLoading(count=PP){
-  const grid=document.getElementById('cgrid');
-  const total=Math.max(1,count);
-  grid.innerHTML=Array.from({length:Math.min(total,PP)},()=>skelHTML()).join('');
-  document.getElementById('rtxt').innerHTML='<strong>Loading...</strong> preparing scholarship matches';
-  document.getElementById('pagi').innerHTML='';
-}
-function setCheckboxGroup(name,values){
-  document.querySelectorAll(`input[name="${name}"]`).forEach(c=>{c.checked=values.includes(c.value);});
-}
-function setPill(group,value){
-  document.querySelectorAll(`.pill[data-g=${group}]`).forEach(p=>p.classList.remove('active'));
-  const target=document.querySelector(`.pill[data-g=${group}][data-v="${value}"]`);
-  if(target)target.classList.add('active');
-}
-function applyDefaults(){
-  setCheckboxGroup('status',defaults.status);
-  setCheckboxGroup('category',defaults.category);
-  setCheckboxGroup('income',defaults.income);
-  setPill('location',defaults.location);
-  setPill('deadline',defaults.deadline);
-  document.getElementById('gpa-s').value=defaults.gpa;
-  document.getElementById('gpa-d').textContent='≥ '+defaults.gpa.toFixed(2);
-  document.getElementById('match-s').value=defaults.match;
-  document.getElementById('match-d').textContent='≥ '+defaults.match+'%';
-  document.getElementById('nav-search').value='';
-}
-function uc(n,v){const c=document.querySelector(`input[name="${n}"][value="${v}"]`);if(c)c.checked=false;}
-function renderChips(){
-  const f=gF(),bar=document.getElementById('cbar');
-  const chips=[];
-  if(f.sts.includes('Open'))chips.push({l:'Open',rm:()=>uc('status','Open')});
-  if(f.sts.includes('Closing Soon'))chips.push({l:'Closing Soon',rm:()=>uc('status','Closing Soon')});
-  if(f.sts.includes('Coming Soon'))chips.push({l:'Coming Soon',rm:()=>uc('status','Coming Soon')});
-  f.cats.forEach(c=>chips.push({l:c,rm:()=>uc('category',c)}));
-  if(f.incs.includes('Below ₱100K/yr'))chips.push({l:'Below ₱100K',rm:()=>uc('income','Below ₱100K/yr')});
-  if(f.incs.includes('₱100K–₱250K'))chips.push({l:'₱100K–₱250K',rm:()=>uc('income','₱100K–₱250K')});
-  if(f.loc)chips.push({l:f.loc,rm:()=>setPill('location',defaults.location)});
-  if(f.dl)chips.push({l:f.dl,rm:()=>setPill('deadline',defaults.deadline)});
-  if(f.gpa>1)chips.push({l:`GPA ≥ ${f.gpa.toFixed(2)}`,rm:()=>{document.getElementById('gpa-s').value=1;document.getElementById('gpa-d').textContent='≥ 1.00';}});
-  if(f.mm>0)chips.push({l:`Match ≥ ${f.mm}%`,rm:()=>{document.getElementById('match-s').value=0;document.getElementById('match-d').textContent='≥ 0%';}});
-  if(!chips.length){bar.innerHTML='';return;}
-  bar.innerHTML='<span class="chips-lbl">Active:</span>'+chips.map((c,i)=>`<span class="chip" data-i="${i}">${c.l} <span class="cx">×</span></span>`).join('')+'<button class="btn-clrchips">Clear all</button>';
-  bar.querySelectorAll('.chip').forEach((el,i)=>el.addEventListener('click',()=>{chips[i].rm();cp=1;render();}));
-  bar.querySelector('.btn-clrchips')?.addEventListener('click',clearAll);
-}
-function renderPagi(total){
-  const tp=Math.ceil(total/PP),el=document.getElementById('pagi');
-  if(tp<=1){el.innerHTML='';return;}
-  const nums=[];
-  for(let i=1;i<=tp;i++){
-    if(i===1||i===tp||Math.abs(i-cp)<=1)nums.push(i);
-    else if(Math.abs(i-cp)===2)nums.push('…');
-  }
-  const dd=nums.filter((v,i)=>!(v==='…'&&nums[i-1]==='…'));
-  let h=`<button class="pbtn" id="pp" ${cp===1?'disabled':''}>‹</button>`;
-  dd.forEach(v=>{if(v==='…')h+=`<span class="psep">…</span>`;else h+=`<button class="pbtn${v===cp?' active':''}" data-p="${v}">${v}</button>`;});
-  h+=`<button class="pbtn" id="pn" ${cp===tp?'disabled':''}>›</button>`;
-  el.innerHTML=h;
-  el.querySelectorAll('[data-p]').forEach(b=>b.addEventListener('click',()=>{cp=parseInt(b.dataset.p,10);render();}));
-  el.querySelector('#pp')?.addEventListener('click',()=>{if(cp>1){cp--;render();}});
-  el.querySelector('#pn')?.addEventListener('click',()=>{if(cp<tp){cp++;render();}});
-}
-function bindCardActions(slice){
-  document.querySelectorAll('.btn-bm').forEach(b=>b.addEventListener('click',()=>{
-    const id=parseInt(b.dataset.id,10);
-    const selected=slice.find(x=>x.id===id);
-    if(sv.has(id)){sv.delete(id);showToast(`Removed "${selected.t}" from saved`);}
-    else{sv.add(id);showToast(`Saved "${selected.t}"`);}
-    render();
-  }));
-  document.querySelectorAll('.btn-apply').forEach(b=>b.addEventListener('click',()=>{
-    const id=parseInt(b.dataset.aid,10);
-    const selected=slice.find(x=>x.id===id);
-    showToast(`Application started for "${selected.t}"`);
-  }));
-}
-function render(){
-  const f=filt(),s=srt(f),total=s.length;
-  const tp=Math.max(1,Math.ceil(total/PP));
-  if(cp>tp)cp=tp;
-  const slice=s.slice((cp-1)*PP,cp*PP);
-  document.getElementById('rtxt').innerHTML=`<strong>${total}</strong> scholarship${total!==1?'s':''} match your filters`;
-  const grid=document.getElementById('cgrid');
-  if(total===0){
-    grid.innerHTML=`<div class="no-res"><strong>No scholarships found</strong><span>Try adjusting your filters.</span><div style="margin-top:12px;"><button class="pbtn" id="rst-btn">Reset filters</button></div></div>`;
-    document.getElementById('rst-btn')?.addEventListener('click',clearAll);
-  }else{
-    let cards=slice.map(item=>lv?cHTMLlv(item):cHTML(item));
-    if(!lv&&cp===1&&slice.length===PP)cards[cards.length-1]=skelHTML();
-    grid.innerHTML=cards.join('');
-    bindCardActions(slice);
-  }
-  renderPagi(total);
-  renderChips();
-}
-function scheduleRender(delay=260){
-  clearTimeout(renderTimer);
-  renderLoading();
-  renderTimer=setTimeout(()=>render(),delay);
-}
-function clearAll(){
-  document.querySelectorAll('input[type=checkbox]').forEach(c=>{c.checked=false;});
-  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
-  document.getElementById('gpa-s').value=1;
-  document.getElementById('gpa-d').textContent='≥ 1.00';
-  document.getElementById('match-s').value=0;
-  document.getElementById('match-d').textContent='≥ 0%';
-  document.getElementById('nav-search').value='';
-  cp=1;
-  scheduleRender();
-}
-document.getElementById('btn-ca').addEventListener('click',clearAll);
-document.getElementById('gpa-s').addEventListener('input',function(){document.getElementById('gpa-d').textContent='≥ '+parseFloat(this.value).toFixed(2);cp=1;scheduleRender();});
-document.getElementById('match-s').addEventListener('input',function(){document.getElementById('match-d').textContent='≥ '+this.value+'%';cp=1;scheduleRender();});
-document.querySelectorAll('input[type=checkbox]').forEach(c=>c.addEventListener('change',()=>{cp=1;scheduleRender();}));
-document.querySelectorAll('.pill[data-g=location]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.pill[data-g=location]').forEach(x=>x.classList.remove('active'));b.classList.add('active');cp=1;scheduleRender();}));
-document.querySelectorAll('.pill[data-g=deadline]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.pill[data-g=deadline]').forEach(x=>x.classList.remove('active'));b.classList.add('active');cp=1;scheduleRender();}));
-document.getElementById('sort-sel').addEventListener('change',()=>{cp=1;scheduleRender();});
-document.getElementById('bg').addEventListener('click',()=>{lv=false;document.getElementById('cgrid').className='cgrid';document.getElementById('bg').classList.add('active');document.getElementById('bl').classList.remove('active');scheduleRender(180);});
-document.getElementById('bl').addEventListener('click',()=>{lv=true;document.getElementById('cgrid').className='cgrid lv';document.getElementById('bl').classList.add('active');document.getElementById('bg').classList.remove('active');scheduleRender(180);});
-let st;
-document.getElementById('nav-search').addEventListener('input',()=>{clearTimeout(st);st=setTimeout(()=>{cp=1;scheduleRender();},220);});
-document.addEventListener('keydown',e=>{
-  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){
+
+// ── Search input: debounce to avoid submitting on every keystroke ──────────
+document.getElementById('nav-search').addEventListener('input', () => submitFilters(500));
+
+// ── ⌘K / Ctrl+K focuses the search bar ────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault();
     document.getElementById('nav-search').focus();
   }
 });
-applyDefaults();
-scheduleRender(120);
+
+// ── Simple toast helper ────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1700);
+}
 </script>
 </body>
 </html>
