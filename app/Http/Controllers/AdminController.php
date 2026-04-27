@@ -93,6 +93,129 @@ class AdminController extends Controller
             ? auth()->user()->notifications()->where('is_read', false)->count()
             : 0;
 
+        // Build stat cards data
+        $stats = [
+            [
+                'icon' => '📖',
+                'badge_text' => '↑ ' . $newScholarships . ' new',
+                'badge_color' => 'var(--green-success)',
+                'value' => $openScholarships,
+                'label' => 'Open Scholarships',
+                'footer' => $closingSoonScholarships . ' closing soon · ' . $draftScholarships . ' drafting',
+            ],
+            [
+                'icon' => '📝',
+                'badge_text' => '↑ ' . $pendingToday . ' today',
+                'badge_color' => 'var(--red-alert)',
+                'value' => $pendingReviews,
+                'label' => 'Pending Reviews',
+                'footer' => 'Oldest: ' . $oldestPendingDays . ' days ago',
+            ],
+            [
+                'icon' => '📈',
+                'badge_text' => ($applicationsGrowth >= 0 ? '↑' : '↓') . ' ' . abs($applicationsGrowth) . '%',
+                'badge_color' => 'var(--green-success)',
+                'value' => $totalApplications,
+                'label' => 'Total Applications',
+                'footer' => 'This academic year',
+            ],
+            [
+                'icon' => '💰',
+                'badge_text' => ($applicationsGrowth >= 0 ? '↑' : '↓') . ' ' . abs($applicationsGrowth) . '%',
+                'badge_color' => 'var(--green-success)',
+                'value' => $approvedAwarded,
+                'label' => 'Approved / Awarded',
+                'footer' => $approvalRate . '% approval rate',
+            ],
+        ];
+
+        // Build alerts data
+        $alerts = [
+            [
+                'type' => 'red',
+                'icon' => '🚨',
+                'title' => $unassignedApplications . ' Applications Unassigned for 4+ Days',
+                'description' => 'Applications with no evaluations assigned yet. Risk of missing SLA.',
+                'link' => route('admin.applications.unassigned') ?? '#',
+                'link_text' => 'Assign Evaluators',
+            ],
+            [
+                'type' => 'orange',
+                'icon' => '⏳',
+                'title' => 'Upcoming Deadlines — ' . $incompleteDocsApplications . ' Applicants with Incomplete Docs',
+                'description' => 'Applicants still missing at least one required document.',
+                'link' => route('admin.applications.incomplete_docs') ?? '#',
+                'link_text' => 'View Applicants',
+            ],
+            [
+                'type' => 'blue',
+                'icon' => '📢',
+                'title' => $awaitingApprovalScholarships . ' Scholarships Awaiting Approval',
+                'description' => 'Draft scholarships are ready for review and publication.',
+                'link' => route('admin.scholarships.drafts') ?? '#',
+                'link_text' => 'Review Drafts',
+            ],
+        ];
+
+        // Build quick actions data
+        $quickActions = [
+            [
+                'icon' => '➕',
+                'label' => 'New Scholarship',
+                'link' => route('admin.scholarships.create') ?? '#',
+            ],
+            [
+                'icon' => '👥',
+                'label' => 'Assign',
+                'link' => route('admin.applications.pending') ?? '#',
+            ],
+            [
+                'icon' => '⚙️',
+                'label' => 'Weight Config',
+                'link' => route('admin.settings') ?? '#',
+            ],
+            [
+                'icon' => '📊',
+                'label' => 'Analytics',
+                'link' => route('admin.reports.index') ?? '#',
+            ],
+        ];
+
+        // Build breakdown items data
+        $totalForBreakdown = max(1, $totalApplications);
+        $breakdownItems = [
+            [
+                'color' => '#ea8c55',
+                'label' => 'Pending Review',
+                'count' => $statusCounts['pending'],
+                'percentage' => round(($statusCounts['pending'] / $totalForBreakdown) * 100),
+            ],
+            [
+                'color' => '#1a8fa0',
+                'label' => 'Under Evaluation',
+                'count' => $statusCounts['under_review'],
+                'percentage' => round(($statusCounts['under_review'] / $totalForBreakdown) * 100),
+            ],
+            [
+                'color' => '#8b5cf6',
+                'label' => 'Awaiting Docs',
+                'count' => $statusCounts['revision'],
+                'percentage' => round(($statusCounts['revision'] / $totalForBreakdown) * 100),
+            ],
+            [
+                'color' => '#10b981',
+                'label' => 'Approved',
+                'count' => $statusCounts['approved'],
+                'percentage' => round(($statusCounts['approved'] / $totalForBreakdown) * 100),
+            ],
+            [
+                'color' => '#ef5350',
+                'label' => 'Rejected',
+                'count' => $statusCounts['rejected'],
+                'percentage' => round(($statusCounts['rejected'] / $totalForBreakdown) * 100),
+            ],
+        ];
+
         return view('admin.dashboard', [
             'now' => $now,
             'openScholarships' => $openScholarships,
@@ -114,6 +237,10 @@ class AdminController extends Controller
             'scholarshipOverview' => $scholarshipOverview,
             'upcomingDeadlines' => $upcomingDeadlines,
             'unreadNotifications' => $unreadNotifications,
+            'stats' => $stats,
+            'alerts' => $alerts,
+            'quickActions' => $quickActions,
+            'breakdownItems' => $breakdownItems,
         ]);
     }
 

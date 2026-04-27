@@ -355,7 +355,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       Browse
     </a>
-    <a class="sb-nav-item" href="{{ route('applications.index') }}">
+    <a class="sb-nav-item" href="{{ route('applicant.documents.index') }}">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Applications
     </a>
@@ -389,13 +389,13 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
   <!-- MAIN -->
   <main class="main">
     <div class="inbox-container">
-        
+
         <div class="inbox-header">
             <div class="inbox-title-area">
                 <span class="inbox-eyebrow">INBOX</span>
                 <h1 class="inbox-title">Notifications</h1>
             </div>
-            
+
             <form action="{{ route('notifications.markAllRead') }}" method="POST">
                 @csrf
                 <button type="submit" class="btn-mark-read">Mark all as read</button>
@@ -425,7 +425,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                 @php
                     $isUnread = !$notif->is_read;
                     $titleLower = strtolower($notif->title);
-                    
+
                     // Determine icon and color
                     $iconColor = 'purple';
                     $iconSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
@@ -455,7 +455,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                         $iconSvg = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
                     }
                 @endphp
-                
+
                 <div class="n-item {{ $isUnread ? 'unread' : 'read' }}">
                     <div class="n-icon {{ $iconColor }}">
                         {!! $iconSvg !!}

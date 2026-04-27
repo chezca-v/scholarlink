@@ -196,9 +196,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .psep{color:var(--slate);font-size:13px;padding:0 2px;}
 
 /* List view overrides */
-.cgrid.lv .card{flex-direction:row;align-items:stretch;padding:14px 18px;}
-.lvl{flex:1;min-width:0;padding-right:20px;display:flex;flex-direction:column;}
-.lvr{width:200px;flex-shrink:0;display:flex;flex-direction:column;justify-content:flex-end;}
+.cgrid.lv .card { flex-direction: row; align-items: stretch; padding: 14px 18px; gap: 0; }
+.cgrid.lv .card .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.cgrid.lv .card .cact { margin-top: 0; flex-shrink: 0; flex-direction: column; justify-content: flex-end; gap: 6px; width: 140px; padding-left: 16px; border-left: 1.5px solid var(--mist); }
+.cgrid.lv .card .cact .btn-bm { width: 100%; border-radius: 8px; }
+.cgrid.lv .card .cdiv { display: none; }
+.cgrid.lv .card .mrow { margin-bottom: 0; }
+.cgrid.lv .card .ctags { flex-wrap: nowrap; overflow: hidden; }
 
 /* Toast */
 .toast{
@@ -225,14 +229,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </head>
 <body>
 
-{{-- ═══════════════════════════════════════════════════ NAVBAR ══════════════ --}}
+{{--═══════════════════════════════════════════════════ NAVBAR ══════════════ --}}
 <nav class="navbar">
-  <a class="nav-logo" href="{{ route('home') }}">
+  <a class="nav-logo" href="{{ route('landing') }}">
     <div class="logo-box">🎓</div>
     <span class="logo-text">ScholarLink</span>
   </a>
 
-  {{-- Search form — submits GET to same page --}}
+  {{--Search form — submits GET to same page --}}
   <form class="nav-search" method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
     <span class="si">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -243,7 +247,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
            value="{{ $filters['q'] ?? '' }}"
            placeholder="Search scholarships, organizations…"
            autocomplete="off">
-    <div class="skb"><span class="kb">⌘</span><span class="kb">K</span></div>
   </form>
 
   <div class="nav-right">
@@ -262,7 +265,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     </button>
 
     @auth
-      {{-- Show initials from the logged-in user's name --}}
+     {{--Show initials from the logged-in user's name --}}
       <div class="nav-av" title="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
         {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name, 0, 1)) }}
       </div>
@@ -275,7 +278,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 {{-- ═══════════════════════════════════════════════════ LAYOUT ═════════════ --}}
 <div class="layout">
 
-  {{-- ───────────────────────────────────── SIDEBAR / FILTERS ─────────────── --}}
+ {{--───────────────────────────────────── SIDEBAR / FILTERS ───────────────--}}
   <aside class="sidebar">
     <div class="sb-hd">
       <span class="sb-title">Filters</span>
@@ -352,6 +355,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="fg">
       <div class="fgl">Income Bracket</div>
       @php
+
         $activeIncomes = (array) ($filters['income'] ?? ['Below ₱100K/yr', '₱100K–₱250K']);
         $incomeOptions = ['Below ₱100K/yr', '₱100K–₱250K', '₱250K–₱500K', 'Open / Any'];
       @endphp
@@ -495,25 +499,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
     </div>
 
-    {{-- ─────────────────── SCHOLARSHIP CARDS GRID ──────────────────────── --}}
+    {{--─────────────────── SCHOLARSHIP CARDS GRID ──────────────────────── --}}
     <div class="cgrid" id="cgrid">
 
       @forelse($scholarships as $scholarship)
         @php
-          {{--
-            ai_match_score lives on the applications table (per applicant).
+        /* ai_match_score lives on the applications table (per applicant).
             If the user is logged in and has applied, pull it from the
             eager-loaded relationship. Otherwise show no score.
-          --}}
-          $userApplication = $user
+       */
+          $userApplication = auth()->check()
               ? $scholarship->applications->first()
               : null;
           $matchScore = $userApplication?->ai_match_score ?? null;
 
-          {{--
+          /*
             Determine badge type from scholarships.status (ENUM).
             Values from DB: open, closing_soon, coming_soon, closed
-          --}}
+          */
           $statusLabel = match($scholarship->status) {
               'open'         => 'Open',
               'closing_soon' => 'Closing Soon',
@@ -522,16 +525,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
               default        => ucfirst($scholarship->status),
           };
 
-          {{--
+          /*
             "New" badge: posted within the last 14 days
-          --}}
+          */
           $isNew = $scholarship->posted_at &&
                    \Carbon\Carbon::parse($scholarship->posted_at)->diffInDays(now()) <= 14;
 
-          {{--
-            Tags: scholarships.tags is stored as JSON array.
-            Cast it to array; handle null gracefully.
-          --}}
+
           $tags = $scholarship->tags ?? [];
           if (is_string($tags)) {
               $tags = json_decode($tags, true) ?? [];
@@ -540,6 +540,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
         <div class="card {{ $userApplication && $userApplication->status === 'approved' ? 'saved' : '' }}"
              data-id="{{ $scholarship->id }}">
+             <div class="card-body">
 
           {{-- Card top: org name + badges --}}
           <div class="ctop">
@@ -625,14 +626,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           @endauth
 
           {{-- Actions --}}
+          </div> 
           <div class="cact">
             <a href="{{ route('scholarships.show', $scholarship->id) }}"
                class="btn-apply">
               View & Apply
             </a>
-            {{-- Bookmark / save button (wired to a POST route) --}}
-            <form method="POST" action="{{ route('scholarships.bookmark', $scholarship->id) }}" style="display:contents;">
-              @csrf
+            {{-- Save  / save button (wired to a POST route) --}}
+            <form method="POST" action="{{ route('scholarships.save', $scholarship->id) }}" style="display:contents;">              @csrf
               <button type="submit" class="btn-bm" title="Save scholarship">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
