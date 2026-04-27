@@ -280,14 +280,10 @@ footer { background: #071820; padding: 64px 48px 32px; }
     <div class="logos-row">
       @forelse($scholarships as $scholarship)
         <span class="logo-item">{{ $scholarship->provider_name }}</span>
-      @empty
-        <span class="logo-item">Loading scholarships...</span>
       @endforelse
-      @if($scholarships->count() > 0)
-        @forelse($scholarships as $scholarship)
-          <span class="logo-item">{{ $scholarship->provider_name }}</span>
-        @endforelse
-      @endif
+      @foreach($scholarships as $scholarship)
+        <span class="logo-item">{{ $scholarship->provider_name }}</span>
+      @endforeach
     </div>
   </div>
 </div>
