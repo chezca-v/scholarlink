@@ -98,12 +98,16 @@
     $evaluator = $evaluator ?? ['initials' => 'EP', 'role' => 'Evaluator'];
 @endphp
 
-{{-- ════════════════════════════════════════════════════════════════════════
-     STYLES
-════════════════════════════════════════════════════════════════════════ --}}
-@push('styles')
-<style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap');
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>ScholarLink — Evaluator Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
 
 /* ── CSS Variables ──────────────────────────────────────────────────── */
 :root {
@@ -215,6 +219,69 @@
     transition:      transform var(--sl-transition), box-shadow var(--sl-transition);
 }
 .sl-nav__avatar:hover { transform: scale(1.07); box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   USER DROPDOWN MENU
+════════════════════════════════════════════════════════════════════════ */
+.sl-dropdown {
+    position: relative;
+}
+.sl-dropdown__menu {
+    position:       absolute;
+    top:            100%;
+    right:          0;
+    margin-top:     8px;
+    background:     var(--sl-surface);
+    border:         1px solid var(--sl-border);
+    border-radius:  var(--sl-radius-md);
+    box-shadow:     var(--sl-shadow-md);
+    min-width:      180px;
+    opacity:        0;
+    pointer-events: none;
+    transform:      translateY(-8px);
+    transition:     opacity .2s ease, transform .2s ease;
+    z-index:        1000;
+}
+.sl-dropdown__menu.is-open {
+    opacity:        1;
+    pointer-events: auto;
+    transform:      translateY(0);
+}
+.sl-dropdown__item {
+    display:       block;
+    width:         100%;
+    padding:       12px 16px;
+    text-align:    left;
+    border:        none;
+    background:    transparent;
+    color:         var(--sl-text-dark);
+    font-family:   var(--sl-font);
+    font-size:     14px;
+    cursor:        pointer;
+    transition:    background .15s ease;
+}
+.sl-dropdown__item:hover {
+    background:    var(--sl-teal-xlight);
+    color:         var(--sl-teal-dark);
+}
+.sl-dropdown__item:first-child {
+    border-radius:  var(--sl-radius-md) var(--sl-radius-md) 0 0;
+}
+.sl-dropdown__item:last-child {
+    border-radius:  0 0 var(--sl-radius-md) var(--sl-radius-md);
+}
+.sl-dropdown__divider {
+    height:        1px;
+    background:    var(--sl-border);
+    margin:        4px 0;
+}
+.sl-dropdown__logout {
+    color: var(--sl-red);
+}
+.sl-dropdown__logout:hover {
+    background: #fde7e7;
+    color: var(--sl-red);
+}
 
 /* ════════════════════════════════════════════════════════════════════════
    LAYOUT — two-column grid
@@ -618,7 +685,8 @@
 /* ── Spacing utility ── */
 .sl-mt { margin-top: 16px; }
 </style>
-@endpush
+</head>
+<body>
 
 
 {{-- ════════════════════════════════════════════════════════════════════════
@@ -634,8 +702,22 @@
         </div>
         <div class="sl-nav__right">
             <span class="sl-nav__role-badge">{{ $evaluator['role'] }}</span>
-            <div class="sl-nav__avatar" title="{{ $evaluator['role'] }}">
-                {{ $evaluator['initials'] }}
+            <div class="sl-dropdown">
+                <div class="sl-nav__avatar" id="userMenuBtn" title="Open menu" style="cursor: pointer;">
+                    {{ $evaluator['initials'] }}
+                </div>
+                <div class="sl-dropdown__menu" id="userMenu">
+                    <button class="sl-dropdown__item" onclick="window.location.href='{{ route('profile.setup') }}'">
+                        Profile Settings
+                    </button>
+                    <div class="sl-dropdown__divider"></div>
+                    <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                        @csrf
+                        <button type="submit" class="sl-dropdown__item sl-dropdown__logout">
+                            Log Out
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </nav>
@@ -872,7 +954,6 @@
 {{-- ════════════════════════════════════════════════════════════════════════
      JAVASCRIPT — ScholarDash namespace
 ════════════════════════════════════════════════════════════════════════ --}}
-@push('scripts')
 <script>
 (function () {
     'use strict';
@@ -970,5 +1051,29 @@
         },
     };
 })();
+
+/**
+ * User dropdown menu toggle
+ */
+(function() {
+    const btn = document.getElementById('userMenuBtn');
+    const menu = document.getElementById('userMenu');
+    
+    if (btn && menu) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('is-open');
+        });
+        
+        document.addEventListener('click', () => {
+            menu.classList.remove('is-open');
+        });
+        
+        menu.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+    }
+})();
 </script>
-@endpush
+</body>
+</html>
