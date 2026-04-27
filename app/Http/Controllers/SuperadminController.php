@@ -355,13 +355,35 @@ class SuperadminController extends Controller
     {
         $query = ActivityLog::query()->with('user');
 
-        // Filters
+        // 1. Search Filter
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('action', 'like', "%{$search}%")
+                  ->orWhere('ip_address', 'like', "%{$search}%")
+                  ->orWhereHas('user', function($uq) use ($search) {
+                      $uq->where('first_name', 'like', "%{$search}%")
+                         ->orWhere('last_name', 'like', "%{$search}%")
+                         ->orWhere('email', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // 2. Action Dropdown Filter
         if ($request->filled('action')) {
-            $query->where('action', $request->action);
+            $action = $request->action;
+            $query->where('action', 'like', "%{$action}%");
         }
-        if ($request->filled('user_id')) {
-            $query->where('user_id', $request->user_id);
+
+        // 3. User Role Filter
+        if ($request->filled('user_role')) {
+            $role = $request->user_role;
+            $query->whereHas('user', function($q) use ($role) {
+                $q->where('role', $role);
+            });
         }
+
+        // 4. Date Filters
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
@@ -369,21 +391,141 @@ class SuperadminController extends Controller
             $query->whereDate('created_at', '<=', $request->date_to);
         }
 
-        $logs = $query->latest('created_at')->paginate(20);
+        // 5. Quick Filters
+        if ($request->filled('quick')) {
+            $quick = $request->quick;
+            if ($quick === 'login') {
+                $query->where(function($q) {
+                    $q->where('action', 'like', '%login%')
+                      ->orWhere('action', 'like', '%logout%');
+                });
+            } elseif ($quick === 'errors') {
+                $query->where(function($q) {
+                    $q->where('action', 'like', '%error%')
+                      ->orWhere('action', 'like', '%failed%');
+                });
+            } elseif ($quick === 'data_changes') {
+                $query->where(function($q) {
+                    $q->where('action', 'like', '%create%')
+                      ->orWhere('action', 'like', '%update%')
+                      ->orWhere('action', 'like', '%delete%');
+                });
+            } elseif ($quick === 'fraud') {
+                $query->where(function($q) {
+                    $q->where('action', 'like', '%fraud%')
+                      ->orWhere('action', 'like', '%alert%');
+                });
+            }
+        }
 
-        $users = User::query()
-            ->orderBy('first_name')
-            ->get(['id', 'first_name', 'last_name', 'role']);
+        // 6. Counts Calculation (on filtered query)
+        $successCount = (clone $query)->where(function($q) {
+            $q->where('action', 'not like', '%error%')
+              ->where('action', 'not like', '%failed%')
+              ->where('action', 'not like', '%fraud%')
+              ->where('action', 'not like', '%alert%');
+        })->count();
 
+        $errorCount = (clone $query)->where(function($q) {
+            $q->where('action', 'like', '%error%')
+              ->orWhere('action', 'like', '%failed%');
+        })->count();
+
+        $warnCount = (clone $query)->where(function($q) {
+            $q->where('action', 'like', '%fraud%')
+              ->orWhere('action', 'like', '%alert%');
+        })->count();
+
+        // 7. Paginate and Format
+        $logs = $query->latest('created_at')->paginate(20)->withQueryString();
+
+        $logs->getCollection()->transform(function ($log) {
+            $actionLower = strtolower($log->action);
+            
+            // Defaults
+            $log->icon = '📋';
+            $log->badge_color = 'teal';
+            $log->icon_bg = 'rgba(15,76,92,.08)';
+            $log->action_type = 'system';
+            
+            if (str_contains($actionLower, 'login') || str_contains($actionLower, 'logout')) {
+                $log->icon = '🔑';
+                $log->badge_color = 'gray';
+                $log->icon_bg = '#F3F4F6';
+                $log->action_type = 'auth';
+            } elseif (str_contains($actionLower, 'error') || str_contains($actionLower, 'fail')) {
+                $log->icon = '✖️';
+                $log->badge_color = 'red';
+                $log->icon_bg = '#FEF2F2';
+                $log->action_type = 'error';
+            } elseif (str_contains($actionLower, 'fraud') || str_contains($actionLower, 'alert')) {
+                $log->icon = '⚠️';
+                $log->badge_color = 'red';
+                $log->icon_bg = '#FEF2F2';
+                $log->action_type = 'security';
+            } elseif (str_contains($actionLower, 'create') || str_contains($actionLower, 'add')) {
+                $log->icon = '➕';
+                $log->badge_color = 'green';
+                $log->icon_bg = '#E8F8F0';
+                $log->action_type = 'create';
+            } elseif (str_contains($actionLower, 'update') || str_contains($actionLower, 'edit')) {
+                $log->icon = '✏️';
+                $log->badge_color = 'yellow';
+                $log->icon_bg = '#FEF3C7';
+                $log->action_type = 'update';
+            } elseif (str_contains($actionLower, 'delete') || str_contains($actionLower, 'remove')) {
+                $log->icon = '🗑️';
+                $log->badge_color = 'red';
+                $log->icon_bg = '#FEF2F2';
+                $log->action_type = 'delete';
+            } elseif (str_contains($actionLower, 'export') || str_contains($actionLower, 'download')) {
+                $log->icon = '⬇️';
+                $log->badge_color = 'teal';
+                $log->icon_bg = 'rgba(15,76,92,.08)';
+                $log->action_type = 'export';
+            }
+
+            // Action Label
+            if ($log->user) {
+                $log->action_label = $log->user->first_name . ' ' . $log->user->last_name . ' ' . strtolower($log->action);
+            } else {
+                $log->action_label = ucfirst($log->action);
+            }
+
+            // Extra Meta
+            $meta = [];
+            if ($log->target_type) {
+                $meta[] = "Target: " . class_basename($log->target_type) . ($log->target_id ? " (#{$log->target_id})" : "");
+            }
+            if ($log->user && $log->user->role) {
+                $meta[] = "Role: " . ucfirst($log->user->role);
+            }
+            $log->extra_meta = empty($meta) ? null : implode(' · ', $meta);
+
+            return $log;
+        });
+
+        // 8. Dynamic Options for View Filters
         $actions = ActivityLog::query()
+            ->select('action')
             ->distinct()
+            ->orderBy('action')
             ->pluck('action');
 
-        return view('superadmin.logs', [
-            'logs'    => $logs,
-            'users'   => $users,
-            'actions' => $actions,
-        ]);
+        $roles = User::query()
+            ->select('role')
+            ->distinct()
+            ->orderBy('role')
+            ->pluck('role');
+
+        return view('superadmin.logs', compact(
+            'logs',
+            'successCount',
+            'errorCount',
+            'warnCount',
+            'actions',
+            'roles'
+        ));
     }
 
     // ─────────────────────────────────────────────

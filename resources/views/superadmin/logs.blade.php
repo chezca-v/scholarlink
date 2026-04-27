@@ -29,19 +29,17 @@
         </div>
         <select class="form-select" name="action" style="width: auto;">
           <option value="">All Actions</option>
-          <option value="login" {{ request('action') === 'login' ? 'selected' : '' }}>Login / Logout</option>
-          <option value="create" {{ request('action') === 'create' ? 'selected' : '' }}>Create</option>
-          <option value="update" {{ request('action') === 'update' ? 'selected' : '' }}>Update</option>
-          <option value="delete" {{ request('action') === 'delete' ? 'selected' : '' }}>Delete</option>
-          <option value="export" {{ request('action') === 'export' ? 'selected' : '' }}>Export</option>
-          <option value="error" {{ request('action') === 'error' ? 'selected' : '' }}>Error</option>
+          @foreach($actions as $act)
+            <option value="{{ $act }}" {{ request('action') === $act ? 'selected' : '' }}>{{ ucfirst($act) }}</option>
+          @endforeach
         </select>
         <select class="form-select" name="user_role" style="width: auto;">
           <option value="">All Users</option>
-          <option value="admin" {{ request('user_role') === 'admin' ? 'selected' : '' }}>Admins Only</option>
-          <option value="applicant" {{ request('user_role') === 'applicant' ? 'selected' : '' }}>Applicants Only</option>
-          <option value="evaluator" {{ request('user_role') === 'evaluator' ? 'selected' : '' }}>Evaluators Only</option>
-          <option value="superadmin" {{ request('user_role') === 'superadmin' ? 'selected' : '' }}>Superadmin</option>
+          @foreach($roles as $role)
+            @if($role)
+              <option value="{{ $role }}" {{ request('user_role') === $role ? 'selected' : '' }}>{{ ucfirst($role) }}</option>
+            @endif
+          @endforeach
         </select>
         <div style="display: flex; align-items: center; gap: 6px;">
           <input class="form-input" type="date" name="date_from" style="width: auto;"
