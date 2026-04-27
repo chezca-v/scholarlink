@@ -306,8 +306,8 @@
     </a>
     
     <div class="sidebar-section">Account</div>
-    <a href="#" class="sidebar-link"><span class="icon">🔔</span> Notifications <span class="badge">3</span></a>
-    <a href="#" class="sidebar-link"><span class="icon">👤</span> My Profile</a>
+    <a href="#" onclick="alert('Notifications coming soon!'); return false;" class="sidebar-link"><span class="icon">🔔</span> Notifications <span class="badge">3</span></a>
+    <a href="#" onclick="alert('Profile management coming soon!'); return false;" class="sidebar-link"><span class="icon">👤</span> My Profile</a>
     
     <div class="sidebar-footer">
       <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>

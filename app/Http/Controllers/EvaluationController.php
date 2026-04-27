@@ -177,10 +177,6 @@ class EvaluationController extends Controller
             'evaluations' => $evaluations,
         ]);
     }
-}
-        return view('evaluator.completed');
-    }
-
     private function maskApplicantForBlindReview($applicant, $profile)
     {
         $applicant->name = 'Anonymous Applicant';
