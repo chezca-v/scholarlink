@@ -40,12 +40,17 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
         Route::patch('/profile/update', 'update')->name('profile.update');
     });
 
-    // Document Wallet
-    Route::controller(DocumentController::class)->prefix('applicant/documents')->name('documents.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::post('/', 'store')->name('store');
+    //Document Wallet
+    Route::controller(DocumentController::class)->prefix('applicant/documents')->name('applicant.documents.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::post('', 'store')->name('store');
         Route::get('/{id}/preview', 'preview')->name('preview');
     });
+
+    // Backward-compatible route aliases used by older views/scripts
+    Route::post('/applicant/documents', [DocumentController::class, 'store'])->name('applicant.documents.store');
+    Route::get('/applicant/documents/{id}/preview', [DocumentController::class, 'preview'])->name('applicant.documents.preview');
+    Route::get('/applicant/applications', [ApplicationController::class, 'index'])->name('applicant.applications.index');
 
     // Application Lifecycle
     Route::controller(ApplicationController::class)->group(function () {

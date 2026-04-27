@@ -398,7 +398,7 @@
 
                 {{-- Used In count --}}
                 @if ($hasFile && $doc->used_in_count > 0)
-                    <a href="{{ route('applicant.applications.index') }}" class="doc-used-in">
+                    <a href="{{ url('/applicant/applications') }}" class="doc-used-in">
                         Used in {{ $doc->used_in_count }} {{ Str::plural('application', $doc->used_in_count) }}
                     </a>
                 @elseif ($hasFile)
@@ -411,7 +411,7 @@
                 @if ($hasFile)
                     <div class="doc-actions">
                         <a
-                            href="{{ route('applicant.documents.preview', $doc->id) }}"
+                            href="{{ url('/applicant/documents/' . $doc->id . '/preview') }}"
                             class="btn-doc btn-doc--preview"
                             target="_blank"
                         >
@@ -463,7 +463,7 @@ function handleFileUpload(event, documentType) {
     formData.append('file', file);
     formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
 
-    fetch('{{ route("applicant.documents.store") }}', {
+    fetch('{{ url('/applicant/documents') }}', {
         method: 'POST',
         body: formData,
     })

@@ -30,13 +30,62 @@ class DocumentController extends Controller
     {
         $documents = Document::query()
             ->where('user_id', Auth::id())
+            ->withCount('applicationDocuments as used_in_count')
             ->orderBy('document_type')
-            ->get();
+            ->orderByDesc('created_at')
+            ->get()
+            ->unique('document_type')
+            ->values()
+            ->map(function (Document $doc) {
+                $doc->file_path = $doc->file_url;
 
+                $fileSize = null;
+                if ($doc->file_url && Storage::disk('public')->exists($doc->file_url)) {
+                    $fileSize = Storage::disk('public')->size($doc->file_url);
+                }
+                $doc->file_size_formatted = $fileSize ? $this->formatBytes($fileSize) : '—';
+
+                if ($doc->expiry_date && $doc->expiry_date->isPast()) {
+                    $doc->status = 'expired';
+                } elseif ($doc->expiry_date && $doc->expiry_date->between(now(), now()->copy()->addDays(30))) {
+                    $doc->status = 'expiring_soon';
+                } else {
+                    $doc->status = 'uploaded';
+                }
+
+                return $doc;
+            });
+
+        $documentTypes = collect(self::DOCUMENT_TYPES)
+            ->map(fn (string $type) => ['key' => $type, 'label' => $type])
+            ->all();
+
+        $stats = [
+            'uploaded'      => $documents->count(),
+            'expiring_soon' => $documents->where('status', 'expiring_soon')->count(),
+            'expired'       => $documents->where('status', 'expired')->count(),
+            'used_in'       => (int) $documents->sum('used_in_count'),
+        ];
         return view('applicant.documents.index', [
             'documents'     => $documents,
-            'documentTypes' => self::DOCUMENT_TYPES,
+            'documents'          => $documents,
+            'documentTypes'      => $documentTypes,
+            'totalDocumentTypes' => count(self::DOCUMENT_TYPES),
+            'stats'              => $stats,
         ]);
+    }
+
+    private function formatBytes(int $bytes): string
+    {
+        if ($bytes < 1024) {
+            return $bytes . ' B';
+        }
+
+        if ($bytes < 1024 * 1024) {
+            return round($bytes / 1024, 1) . ' KB';
+        }
+
+        return round($bytes / (1024 * 1024), 1) . ' MB';
     }
 
     public function store(Request $request)

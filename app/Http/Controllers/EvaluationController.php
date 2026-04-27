@@ -13,7 +13,6 @@ use Carbon\Carbon;
 
 class EvaluationController extends Controller
 {
-<<<<<<< HEAD
     public function show($id)
     {
         $evaluator = auth()->user();
@@ -53,36 +52,11 @@ class EvaluationController extends Controller
             'evaluation'     => $evaluation,
             'blindScreening' => $blindScreening,
             'alternatives'   => $alternatives,
-=======
-    public function index()
-    {
-        return view('evaluator.index');
-    }
-
-    public function show($id)
-    {
-        $application = Application::with(['applicant.applicantProfile', 'scholarship'])
-            ->findOrFail($id);
-
-        $applicant = $application->applicant;
-        $profile = $applicant->applicantProfile;
-
-        if ($application->scholarship->blind_screening) {
-            $applicant = $this->maskApplicantForBlindReview($applicant, $profile);
-        }
-
-        return view('evaluator.show', [
-            'application' => $application,
-            'applicant' => $applicant,
-            'profile' => $profile,
-            'blindScreening' => $application->scholarship->blind_screening,
->>>>>>> befeee8ae2402f668691b68731b8cd3828889af6
         ]);
     }
 
     public function store(Request $request, $id)
     {
-<<<<<<< HEAD
         $evaluator = auth()->user();
 
         $application = Application::query()->findOrFail($id);
@@ -186,7 +160,6 @@ class EvaluationController extends Controller
 
         return redirect()->route('evaluator.queue')
             ->with('success', 'Rejection submitted successfully.');
-=======
         $application = Application::findOrFail($id);
 
         $request->validate([
@@ -242,12 +215,10 @@ class EvaluationController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Application rejected successfully.');
->>>>>>> befeee8ae2402f668691b68731b8cd3828889af6
     }
 
     public function completed()
     {
-<<<<<<< HEAD
         $evaluator = auth()->user();
 
         $evaluations = Evaluation::query()
@@ -262,7 +233,6 @@ class EvaluationController extends Controller
         ]);
     }
 }
-=======
         return view('evaluator.completed');
     }
 
@@ -290,4 +260,3 @@ class EvaluationController extends Controller
         return $applicant;
     }
 }
->>>>>>> befeee8ae2402f668691b68731b8cd3828889af6
