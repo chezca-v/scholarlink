@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $scholarship->name }} — ScholarLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -17,7 +18,7 @@
     <nav class="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
         <div class="max-w-[1280px] mx-auto px-16 h-[68px] flex items-center justify-between gap-8">
 
-            {{-- Logo --}}
+            {{-- Logo (always visible) --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 flex-shrink-0">
                 <div class="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0"
                      style="background: linear-gradient(135deg, #0F4C5C 0%, #1A6B7A 100%);">
@@ -26,31 +27,93 @@
                 <span style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 21px; color: #0F4C5C; letter-spacing: -0.5px;">ScholarLink</span>
             </a>
 
-            {{-- Nav Center --}}
-            <div class="flex items-center gap-1 px-1 py-1 rounded-[10px]" style="background: #F0FAFA;">
-                <a href="{{ route('scholarships.index') }}"
-                   class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150"
-                   style="{{ request()->routeIs('scholarships.*') ? 'color: #0F4C5C; background: #FFFFFF; box-shadow: 0px 1px 6px rgba(15,76,92,0.08);' : 'color: #4A7A80;' }}">
-                    Browse
-                </a>
-                <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">How It Works</a>
-                <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">Organizations</a>
-                <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">About</a>
-            </div>
+            @auth
+                {{-- ===== LOGGED IN NAV ===== --}}
 
-            {{-- Nav Right --}}
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <a href="{{ route('login') }}"
-                   class="px-5 py-2 rounded-[9px] text-[13px] font-semibold border transition-all duration-150 hover:bg-[#F0FAFA]"
-                   style="color: #0F4C5C; border-color: #C8E8E4;">
-                    Log In
-                </a>
-                <a href="{{ route('register') }}"
-                   class="px-5 py-2 rounded-[9px] text-[13px] font-bold transition-all duration-150 hover:opacity-90"
-                   style="background: linear-gradient(104.98deg, #0F4C5C 0%, #1A6B7A 100%); color: #F9D679; box-shadow: 0px 4px 12px rgba(15,76,92,0.2);">
-                    Get Started →
-                </a>
-            </div>
+                {{-- Search Bar --}}
+                <div class="flex-1 max-w-[400px]">
+                    <div class="flex items-center gap-2 px-4 py-2 rounded-[10px] border transition-all duration-150 hover:border-[#1A6B7A] focus-within:border-[#1A6B7A] focus-within:shadow-sm"
+                         style="background: #F0FAFA; border-color: #C8E8E4;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A7A80" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"/>
+                            <path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <input type="text"
+                               placeholder="Search scholarships..."
+                               class="flex-1 bg-transparent text-[13px] outline-none placeholder-[#4A7A80]"
+                               style="color: #0F4C5C;"
+                               onkeydown="if(event.key==='Enter') window.location.href='{{ route('scholarships.index') }}?search='+this.value">
+                        <span class="text-[11px] font-medium px-1.5 py-0.5 rounded"
+                              style="background: #C8E8E4; color: #4A7A80;">⌘K</span>
+                    </div>
+                </div>
+
+                {{-- Right Icons --}}
+                <div class="flex items-center gap-3 flex-shrink-0">
+
+                    {{-- Notifications Bell --}}
+                    <a href="{{ route('notifications.index') }}"
+                       class="relative w-9 h-9 flex items-center justify-center rounded-full transition-all duration-150 hover:bg-[#F0FAFA]"
+                       title="Notifications">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A7A80" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        {{-- Unread badge - show if user has unread notifications --}}
+                        @if(auth()->user()->notifications()->where('is_read', 0)->exists())
+                            <span class="absolute top-1 right-1 w-2 h-2 rounded-full border-2 border-white"
+                                  style="background: #F9D679;"></span>
+                        @endif
+                    </a>
+
+                    {{-- Messages (placeholder - not yet implemented) --}}
+                    <button class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-150 hover:bg-[#F0FAFA] opacity-50 cursor-not-allowed"
+                            title="Messages (coming soon)">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A7A80" stroke-width="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </button>
+
+                    {{-- Profile Avatar --}}
+                    <a href="{{ route('dashboard') }}"
+                       class="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-150 hover:opacity-80"
+                       style="background: linear-gradient(135deg, #0F4C5C 0%, #1A6B7A 100%); color: #F9D679; font-family: 'Fraunces', serif;"
+                       title="My Profile">
+                        {{ strtoupper(substr(auth()->user()->first_name ?? auth()->user()->name, 0, 1)) }}{{ strtoupper(substr(auth()->user()->last_name ?? '', 0, 1)) }}
+                    </a>
+
+                </div>
+
+            @else
+                {{-- ===== PUBLIC NAV ===== --}}
+
+                {{-- Nav Center --}}
+                <div class="flex items-center gap-1 px-1 py-1 rounded-[10px]" style="background: #F0FAFA;">
+                    <a href="{{ route('scholarships.index') }}"
+                       class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150"
+                       style="{{ request()->routeIs('scholarships.*') ? 'color: #0F4C5C; background: #FFFFFF; box-shadow: 0px 1px 6px rgba(15,76,92,0.08);' : 'color: #4A7A80;' }}">
+                        Browse
+                    </a>
+                    <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">How It Works</a>
+                    <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">Organizations</a>
+                    <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">About</a>
+                </div>
+
+                {{-- Nav Right --}}
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <a href="{{ route('login') }}"
+                       class="px-5 py-2 rounded-[9px] text-[13px] font-semibold border transition-all duration-150 hover:bg-[#F0FAFA]"
+                       style="color: #0F4C5C; border-color: #C8E8E4;">
+                        Log In
+                    </a>
+                    <a href="{{ route('register') }}"
+                       class="px-5 py-2 rounded-[9px] text-[13px] font-bold transition-all duration-150 hover:opacity-90"
+                       style="background: linear-gradient(104.98deg, #0F4C5C 0%, #1A6B7A 100%); color: #F9D679; box-shadow: 0px 4px 12px rgba(15,76,92,0.2);">
+                        Get Started →
+                    </a>
+                </div>
+
+            @endauth
         </div>
     </nav>
 
@@ -228,17 +291,11 @@
                         <div class="flex items-center gap-3 mb-4">
                             @if($scholarship->org_logo)
                                 <img src="{{ asset($scholarship->org_logo) }}"
-                                    class="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
-                                    alt="{{ $scholarship->provider_name }}"
-                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                {{-- Fallback must be HERE (next sibling in DOM), not in @else --}}
-                                <div class="w-[30px] h-[30px] rounded-full flex-shrink-0 items-center justify-center text-xs font-bold"
-                                    style="background: #0F4C5C; color: #F9D679; font-family: 'Fraunces', serif; display: none;">
-                                    {{ strtoupper(substr($scholarship->provider_name, 0, 1)) }}
-                                </div>
+                                     class="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
+                                     alt="{{ $scholarship->provider_name }}">
                             @else
                                 <div class="w-[30px] h-[30px] rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
-                                    style="background: #0F4C5C; color: #F9D679; font-family: 'Fraunces', serif;">
+                                     style="background: #0F4C5C; color: #F9D679; font-family: 'Fraunces', serif;">
                                     {{ strtoupper(substr($scholarship->provider_name, 0, 1)) }}
                                 </div>
                             @endif
@@ -494,7 +551,10 @@ function countdownTimer(deadline) {
         },
         update() {
             const diff = new Date(deadline).getTime() - new Date().getTime();
-            if (diff <= 0) { this.days = this.hours = this.minutes = this.seconds = '00'; return; }
+            if (diff <= 0) {
+                this.days = this.hours = this.minutes = this.seconds = '00';
+                return;
+            }
             this.days    = String(Math.floor(diff / 86400000)).padStart(2, '0');
             this.hours   = String(Math.floor((diff % 86400000) / 3600000)).padStart(2, '0');
             this.minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
@@ -503,5 +563,6 @@ function countdownTimer(deadline) {
     }
 }
 </script>
+
 </body>
 </html>
