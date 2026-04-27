@@ -1,0 +1,170 @@
+{{--
+|--------------------------------------------------------------------------
+| resources/views/superadmin/dashboard.blade.php
+| Route : superadmin.dashboard
+| Purpose: Nationwide stats + fraud alert feed
+|--------------------------------------------------------------------------
+| Controller should pass:
+|   $admin           array  ['name','initials']
+|   $pendingAdmins   int
+|   $stats           array  of stat cards
+|   $orgPerformance  array  bar chart rows
+|   $fraudAlerts     array  alert feed items
+|   $fraudAlertCount int
+|   $systemHealth    array  health indicator cards
+|   $chartMonths     array  monthly bar data [{month,pct,accent}]
+--}}
+@extends('superadmin._layout')
+
+@section('title', 'Dashboard')
+@section('page-title', 'Dashboard')
+@section('page-subtitle', 'Nationwide overview · ScholarLink')
+
+@php
+    $activePage = 'dashboard';
+
+    $stats = $stats ?? [
+        ['icon' => '🏛️', 'icon_bg' => '#E8F8F0',          'label' => 'Organizations',      'value' => '24',    'delta' => '▲ 3 this month',   'delta_class' => 'up'],
+        ['icon' => '🎓', 'icon_bg' => '#FDF4E3',          'label' => 'Active Applicants',  'value' => '8,412', 'delta' => '▲ 12% vs last sem', 'delta_class' => 'up'],
+        ['icon' => '📋', 'icon_bg' => 'rgba(15,76,92,.08)','label' => 'Total Applications', 'value' => '31,587','delta' => 'Across all orgs',   'delta_class' => 'neutral'],
+        ['icon' => '⚠️', 'icon_bg' => '#FEF2F2',          'label' => 'Fraud Alerts',       'value' => '7',     'delta' => '▲ 2 unreviewed',    'delta_class' => 'down'],
+    ];
+
+    $orgPerformance = $orgPerformance ?? [
+        ['name' => 'CHED NCR',        'pct' => 92, 'count' => '9,234', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
+        ['name' => 'DOST-SEI',        'pct' => 78, 'count' => '7,812', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
+        ['name' => 'SM Foundation',   'pct' => 60, 'count' => '6,020', 'color' => 'linear-gradient(90deg,#E8A838,#F9D679)'],
+        ['name' => 'Ayala Foundation','pct' => 48, 'count' => '4,801', 'color' => 'linear-gradient(90deg,#E8A838,#F9D679)'],
+        ['name' => 'GMA Kapuso',      'pct' => 35, 'count' => '3,498', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
+        ['name' => 'PCSO Scholars',   'pct' => 22, 'count' => '2,188', 'color' => 'linear-gradient(90deg,#0F4C5C,#2A8FA0)'],
+    ];
+
+    $fraudAlerts     = $fraudAlerts     ?? [
+        ['dot' => 'red',    'title' => 'Duplicate document detected',       'meta' => 'App #A-2241 vs #A-2304 · DOST-SEI · 2 min ago'],
+        ['dot' => 'red',    'title' => 'Conflicting scholarship enrollment', 'meta' => 'Juan dela Cruz · CHED + SM · 18 min ago'],
+        ['dot' => 'yellow', 'title' => 'GPA discrepancy flagged',           'meta' => 'App #A-1987 · Ayala Foundation · 1h ago'],
+        ['dot' => 'teal',   'title' => 'Mass application pattern detected', 'meta' => '3 accounts · GMA Kapuso · 3h ago'],
+    ];
+    $fraudAlertCount = $fraudAlertCount ?? 7;
+
+    $systemHealth = $systemHealth ?? [
+        ['label' => 'API Uptime',  'value' => '99.8%', 'status' => 'ok',   'status_text' => '● Operational'],
+        ['label' => 'SMS Gateway', 'value' => 'Online', 'status' => 'ok',   'status_text' => '● ESP32 Active'],
+        ['label' => 'DB Storage',  'value' => '68%',    'status' => 'warn', 'status_text' => '⚠ 4.8 GB used'],
+        ['label' => 'AI Matching', 'value' => 'Active', 'status' => 'ok',   'status_text' => '● Gemini API'],
+    ];
+
+    $chartMonths = $chartMonths ?? [
+        ['month' => 'May', 'pct' => 52,  'accent' => false],
+        ['month' => 'Jun', 'pct' => 61,  'accent' => false],
+        ['month' => 'Jul', 'pct' => 45,  'accent' => false],
+        ['month' => 'Aug', 'pct' => 70,  'accent' => false],
+        ['month' => 'Sep', 'pct' => 88,  'accent' => false],
+        ['month' => 'Oct', 'pct' => 75,  'accent' => false],
+        ['month' => 'Nov', 'pct' => 38,  'accent' => true],
+        ['month' => 'Dec', 'pct' => 42,  'accent' => true],
+        ['month' => 'Jan', 'pct' => 92,  'accent' => false],
+        ['month' => 'Feb', 'pct' => 100, 'accent' => false],
+        ['month' => 'Mar', 'pct' => 82,  'accent' => false],
+        ['month' => 'Apr', 'pct' => 68,  'accent' => false],
+    ];
+@endphp
+
+@section('content')
+    <div class="breadcrumb">
+        <span>Home</span><span class="sep">/</span><span class="current">Dashboard</span>
+    </div>
+
+    {{-- STAT CARDS --}}
+    <div class="stat-grid">
+        @foreach ($stats as $stat)
+            <div class="stat-card">
+                <div class="icon-wrap" style="background:{{ $stat['icon_bg'] }};margin-bottom:10px">{{ $stat['icon'] }}</div>
+                <div class="label">{{ $stat['label'] }}</div>
+                <div class="value">{{ $stat['value'] }}</div>
+                <div class="delta {{ $stat['delta_class'] }}">{{ $stat['delta'] }}</div>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- TWO-COLUMN --}}
+    <div class="grid-2">
+
+        {{-- Org Performance Chart --}}
+        <div class="card">
+            <div class="section-header">
+                <div class="section-title">Org Performance <small>by applications processed</small></div>
+                <button class="btn btn-outline btn-sm">Export</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+                <span style="font-size:11px;color:var(--slate)">Sort by:</span>
+                <button class="badge teal" style="cursor:pointer">Volume</button>
+                <button class="badge gray" style="cursor:pointer">Approval %</button>
+                <button class="badge gray" style="cursor:pointer">Avg Score</button>
+            </div>
+            @foreach ($orgPerformance as $org)
+                <div class="org-row">
+                    <span class="name">{{ $org['name'] }}</span>
+                    <div class="bar-track">
+                        <div class="fill" style="width:{{ $org['pct'] }}%;background:{{ $org['color'] }}"></div>
+                    </div>
+                    <span class="count">{{ $org['count'] }}</span>
+                </div>
+            @endforeach
+        </div>
+
+        {{-- Alert feed + health --}}
+        <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="card compact">
+                <div class="section-header">
+                    <div class="section-title">🚨 Fraud Alert Feed</div>
+                    <span class="badge red">{{ $fraudAlertCount }} active</span>
+                </div>
+                @foreach ($fraudAlerts as $alert)
+                    <div class="alert-item">
+                        <div class="alert-dot {{ $alert['dot'] }}"></div>
+                        <div>
+                            <div style="font-size:13px;font-weight:500;color:var(--ink)">{{ $alert['title'] }}</div>
+                            <div style="font-size:11px;color:var(--slate)">{{ $alert['meta'] }}</div>
+                        </div>
+                    </div>
+                @endforeach
+                <div style="margin-top:10px;text-align:center">
+                    <a href="{{ route('superadmin.logs') }}" class="btn btn-outline btn-sm" style="width:100%">View All Alerts →</a>
+                </div>
+            </div>
+
+            <div class="card compact">
+                <div class="section-title" style="margin-bottom:12px">System Health</div>
+                <div class="health-grid">
+                    @foreach ($systemHealth as $h)
+                        <div class="health-item">
+                            <div class="h-label">{{ $h['label'] }}</div>
+                            <div class="h-value">{{ $h['value'] }}</div>
+                            <div class="h-status {{ $h['status'] }}">{{ $h['status_text'] }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- VOLUME CHART --}}
+    <div class="card" style="margin-top:20px">
+        <div class="section-header">
+            <div class="section-title">Nationwide Application Volume <small>last 12 months</small></div>
+            <div style="display:flex;gap:8px">
+                <span class="badge teal">■ Applications</span>
+                <span class="badge amber">■ Approvals</span>
+            </div>
+        </div>
+        <div class="chart-area">
+            @foreach ($chartMonths as $bar)
+                <div class="bar-col">
+                    <div class="bar-fill {{ $bar['accent'] ? 'accent' : '' }}" style="height:{{ $bar['pct'] }}%"></div>
+                    <div class="bar-label">{{ $bar['month'] }}</div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+@endsection

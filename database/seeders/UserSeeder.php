@@ -68,5 +68,91 @@ class UserSeeder extends Seeder
                 'email_verified_at' => '2026-01-01 00:00:00',
             ]);
         }
+
+        // ── SUPERADMIN (user ID 26) ───────────────────────
+        User::create([
+            'first_name'        => 'Super',
+            'last_name'         => 'Admin',
+            'email'             => 'superadmin@scholarlink.ph',
+            'password'          => Hash::make('Superadmin@000'),
+            'role'              => 'superadmin',
+            'organization_id'   => null,
+            'is_active'         => 1,
+            'email_verified_at' => '2026-01-01 00:00:00',
+        ]);
+
+        // ── ADMINS (user IDs 27–32) ───────────────────────
+        $admins = [
+            // ID 27 — manages scholarships 1, 2, 3
+            [
+                'first_name'        => 'Admin',
+                'last_name'         => 'Gabay',
+                'email'             => 'admin.gabay@scholarlink.ph',
+                'password'          => Hash::make('AdminGabay@027'),
+                'role'              => 'admin',
+                'organization_id'   => null,
+                'is_active'         => 1,
+                'email_verified_at' => '2026-01-01 00:00:00',
+            ],
+            // ID 28 — manages scholarships 4, 5, 6
+            [
+                'first_name'        => 'Admin',
+                'last_name'         => 'Community',
+                'email'             => 'admin.community@scholarlink.ph',
+                'password'          => Hash::make('AdminCommunity@028'),
+                'role'              => 'admin',
+                'organization_id'   => null,
+                'is_active'         => 1,
+                'email_verified_at' => '2026-01-01 00:00:00',
+            ],
+            // ID 29 — manages scholarships 7, 8, 9
+            [
+                'first_name'        => 'Admin',
+                'last_name'         => 'STEM',
+                'email'             => 'admin.stem@scholarlink.ph',
+                'password'          => Hash::make('AdminSTEM@029'),
+                'role'              => 'admin',
+                'organization_id'   => null,
+                'is_active'         => 1,
+                'email_verified_at' => '2026-01-01 00:00:00',
+            ],
+            // ID 30 — manages scholarships 10, 11, 12, 13
+            [
+                'first_name'        => 'Admin',
+                'last_name'         => 'Government',
+                'email'             => 'admin.government@scholarlink.ph',
+                'password'          => Hash::make('AdminGovernment@030'),
+                'role'              => 'admin',
+                'organization_id'   => null,
+                'is_active'         => 1,
+                'email_verified_at' => '2026-01-01 00:00:00',
+            ],
+            // ID 31 — manages scholarships 14, 15, 16, 17, 18, 19, 20
+            [
+                'first_name'        => 'Admin',
+                'last_name'         => 'Corporate',
+                'email'             => 'admin.corporate@scholarlink.ph',
+                'password'          => Hash::make('AdminCorporate@031'),
+                'role'              => 'admin',
+                'organization_id'   => null,
+                'is_active'         => 1,
+                'email_verified_at' => '2026-01-01 00:00:00',
+            ],
+            // ID 32 — manages scholarships 21, 22, 23, 24, 25
+            [
+                'first_name'        => 'Admin',
+                'last_name'         => 'SHS',
+                'email'             => 'admin.shs@scholarlink.ph',
+                'password'          => Hash::make('AdminSHS@032'),
+                'role'              => 'admin',
+                'organization_id'   => null,
+                'is_active'         => 1,
+                'email_verified_at' => '2026-01-01 00:00:00',
+            ],
+        ];
+
+        foreach ($admins as $admin) {
+            User::create($admin);
+        }
     }
 }
