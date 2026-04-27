@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Scholarship;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ScholarshipController extends Controller
 {
@@ -185,7 +187,8 @@ class ScholarshipController extends Controller
 
     public function edit($id)
     {
-        return view('admin.scholarships.edit', compact('id'));
+        $scholarship = Scholarship::findOrFail($id);
+        return view('admin.scholarships.edit', compact('scholarship'));
     }
 
     public function update(Request $request, $id)

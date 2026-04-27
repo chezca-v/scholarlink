@@ -36,7 +36,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/profile/setup', 'setup')->name('profile.setup');
-        Route::get('/profile', 'show')->name('profile.show'); 
+        Route::get('/profile', 'show')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
     });
 
@@ -96,6 +96,8 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
     Route::controller(EvaluationController::class)->group(function () {
         Route::get('/review/{id}', 'show')->name('review.show');
         Route::post('/review/{id}', 'store')->name('review.store');
+        Route::get('/review/{id}/reject', 'reject')->name('rejection');
+        Route::post('/review/{id}/reject', 'submitRejection')->name('rejection.store');
         Route::get('/completed', 'completed')->name('completed');
     });
 });
@@ -106,10 +108,24 @@ Superadmin Routes (Role: superadmin)
 Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::controller(SuperadminController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
+
+        // Organizations
         Route::get('/organizations', 'organizations')->name('organizations');
+        Route::post('/organizations', 'storeOrganization')->name('organizations.store');
+        Route::put('/organizations/{id}', 'updateOrganization')->name('organizations.update');
+        Route::delete('/organizations/{id}', 'destroyOrganization')->name('organizations.destroy');
+
+        // Admin Accounts
         Route::get('/admins', 'admins')->name('admins');
+        Route::post('/admins', 'storeAdmin')->name('admins.store');
+        Route::put('/admins/{id}', 'updateAdmin')->name('admins.update');
+        Route::patch('/admins/{id}/deactivate', 'deactivateAdmin')->name('admins.deactivate');
+        Route::patch('/admins/{id}/reassign', 'reassignAdmin')->name('admins.reassign');
+
+        // Logs & Settings
         Route::get('/logs', 'logs')->name('logs');
         Route::get('/settings', 'settings')->name('settings');
+        Route::patch('/settings', 'updateSettings')->name('settings.update');
     });
 });
 
