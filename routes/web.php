@@ -36,6 +36,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/profile/setup', 'setup')->name('profile.setup');
+        Route::get('/profile', 'show')->name('profile.show'); 
         Route::patch('/profile/update', 'update')->name('profile.update');
     });
 
@@ -58,6 +59,8 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::post('/scholarships/{id}/save', [SavedScholarshipController::class, 'store'])->name('scholarships.save');
     Route::delete('/scholarships/{id}/unsave', [SavedScholarshipController::class, 'destroy'])->name('scholarships.unsave');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.markRead');
 });
 
 /*
