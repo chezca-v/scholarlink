@@ -604,7 +604,7 @@
             <div class="logo-icon">🎓</div>
             <div>
                 <h3 style="font-family:'Fraunces'; font-size: 16px;">Scholar<span style="color:var(--warm-amber)">Link</span></h3>
-                <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">Admin Panel</p>
+                <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">{{ auth()->user()?->organization?->name ?? 'Admin Panel' }}</p>
             </div>
         </div>
 
@@ -677,8 +677,11 @@
                     <p style="font-size:12px; color:var(--muted); margin-top:2px;">{{ $now->format('l, F j, Y') }} · Academic Year {{ $now->year }}–{{ $now->copy()->addYear()->year }}</p>
                 </div>
                 <div class="heading-actions">
-                    <button class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
-                    <button class="btn-pri">New Scholarship</button>
+                    <form method="POST" action="{{ route('admin.reports.export') ?? '#' }}" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
+                    </form>
+                    <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="btn-pri" style="text-decoration:none; display:inline-block;">New Scholarship</a>
                 </div>
             </div>
 
@@ -702,7 +705,7 @@
                     <p class="stat-card-foot">This academic year</p>
                 </div>
                 <div class="stat-card">
-                    <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">↑ 8%</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">{{ $awardedGrowth >= 0 ? '↑' : '↓' }} {{ abs($awardedGrowth) ?? 0 }}%</span></div>
                     <h1>{{ $approvedAwarded }}</h1>
                     <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Approved / Awarded</p>
                     <p class="stat-card-foot">{{ $approvalRate }}% approval rate</p>
@@ -745,7 +748,7 @@
                     <div class="activity-section">
                         <div class="section-header">
                             <h3>Recent Activity</h3>
-                            <span class="subtitle">View all →</span>
+                            <a href="{{ route('admin.activity.index') ?? '#' }}" class="subtitle" style="text-decoration: none; color: inherit;">View all →</a>
                         </div>
 
                         <div class="activity-list">
@@ -821,22 +824,22 @@
                     <div class="box-container">
                         <h3 class="box-title" style="margin-bottom:12px;">Quick Actions</h3>
                         <div class="action-grid">
-                            <div class="action-card">
+                            <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">➕</div>
                                 <b style="font-size:11px;">New Scholarship</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.applications.pending') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">👥</div>
                                 <b style="font-size:11px;">Assign</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.settings') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">⚙️</div>
                                 <b style="font-size:11px;">Weight Config</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.reports.index') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">📊</div>
                                 <b style="font-size:11px;">Analytics</b>
-                            </div>
+                            </a>
                         </div>
                     </div>
 
@@ -891,7 +894,7 @@
                     <div class="alerts-section" style="margin-top: 20px;">
                         <div class="section-header">
                             <h3>Upcoming Deadlines</h3>
-                            <span class="subtitle">Calendar →</span>
+                            <a href="{{ route('admin.calendar') ?? '#' }}" class="subtitle" style="text-decoration: none; color: inherit;">Calendar →</a>
                         </div>
 
                         <div>
