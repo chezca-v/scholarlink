@@ -46,7 +46,7 @@ class ApplicationController extends Controller
             'actionNeeded' => $applications->where('status', 'revision')->count(),
         ];
 
-        return view('applicant.applications.index', [
+        return view('applicant.track', [
             'applications' => $applications,
             'stats' => $stats,
             'statusMap' => $statusMap,
