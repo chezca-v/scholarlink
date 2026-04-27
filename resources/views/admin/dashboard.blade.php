@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         :root {
             --deep-teal: #0F4C5C;
@@ -937,6 +938,107 @@
         // 5 minute auto-refresh simulation
         setInterval(() => { console.log("Checking for updates..."); }, 300000);
     });
+
+    /**
+     * Session Timeout Tracker
+     */
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('sessionTracker', () => ({
+            idleSeconds: 0,
+            warningLimit: 13 * 60,
+            timeoutLimit: 15 * 60,
+            interval: null,
+            isWarningShown: false,
+
+            init() {
+                this.resetIdleTime();
+                const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+                events.forEach(event => {
+                    window.addEventListener(event, () => this.resetIdleTime(), true);
+                });
+
+                this.interval = setInterval(() => {
+                    this.idleSeconds++;
+                    if (this.idleSeconds === this.warningLimit && !this.isWarningShown) {
+                        this.isWarningShown = true;
+                        const modal = document.getElementById('session-timeout-modal');
+                        if (modal) modal.style.display = 'flex';
+                    }
+                    if (this.idleSeconds >= this.timeoutLimit) {
+                        clearInterval(this.interval);
+                        document.getElementById('auto-logout-form').submit();
+                    }
+                }, 1000);
+            },
+
+            resetIdleTime() {
+                this.idleSeconds = 0;
+                this.isWarningShown = false;
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+            },
+
+            logout() {
+                document.getElementById('auto-logout-form').submit();
+            },
+
+            stayLoggedIn() {
+                this.resetIdleTime();
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+            }
+        }));
+    });
+
+    // Make tracker globally available
+    window.sessionTracker = null;
+    document.addEventListener('alpine:init', () => {
+        const root = document.querySelector('[x-data]');
+        if (root && root.__x && root.__x.$data) {
+            window.sessionTracker = root.__x.$data;
+        }
+    });
+
+    // Countdown timer
+    setInterval(() => {
+        const modal = document.getElementById('session-timeout-modal');
+        if (modal && modal.style.display !== 'none') {
+            const countdownEl = document.getElementById('session-timeout-countdown');
+            const text = countdownEl.textContent;
+            const [minutes, seconds] = text.split(':').map(Number);
+            let totalSeconds = minutes * 60 + seconds - 1;
+            if (totalSeconds < 0) totalSeconds = 0;
+            const newMinutes = Math.floor(totalSeconds / 60);
+            const newSeconds = totalSeconds % 60;
+            countdownEl.textContent = `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
 </script>
+
+<!-- Session Timeout Modal -->
+<div id="session-timeout-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); animation: slideUp 0.3s ease-out;">
+        <div style="text-align: center; margin-bottom: 20px; font-size: 48px;">⏱️</div>
+        <h2 style="font-size: 20px; font-weight: 700; color: #1a2e2c; margin-bottom: 12px; text-align: center;">Session Expiring Soon</h2>
+        <p style="font-size: 14px; color: #4a6460; line-height: 1.6; margin-bottom: 24px; text-align: center;">You've been inactive for 13 minutes. Your session will expire in 2 minutes for your security. Please click "Stay Logged In" to continue.</p>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="if (window.sessionTracker) window.sessionTracker.stayLoggedIn(); else location.reload();" style="flex: 1; padding: 12px 16px; background: linear-gradient(135deg, #0F4C5C, #1A6B7A); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Stay Logged In</button>
+            <button onclick="if (window.sessionTracker) window.sessionTracker.logout(); else document.getElementById('auto-logout-form').submit();" style="flex: 1; padding: 12px 16px; background: #f5f5f5; color: #1a2e2c; border: 1px solid #e2e8e6; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Log Out</button>
+        </div>
+        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #8aaba6;">Automatically logging out in <span id="session-timeout-countdown">2:00</span></div>
+    </div>
+</div>
+
+<!-- Auto Logout Form -->
+<form id="auto-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 </body>
 </html>

@@ -1,142 +1,52 @@
-/* SCHOLARLINK GLOBAL STYLES
-    Branding: Deep Teal & Warm Amber
-    Typography: Fraunces (Headings) & DM Sans (UI/Body)
-*/
-
+/* Admin Layout Constants */
 :root {
-    /* Primary Palette */
+    --sidebar-width: 230px;
+    --admin-bg: #eef8f8;
     --deep-teal: #0F4C5C;
-    --teal-mid: #1A6B7A;
-    --teal-light: #2A8FA0;
     --warm-amber: #E8A838;
-    --amber-light: #F9D679;
-    --amber-pale: #FDF4E3;
-
-    /* Neutrals */
-    --ink: #0A3040;
-    --slate: #4A7A80;
-    --muted: #7AACAA;
-    --mint-white: #F0FAFA;
-    --white: #ffffff;
-    --border-teal: #C8E8E4;
-    --border-light: #EAF4F3;
-
-    /* Status Colors */
-    --success-bg: #DCFCE7;
-    --success-text: #16A34A;
-    --warning-bg: #FEF9C3;
-    --warning-text: #B45309;
-    --error-bg: #FEE2E2;
-    --error-text: #DC2626;
-
-    /* Shadows */
-    --shadow-s: 0 2px 8px rgba(15, 76, 92, 0.08);
-    --shadow-m: 0 8px 24px rgba(15, 76, 92, 0.10);
-    --shadow-l: 0 16px 40px rgba(15, 76, 92, 0.12);
 }
 
-/* --- Base Reset --- */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { scroll-behavior: smooth; }
-
-body {
+.admin-body {
+    background-color: var(--admin-bg);
     font-family: 'DM Sans', sans-serif;
-    background: var(--white);
-    color: var(--ink);
-    overflow-x: hidden;
-    line-height: 1.5;
+    min-height: 100vh;
 }
 
-h1, h2, h3, h4, .font-display {
-    font-family: 'Fraunces', serif;
+/* Sidebar Styling */
+.sidebar-container {
+    width: var(--sidebar-width);
+    background-color: #091e2a;
+    position: fixed;
+    height: 100vh;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    border-right: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* --- Global Components --- */
-
-/* Navigation */
-nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border-light);
-}
-
-.nav-inner {
-    max-width: 1160px; margin: 0 auto; padding: 0 48px;
-    height: 64px; display: flex; align-items: center; justify-content: space-between;
-}
-
-.logo {
-    font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700;
-    color: var(--deep-teal); text-decoration: none; display: flex; align-items: center; gap: 10px;
-}
-
-.logo-mark {
-    width: 32px; height: 32px;
-    background: linear-gradient(135deg, var(--deep-teal), var(--teal-mid));
-    border-radius: 9px; display: flex; align-items: center; justify-content: center;
-    color: var(--amber-light); font-size: 15px;
-}
-
-/* Buttons */
-.btn-pill {
-    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700;
-    padding: 9px 22px; border: none; background: var(--deep-teal);
-    color: var(--amber-light); border-radius: 999px; cursor: pointer;
-    transition: all 0.2s; box-shadow: 0 4px 14px rgba(15,76,92,0.2);
-}
-
-.btn-pill:hover { background: var(--teal-mid); transform: translateY(-1px); }
-
-.btn-hero-main {
-    font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
-    padding: 14px 32px; border: none; background: var(--deep-teal);
-    color: var(--amber-light); border-radius: 12px; cursor: pointer;
-    transition: all 0.25s; box-shadow: var(--shadow-m);
-}
-
-/* Cards */
-.card-base {
-    background: var(--white);
-    border: 1px solid var(--border-light);
-    border-radius: 18px;
+/* Stat Cards & Components */
+.dashboard-card {
+    background: #ffffff;
+    border: 1px solid #dff0ee;
+    border-radius: 16px;
     padding: 24px;
-    transition: all 0.3s;
-    box-shadow: var(--shadow-s);
+    box-shadow: 0 4px 16px rgba(15, 76, 92, 0.06);
+    transition: transform 0.3s ease;
 }
 
-.card-base:hover {
-    border-color: var(--deep-teal);
-    box-shadow: var(--shadow-l);
-    transform: translateY(-3px);
+.dashboard-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(15, 76, 92, 0.1);
 }
 
-/* --- Section Utilities --- */
-.section-eyebrow {
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    text-transform: uppercase; color: var(--warm-amber); margin-bottom: 14px;
+.progress-bar {
+    height: 5px;
+    background: #dff0ee;
+    border-radius: 999px;
+    overflow: hidden;
 }
 
-.section-title {
-    font-family: 'Fraunces', serif; font-size: clamp(32px, 3vw, 48px);
-    font-weight: 800; letter-spacing: -1.5px; color: var(--ink);
-    margin-bottom: 56px; line-height: 1.05;
-}
-
-/* Status Badges */
-.badge-status {
-    font-size: 10px; font-weight: 700; text-transform: uppercase;
-    padding: 2px 8px; border-radius: 999px;
-}
-.status-open { background: var(--success-bg); color: var(--success-text); }
-.status-warn { background: var(--warning-bg); color: var(--warning-text); }
-
-/* Animations */
-.reveal { opacity: 0; transform: translateY(20px); transition: 0.55s ease; }
-.reveal.visible { opacity: 1; transform: none; }
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(0.85); }
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--deep-teal), #2a8fa0);
 }
