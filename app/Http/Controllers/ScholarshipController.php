@@ -4,12 +4,131 @@ namespace App\Http\Controllers;
 
 use App\Models\Scholarship;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class ScholarshipController extends Controller
 {
-    public function index()
-    {
-        return view('scholarships.index');
+    public function index(Request $request)
+    { // Start query
+        $query = Scholarship::query();
+
+        // Apply search term (q)
+        if ($request->filled('q')) {
+            $search = $request->q;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('provider_name', 'like', "%{$search}%")
+                ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Apply status filter (multiple)
+        if ($request->has('status') && is_array($request->status)) {
+            $query->whereIn('status', $request->status);
+        } else {
+            // Default show open, closing_soon, coming_soon
+            $query->whereIn('status', ['open', 'closing_soon', 'coming_soon']);
+        }
+
+        // Apply category filter (tags JSON contains any of the categories)
+        if ($request->has('category') && is_array($request->category)) {
+            $query->where(function ($q) use ($request) {
+                foreach ($request->category as $cat) {
+                    $q->orWhere('tags', 'like', '%' . $cat . '%');
+                }
+            });
+        }
+
+        // Apply income bracket filter
+        if ($request->has('income') && is_array($request->income)) {
+            $query->whereIn('income_bracket', $request->income);
+        }
+
+        // Apply GPA filter (minimum requirement)
+        if ($request->filled('gpa')) {
+            $gpa = (float) $request->gpa;
+            $query->where('gpa_requirement', '<=', $gpa);
+        }
+
+        // Apply deadline filter (relative to now)
+        if ($request->filled('deadline')) {
+            $now = now();
+            switch ($request->deadline) {
+                case 'This week':
+                    $query->where('deadline', '<=', $now->copy()->endOfWeek())
+                        ->where('deadline', '>=', $now);
+                    break;
+                case 'This month':
+                    $query->where('deadline', '<=', $now->copy()->endOfMonth())
+                        ->where('deadline', '>=', $now);
+                    break;
+                case 'Next 3 months':
+                    $query->where('deadline', '<=', $now->copy()->addMonths(3))
+                        ->where('deadline', '>=', $now);
+                    break;
+                // 'Any time' – no additional constraint
+            }
+        }
+
+        // Apply match score filter (for authenticated users)
+        if (Auth::check() && $request->filled('match')) {
+            $minMatch = (int) $request->match;
+            // You need to join the applications table if you store ai_match_score there
+            // Or recalculate on the fly. Simpler approach: filter after pagination?
+            // For performance, consider storing a computed match score column.
+            // Here we'll assume you have a 'match_score' field on scholarships or a subquery.
+            // If not, you may skip this filter or handle it in PHP after fetching.
+            // For now, we'll add a placeholder – you'll need to adapt to your schema.
+            // $query->whereHas('applications', function($q) use ($minMatch) {
+            //     $q->where('ai_match_score', '>=', $minMatch)
+            //       ->where('user_id', Auth::id());
+            // });
+        }
+
+        // Apply sorting
+        $sort = $request->get('sort', 'match');
+        switch ($sort) {
+            case 'deadline':
+                $query->orderBy('deadline', 'asc');
+                break;
+            case 'slots':
+                $query->orderBy('slots', 'desc');
+                break;
+            case 'alpha':
+                $query->orderBy('name', 'asc');
+                break;
+            case 'match':
+            default:
+                // If you have a computed match score for the logged-in user, order by that.
+                // Otherwise fallback to latest.
+                $query->latest('posted_at');
+                break;
+        }
+
+        // Paginate (e.g., 12 per page)
+        $scholarships = $query->paginate(12)->withQueryString();
+
+        // Eager load applications for the current user (to show match score & bookmark status)
+        if (Auth::check()) {
+            $scholarships->load(['applications' => function ($q) {
+                $q->where('applicant_id', Auth::id());
+            }]);
+        }
+
+        // Store filters for the view (to populate the sidebar)
+        $filters = [
+            'q'        => $request->q,
+            'status'   => $request->status,
+            'category' => $request->category,
+            'income'   => $request->income,
+            'gpa'      => $request->gpa,
+            'deadline' => $request->deadline,
+            'match'    => $request->match,
+            'sort'     => $sort,
+        ];
+
+        return view('scholarships.index', compact('scholarships', 'filters'));
     }
 
     public function create()
@@ -68,7 +187,8 @@ class ScholarshipController extends Controller
 
     public function edit($id)
     {
-        return view('admin.scholarships.edit', compact('id'));
+        $scholarship = Scholarship::findOrFail($id);
+        return view('admin.scholarships.edit', compact('scholarship'));
     }
 
     public function update(Request $request, $id)

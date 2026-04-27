@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
         :root {
             --deep-teal: #0F4C5C;
@@ -604,31 +605,35 @@
             <div class="logo-icon">🎓</div>
             <div>
                 <h3 style="font-family:'Fraunces'; font-size: 16px;">Scholar<span style="color:var(--warm-amber)">Link</span></h3>
-                <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">Admin Panel</p>
+                <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">{{ auth()->user()?->organization?->name ?? 'Admin Panel' }}</p>
             </div>
         </div>
 
         <nav class="side-nav">
             <div class="nav-label">Overview</div>
-            <div class="nav-item active"><span>📊</span> Dashboard</div>
-            <div class="nav-item"><span>📈</span> Analytics</div>
+            <a href="{{ route('admin.dashboard') }}" class="nav-item active"><span>📊</span> Dashboard</a>
+            <a href="{{ route('admin.analytics') ?? '#' }}" class="nav-item"><span>📈</span> Analytics</a>
 
             <div class="nav-label">Scholarships</div>
-            <div class="nav-item"><span>📋</span> Scholarship List</div>
-            <div class="nav-item"><span>➕</span> Create Scholarship</div>
-            <div class="nav-item"><span>📅</span> Deadline Calendar</div>
+            <a href="{{ route('admin.scholarships.index') ?? '#' }}" class="nav-item"><span>📋</span> Scholarship List</a>
+            <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="nav-item"><span>➕</span> Create Scholarship</a>
+            <a href="{{ route('admin.calendar') ?? '#' }}" class="nav-item"><span>📅</span> Deadline Calendar</a>
 
             <div class="nav-label">Applications</div>
-            <div class="nav-item"><span>📂</span> All Applications <span class="badge-nav" style="background:var(--warm-amber); color:var(--deep-teal)">14</span></div>
-            <div class="nav-item"><span>⚠️</span> Pending Reviews <span class="badge-nav" style="background:var(--red-alert); color:white">7</span></div>
+            @php
+                $allApplicationsCount = \App\Models\Application::count();
+                $pendingReviewsCount = \App\Models\Application::where('status', 'pending')->count();
+            @endphp
+            <a href="{{ route('admin.applications.index') ?? '#' }}" class="nav-item"><span>📂</span> All Applications <span class="badge-nav" style="background:var(--warm-amber); color:var(--deep-teal)">{{ $allApplicationsCount }}</span></a>
+            <a href="{{ route('admin.applications.pending') ?? '#' }}" class="nav-item"><span>⚠️</span> Pending Reviews <span class="badge-nav" style="background:var(--red-alert); color:white">{{ $pendingReviewsCount }}</span></a>
 
             <div class="nav-label">Management</div>
-            <div class="nav-item">
+            <a href="{{ route('admin.users.index') ?? '#' }}" class="nav-item">
                 <span>👥</span> User Management
-            </div>
-            <div class="nav-item">
+            </a>
+            <a href="{{ route('admin.settings') ?? '#' }}" class="nav-item">
                 <span>⚙️</span> Settings
-            </div>
+            </a>
         </nav>
 
         <div class="side-user">
@@ -644,11 +649,11 @@
         <header class="header-bar">
             <div class="breadcrumb">ScholarLink <span style="opacity:0.3">›</span> <b style="color:white">Dashboard</b></div>
             <nav class="tab-group">
-                <div class="tab-link active">Overview</div>
-                <div class="tab-link">Applications</div>
-                <div class="tab-link">Scholarships</div>
-                <div class="tab-link">Evaluators</div>
-                <div class="tab-link">Reports</div>
+                <a href="{{ route('admin.dashboard') ?? '#' }}" class="tab-link active">Overview</a>
+                <a href="{{ route('admin.applications.index') ?? '#' }}" class="tab-link">Applications</a>
+                <a href="{{ route('admin.scholarships.index') ?? '#' }}" class="tab-link">Scholarships</a>
+                <a href="{{ route('admin.evaluators.index') ?? '#' }}" class="tab-link">Evaluators</a>
+                <a href="{{ route('admin.reports.index') ?? '#' }}" class="tab-link">Reports</a>
             </nav>
             <div class="topbar-right">
                 <div class="admin-pill">Admin</div>
@@ -665,13 +670,19 @@
         <main class="dashboard-body">
             <div class="dashboard-heading">
                 <div>
-                    <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">PLM Scholarship Office</p>
+                    @php
+                        $organization = auth()->user()->organization ?? null;
+                    @endphp
+                    <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">{{ $organization?->name ?? 'ScholarLink' }}</p>
                     <h2 style="font-family:'Fraunces'; font-size:28px; font-weight:700;">Admin Dashboard</h2>
                     <p style="font-size:12px; color:var(--muted); margin-top:2px;">{{ $now->format('l, F j, Y') }} · Academic Year {{ $now->year }}–{{ $now->copy()->addYear()->year }}</p>
                 </div>
                 <div class="heading-actions">
-                    <button class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
-                    <button class="btn-pri">New Scholarship</button>
+                    <form method="POST" action="{{ route('admin.reports.export') ?? '#' }}" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
+                    </form>
+                    <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="btn-pri" style="text-decoration:none; display:inline-block;">New Scholarship</a>
                 </div>
             </div>
 
@@ -695,7 +706,7 @@
                     <p class="stat-card-foot">This academic year</p>
                 </div>
                 <div class="stat-card">
-                    <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">↑ 8%</span></div>
+                    <div style="display:flex; justify-content:space-between;"><span class="icon">💰</span><span class="stat-badge">{{ $awardedGrowth >= 0 ? '↑' : '↓' }} {{ abs($awardedGrowth) ?? 0 }}%</span></div>
                     <h1>{{ $approvedAwarded }}</h1>
                     <p style="font-size:12px; font-weight:600; color:var(--teal-mid)">Approved / Awarded</p>
                     <p class="stat-card-foot">{{ $approvalRate }}% approval rate</p>
@@ -712,25 +723,25 @@
                         <div class="alert-row alert-red">
                             <div style="font-size:18px;">🚨</div>
                             <div>
-                                <b style="font-size:13px;">{{ $unassignedApplications }} Applications Unassigned for 4+ Days</b>
+                                <b style="font-size:13px;">{{ $unassignedApplications ?? 0 }} Applications Unassigned for 4+ Days</b>
                                 <p style="font-size:12px; opacity:0.8;">Applications with no evaluations assigned yet. Risk of missing SLA.</p>
-                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Assign Evaluators →</a>
+                                <a href="{{ route('admin.applications.unassigned') ?? '#' }}" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Assign Evaluators →</a>
                             </div>
                         </div>
                         <div class="alert-row alert-orange">
                             <div style="font-size:18px;">⏳</div>
                             <div>
-                                <b style="font-size:13px;">Upcoming Deadlines — {{ $incompleteDocsApplications }} Applicants with Incomplete Docs</b>
+                                <b style="font-size:13px;">Upcoming Deadlines — {{ $incompleteDocsApplications ?? 0 }} Applicants with Incomplete Docs</b>
                                 <p style="font-size:12px; opacity:0.8;">Applicants still missing at least one required document.</p>
-                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">View Applicants →</a>
+                                <a href="{{ route('admin.applications.incomplete_docs') ?? '#' }}" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">View Applicants →</a>
                             </div>
                         </div>
                         <div class="alert-row alert-blue">
                             <div style="font-size:18px;">📢</div>
                             <div>
-                                <b style="font-size:13px;">{{ $awaitingApprovalScholarships }} Scholarships Awaiting Approval</b>
+                                <b style="font-size:13px;">{{ $awaitingApprovalScholarships ?? 0 }} Scholarships Awaiting Approval</b>
                                 <p style="font-size:12px; opacity:0.8;">Draft scholarships are ready for review and publication.</p>
-                                <a href="#" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Review Drafts →</a>
+                                <a href="{{ route('admin.scholarships.drafts') ?? '#' }}" style="color:inherit; font-weight:700; font-size:11px; margin-top:6px; display:block;">Review Drafts →</a>
                             </div>
                         </div>
                     </div>
@@ -738,7 +749,7 @@
                     <div class="activity-section">
                         <div class="section-header">
                             <h3>Recent Activity</h3>
-                            <span class="subtitle">View all →</span>
+                            <a href="{{ route('admin.activity.index') ?? '#' }}" class="subtitle" style="text-decoration: none; color: inherit;">View all →</a>
                         </div>
 
                         <div class="activity-list">
@@ -768,7 +779,7 @@
                     <div class="box-container">
                         <div class="box-header">
                             <h3 class="box-title">Scholarship Overview</h3>
-                            <a href="#" style="font-size:12px; color:var(--teal-mid); font-weight:700;">Manage all →</a>
+                            <a href="{{ route('admin.scholarships.index') ?? '#' }}" style="font-size:12px; color:var(--teal-mid); font-weight:700;">Manage all →</a>
                         </div>
                         <table style="width: 100%;">
                             <thead>
@@ -814,22 +825,22 @@
                     <div class="box-container">
                         <h3 class="box-title" style="margin-bottom:12px;">Quick Actions</h3>
                         <div class="action-grid">
-                            <div class="action-card">
+                            <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">➕</div>
                                 <b style="font-size:11px;">New Scholarship</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.applications.pending') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">👥</div>
                                 <b style="font-size:11px;">Assign</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.settings') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">⚙️</div>
                                 <b style="font-size:11px;">Weight Config</b>
-                            </div>
-                            <div class="action-card">
+                            </a>
+                            <a href="{{ route('admin.reports.index') ?? '#' }}" class="action-card" style="cursor: pointer;">
                                 <div style="font-size:18px; margin-bottom:5px;">📊</div>
                                 <b style="font-size:11px;">Analytics</b>
-                            </div>
+                            </a>
                         </div>
                     </div>
 
@@ -884,7 +895,7 @@
                     <div class="alerts-section" style="margin-top: 20px;">
                         <div class="section-header">
                             <h3>Upcoming Deadlines</h3>
-                            <span class="subtitle">Calendar →</span>
+                            <a href="{{ route('admin.calendar') ?? '#' }}" class="subtitle" style="text-decoration: none; color: inherit;">Calendar →</a>
                         </div>
 
                         <div>
@@ -927,6 +938,107 @@
         // 5 minute auto-refresh simulation
         setInterval(() => { console.log("Checking for updates..."); }, 300000);
     });
+
+    /**
+     * Session Timeout Tracker
+     */
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('sessionTracker', () => ({
+            idleSeconds: 0,
+            warningLimit: 13 * 60,
+            timeoutLimit: 15 * 60,
+            interval: null,
+            isWarningShown: false,
+
+            init() {
+                this.resetIdleTime();
+                const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+                events.forEach(event => {
+                    window.addEventListener(event, () => this.resetIdleTime(), true);
+                });
+
+                this.interval = setInterval(() => {
+                    this.idleSeconds++;
+                    if (this.idleSeconds === this.warningLimit && !this.isWarningShown) {
+                        this.isWarningShown = true;
+                        const modal = document.getElementById('session-timeout-modal');
+                        if (modal) modal.style.display = 'flex';
+                    }
+                    if (this.idleSeconds >= this.timeoutLimit) {
+                        clearInterval(this.interval);
+                        document.getElementById('auto-logout-form').submit();
+                    }
+                }, 1000);
+            },
+
+            resetIdleTime() {
+                this.idleSeconds = 0;
+                this.isWarningShown = false;
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+            },
+
+            logout() {
+                document.getElementById('auto-logout-form').submit();
+            },
+
+            stayLoggedIn() {
+                this.resetIdleTime();
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+            }
+        }));
+    });
+
+    // Make tracker globally available
+    window.sessionTracker = null;
+    document.addEventListener('alpine:init', () => {
+        const root = document.querySelector('[x-data]');
+        if (root && root.__x && root.__x.$data) {
+            window.sessionTracker = root.__x.$data;
+        }
+    });
+
+    // Countdown timer
+    setInterval(() => {
+        const modal = document.getElementById('session-timeout-modal');
+        if (modal && modal.style.display !== 'none') {
+            const countdownEl = document.getElementById('session-timeout-countdown');
+            const text = countdownEl.textContent;
+            const [minutes, seconds] = text.split(':').map(Number);
+            let totalSeconds = minutes * 60 + seconds - 1;
+            if (totalSeconds < 0) totalSeconds = 0;
+            const newMinutes = Math.floor(totalSeconds / 60);
+            const newSeconds = totalSeconds % 60;
+            countdownEl.textContent = `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
 </script>
+
+<!-- Session Timeout Modal -->
+<div id="session-timeout-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); animation: slideUp 0.3s ease-out;">
+        <div style="text-align: center; margin-bottom: 20px; font-size: 48px;">⏱️</div>
+        <h2 style="font-size: 20px; font-weight: 700; color: #1a2e2c; margin-bottom: 12px; text-align: center;">Session Expiring Soon</h2>
+        <p style="font-size: 14px; color: #4a6460; line-height: 1.6; margin-bottom: 24px; text-align: center;">You've been inactive for 13 minutes. Your session will expire in 2 minutes for your security. Please click "Stay Logged In" to continue.</p>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="if (window.sessionTracker) window.sessionTracker.stayLoggedIn(); else location.reload();" style="flex: 1; padding: 12px 16px; background: linear-gradient(135deg, #0F4C5C, #1A6B7A); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Stay Logged In</button>
+            <button onclick="if (window.sessionTracker) window.sessionTracker.logout(); else document.getElementById('auto-logout-form').submit();" style="flex: 1; padding: 12px 16px; background: #f5f5f5; color: #1a2e2c; border: 1px solid #e2e8e6; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Log Out</button>
+        </div>
+        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #8aaba6;">Automatically logging out in <span id="session-timeout-countdown">2:00</span></div>
+    </div>
+</div>
+
+<!-- Auto Logout Form -->
+<form id="auto-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 </body>
 </html>

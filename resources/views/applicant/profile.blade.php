@@ -25,80 +25,12 @@
 --}}
 
 @php
-    /* ── Database-Driven Data ─────────────────────────────────────── */
+    /* ── Database-Driven Data from authenticated user ─────────────────── */
     
-    // User data from applicant
     $applicantUser = auth()->user();
     $applicantProfile = $applicantUser?->applicantProfile;
     
-    $user = $user ?? [
-        'name'        => $applicantUser?->name ?? 'Applicant',
-        'initials'    => strtoupper(substr($applicantUser?->name ?? 'A', 0, 1)) . strtoupper(substr(explode(' ', $applicantUser?->name ?? 'A')[1] ?? '', 0, 1)),
-        'role'        => 'Applicant',
-        'program'     => $applicantProfile?->program ?? 'Unknown Program',
-        'school'      => $applicantProfile?->school ?? 'Unknown School',
-        'last_updated'=> $applicantProfile?->updated_at?->format('M d, Y') ?? now()->format('M d, Y'),
-        'avatar'      => $applicantUser?->avatar_url ?? null,
-    ];
-
-    $personal = $personal ?? [
-        'full_name'   => $applicantUser?->name ?? 'Not provided',
-        'dob'         => $applicantProfile?->date_of_birth?->format('F j, Y') ?? 'Not provided',
-        'contact'     => $applicantProfile?->phone_number ?? 'Not provided',
-        'email'       => $applicantUser?->email ?? 'Not provided',
-        'address'     => $applicantProfile?->address ?? 'Not provided',
-    ];
-
-    $academic = $academic ?? [
-        'school'      => $applicantProfile?->school ?? 'Not provided',
-        'program'     => $applicantProfile?->program ?? 'Not provided',
-        'year_level'  => $applicantProfile?->year_level ?? 'Not provided',
-        'gpa'         => $applicantProfile?->gpa ?? 'N/A',
-    ];
-
-    // Fetch documents from database
-    $documents = $documents ?? \App\Models\ApplicationDocument::where('user_id', auth()->id())
-        ->get()
-        ->map(fn($doc) => [
-            'name'   => $doc->document_type,
-            'status' => $doc->status,
-        ])
-        ->toArray();
-
-    // Calculate profile completion from applicant profile
-    $profileFields = [
-        $applicantProfile?->date_of_birth,
-        $applicantProfile?->phone_number,
-        $applicantProfile?->address,
-        $applicantProfile?->school,
-        $applicantProfile?->program,
-        $applicantProfile?->year_level,
-        $applicantProfile?->gpa,
-    ];
-    $completedFields = count(array_filter($profileFields, fn($f) => !is_null($f)));
-    $totalFields = count($profileFields);
-    $percent = $totalFields > 0 ? round(($completedFields / $totalFields) * 100) : 0;
-    
-    $completion = $completion ?? [
-        'percent'            => $percent,
-        'incomplete_sections'=> $totalFields - $completedFields,
-    ];
-
-    /* ── Nav ── */
-    $mainNav = [
-        ['icon' => '🏠', 'label' => 'Dashboard',    'href' => '/applicant/dashboard',    'active' => false, 'badge' => null],
-        ['icon' => '🔍', 'label' => 'Browse',        'href' => '/applicant/browse',        'active' => false, 'badge' => 120],
-        ['icon' => '📋', 'label' => 'Applications',  'href' => '/applicant/applications',  'active' => false, 'badge' => 3],
-        ['icon' => '🤖', 'label' => 'AI Matches',    'href' => '/applicant/ai-matches',    'active' => false, 'badge' => null],
-    ];
-    $accountNav = [
-        ['icon' => '👤', 'label' => 'My Profile',    'href' => '/applicant/profile',       'active' => true,  'badge' => null],
-        ['icon' => '📁', 'label' => 'Documents',     'href' => '/applicant/documents',     'active' => false, 'badge' => 1],
-        ['icon' => '🔔', 'label' => 'Notifications', 'href' => '/applicant/notifications', 'active' => false, 'badge' => null],
-        ['icon' => '⚙️', 'label' => 'Settings',      'href' => '/applicant/settings',      'active' => false, 'badge' => null],
-    ];
-
-    /* ── Document status config ── */
+    // Document status configuration
     $docStatusConfig = [
         'verified' => ['label' => 'Verified', 'class' => 'mp-doc--verified'],
         'expired'  => ['label' => 'Expired',  'class' => 'mp-doc--expired'],
@@ -717,12 +649,19 @@
             </div>
 
             <div class="mp-topbar__actions">
+                @php
+                    $unreadNotifications = \App\Models\Notification::where('user_id', auth()->id())
+                        ->where('read', false)
+                        ->count();
+                @endphp
                 <div class="mp-topbar__bell" aria-label="Notifications">
                     🔔
-                    <span class="mp-topbar__bell-dot"></span>
+                    @if($unreadNotifications > 0)
+                        <span class="mp-topbar__bell-dot"></span>
+                    @endif
                 </div>
-                <div class="mp-topbar__avatar" title="{{ $user['name'] }}">
-                    {{ $user['initials'] }}
+                <div class="mp-topbar__avatar" title="{{ $applicantUser?->name }}">
+                    {{ strtoupper(substr($applicantUser?->name ?? 'A', 0, 1)) }}{{ strtoupper(substr(explode(' ', $applicantUser?->name ?? 'A')[1] ?? '', 0, 1)) }}
                 </div>
             </div>
         </div>
@@ -777,20 +716,20 @@
                 {{-- 04 — HERO BANNER --}}
                 <div class="mp-hero">
                     <div class="mp-hero__avatar">
-                        @if (!empty($user['avatar']))
-                            <img src="{{ $user['avatar'] }}" alt="{{ $user['name'] }}" />
+                        @if (!empty($applicantUser?->avatar_url))
+                            <img src="{{ $applicantUser->avatar_url }}" alt="{{ $applicantUser->name }}" />
                         @else
-                            {{ $user['initials'] }}
+                            {{ strtoupper(substr($applicantUser?->name ?? 'A', 0, 1)) }}{{ strtoupper(substr(explode(' ', $applicantUser?->name ?? 'A')[1] ?? '', 0, 1)) }}
                         @endif
                     </div>
 
                     <div class="mp-hero__info">
-                        <div class="mp-hero__name">{{ $user['name'] }}</div>
+                        <div class="mp-hero__name">{{ $applicantUser?->name ?? 'Applicant' }}</div>
                         <div class="mp-hero__sub">
-                            {{ $user['program'] }} · {{ $user['school'] }}
+                            {{ $applicantProfile?->program ?? 'Unknown Program' }} · {{ $applicantProfile?->school ?? 'Unknown School' }}
                         </div>
                         <div class="mp-hero__updated">
-                            📅 Last updated {{ $user['last_updated'] }}
+                            📅 Last updated {{ $applicantProfile?->updated_at?->format('M d, Y') ?? now()->format('M d, Y') }}
                         </div>
                     </div>
 
@@ -804,18 +743,33 @@
 
                     {{-- 05 — PROFILE COMPLETION --}}
                     <div class="mp-completion">
+                        @php
+                            $profileFields = [
+                                $applicantProfile?->date_of_birth,
+                                $applicantProfile?->phone_number,
+                                $applicantProfile?->address,
+                                $applicantProfile?->school,
+                                $applicantProfile?->program,
+                                $applicantProfile?->year_level,
+                                $applicantProfile?->gpa,
+                            ];
+                            $completedFields = count(array_filter($profileFields, fn($f) => !is_null($f)));
+                            $totalFields = count($profileFields);
+                            $percent = $totalFields > 0 ? round(($completedFields / $totalFields) * 100) : 0;
+                            $incompleteCount = $totalFields - $completedFields;
+                        @endphp
                         <div class="mp-completion__header">
                             <span class="mp-completion__label">Profile Completion</span>
                             <div class="mp-completion__right">
-                                <span class="mp-completion__pct">{{ $completion['percent'] }}%</span>
+                                <span class="mp-completion__pct">{{ $percent }}%</span>
                                 <span class="mp-completion__note">
-                                    {{ $completion['incomplete_sections'] }} sections<br>incomplete
+                                    {{ $incompleteCount }} sections<br>incomplete
                                 </span>
                             </div>
                         </div>
                         <div class="mp-completion__bar">
                             <div class="mp-completion__fill"
-                                 style="width:{{ $completion['percent'] }}%">
+                                 style="width:{{ $percent }}%">
                             </div>
                         </div>
                     </div>
@@ -834,25 +788,25 @@
                                 {{-- Full name --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">Full Name</div>
-                                    <div class="mp-field__value">{{ $personal['full_name'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantUser?->name ?? 'Not provided' }}</div>
                                 </div>
 
                                 {{-- Date of birth --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">Date of Birth</div>
-                                    <div class="mp-field__value">{{ $personal['dob'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantProfile?->date_of_birth?->format('F j, Y') ?? 'Not provided' }}</div>
                                 </div>
 
                                 {{-- Contact --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">Contact Number</div>
-                                    <div class="mp-field__value">{{ $personal['contact'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantProfile?->phone_number ?? 'Not provided' }}</div>
                                 </div>
 
                                 {{-- Email --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">Email Address</div>
-                                    <div class="mp-field__value">{{ $personal['email'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantUser?->email ?? 'Not provided' }}</div>
                                 </div>
                             </div>
 
@@ -860,7 +814,7 @@
                             <div class="mp-info-grid mp-info-grid--wide" style="margin-top:18px;">
                                 <div class="mp-field">
                                     <div class="mp-field__label">Home Address</div>
-                                    <div class="mp-field__value">{{ $personal['address'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantProfile?->address ?? 'Not provided' }}</div>
                                 </div>
                             </div>
                         </div>
@@ -880,26 +834,26 @@
                                 {{-- School --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">School / University</div>
-                                    <div class="mp-field__value">{{ $academic['school'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantProfile?->school ?? 'Not provided' }}</div>
                                 </div>
 
                                 {{-- Program --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">Program / Course</div>
-                                    <div class="mp-field__value">{{ $academic['program'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantProfile?->program ?? 'Not provided' }}</div>
                                 </div>
 
                                 {{-- Year level --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">Year Level</div>
-                                    <div class="mp-field__value">{{ $academic['year_level'] }}</div>
+                                    <div class="mp-field__value">{{ $applicantProfile?->year_level ?? 'Not provided' }}</div>
                                 </div>
 
                                 {{-- GPA --}}
                                 <div class="mp-field">
                                     <div class="mp-field__label">GPA / QPI</div>
                                     <div class="mp-field__value mp-field__value--bold">
-                                        {{ $academic['gpa'] }}
+                                        {{ $applicantProfile?->gpa ?? 'N/A' }}
                                     </div>
                                 </div>
                             </div>
@@ -910,16 +864,19 @@
                     <div class="mp-doc-wallet">
                         <div class="mp-doc-wallet__header">
                             <span class="mp-doc-wallet__title">Document Wallet Status</span>
-                            <a href="/applicant/documents"
+                            <a href="{{ route('applicant.documents.index') }}"
                                class="mp-doc-wallet__manage">
                                 Manage →
                             </a>
                         </div>
                         <div class="mp-doc-wallet__body">
-                            @foreach ($documents as $doc)
+                            @php
+                                $documents = \App\Models\ApplicationDocument::where('user_id', auth()->id())->get();
+                            @endphp
+                            @forelse($documents as $doc)
                                 @php
-                                    $ds = $docStatusConfig[$doc['status']] ?? ['label' => ucfirst($doc['status']), 'class' => ''];
-                                    $docIcon = match($doc['status']) {
+                                    $ds = $docStatusConfig[$doc->status] ?? ['label' => ucfirst($doc->status), 'class' => ''];
+                                    $docIcon = match($doc->status) {
                                         'verified' => '📄',
                                         'expired'  => '📄',
                                         'pending'  => '🕐',
@@ -928,10 +885,12 @@
                                 @endphp
                                 <div class="mp-doc-chip {{ $ds['class'] }}">
                                     <span class="mp-doc-chip__icon">{{ $docIcon }}</span>
-                                    {{ $doc['name'] }}
+                                    {{ $doc->document_type }}
                                     <span class="mp-doc-chip__status">{{ $ds['label'] }}</span>
                                 </div>
-                            @endforeach
+                            @empty
+                                <p style="color: #999; font-size: 13px;">No documents uploaded yet. <a href="{{ route('applicant.documents.index') }}" style="color: #1a6b63; text-decoration: underline;">Upload now</a></p>
+                            @endforelse
                         </div>
                     </div>
 
