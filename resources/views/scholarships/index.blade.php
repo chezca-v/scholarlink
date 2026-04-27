@@ -196,9 +196,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .psep{color:var(--slate);font-size:13px;padding:0 2px;}
 
 /* List view overrides */
-.cgrid.lv .card{flex-direction:row;align-items:stretch;padding:14px 18px;}
-.lvl{flex:1;min-width:0;padding-right:20px;display:flex;flex-direction:column;}
-.lvr{width:200px;flex-shrink:0;display:flex;flex-direction:column;justify-content:flex-end;}
+.cgrid.lv .card { flex-direction: row; align-items: stretch; padding: 14px 18px; gap: 0; }
+.cgrid.lv .card .card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.cgrid.lv .card .cact { margin-top: 0; flex-shrink: 0; flex-direction: column; justify-content: flex-end; gap: 6px; width: 140px; padding-left: 16px; border-left: 1.5px solid var(--mist); }
+.cgrid.lv .card .cact .btn-bm { width: 100%; border-radius: 8px; }
+.cgrid.lv .card .cdiv { display: none; }
+.cgrid.lv .card .mrow { margin-bottom: 0; }
+.cgrid.lv .card .ctags { flex-wrap: nowrap; overflow: hidden; }
 
 /* Toast */
 .toast{
@@ -351,7 +355,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="fg">
       <div class="fgl">Income Bracket</div>
       @php
-      
+
         $activeIncomes = (array) ($filters['income'] ?? ['Below ₱100K/yr', '₱100K–₱250K']);
         $incomeOptions = ['Below ₱100K/yr', '₱100K–₱250K', '₱250K–₱500K', 'Open / Any'];
       @endphp
@@ -536,6 +540,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
         <div class="card {{ $userApplication && $userApplication->status === 'approved' ? 'saved' : '' }}"
              data-id="{{ $scholarship->id }}">
+             <div class="card-body">
 
           {{-- Card top: org name + badges --}}
           <div class="ctop">
@@ -621,6 +626,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           @endauth
 
           {{-- Actions --}}
+          </div> 
           <div class="cact">
             <a href="{{ route('scholarships.show', $scholarship->id) }}"
                class="btn-apply">
