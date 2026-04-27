@@ -112,7 +112,7 @@ class ScholarshipController extends Controller
         // Eager load applications for the current user (to show match score & bookmark status)
         if (Auth::check()) {
             $scholarships->load(['applications' => function ($q) {
-                $q->where('user_id', Auth::id());
+                $q->where('applicant_id', Auth::id());
             }]);
         }
 

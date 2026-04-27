@@ -225,14 +225,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </head>
 <body>
 
-//═══════════════════════════════════════════════════ NAVBAR ══════════════ //
+{{--═══════════════════════════════════════════════════ NAVBAR ══════════════ --}}
 <nav class="navbar">
   <a class="nav-logo" href="{{ route('landing') }}">
     <div class="logo-box">🎓</div>
     <span class="logo-text">ScholarLink</span>
   </a>
 
-  //Search form — submits GET to same page //
+  {{--Search form — submits GET to same page --}}
   <form class="nav-search" method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
     <span class="si">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -261,7 +261,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     </button>
 
     @auth
-     //Show initials from the logged-in user's name //
+     {{--Show initials from the logged-in user's name --}}
       <div class="nav-av" title="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
         {{ strtoupper(substr(Auth::user()->first_name, 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name, 0, 1)) }}
       </div>
@@ -271,17 +271,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </div>
 </nav>
 
-// ═══════════════════════════════════════════════════ LAYOUT ═════════════ //
+{{-- ═══════════════════════════════════════════════════ LAYOUT ═════════════ --}}
 <div class="layout">
 
- // ───────────────────────────────────── SIDEBAR / FILTERS ───────────────//
+ {{--───────────────────────────────────── SIDEBAR / FILTERS ───────────────--}}
   <aside class="sidebar">
     <div class="sb-hd">
       <span class="sb-title">Filters</span>
       <a href="{{ route('scholarships.index') }}" class="btn-clr">Clear all</a>
     </div>
 
-    // Status //
+    {{-- Status --}}
     <div class="fg">
       <div class="fgl">Status</div>
       @php
@@ -494,7 +494,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       </div>
     </div>
 
-    // ─────────────────── SCHOLARSHIP CARDS GRID ──────────────────────── //
+    {{--─────────────────── SCHOLARSHIP CARDS GRID ──────────────────────── --}}
     <div class="cgrid" id="cgrid">
 
       @forelse($scholarships as $scholarship)
@@ -503,7 +503,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
             If the user is logged in and has applied, pull it from the
             eager-loaded relationship. Otherwise show no score.
        */
-          $userApplication = $user
+          $userApplication = auth()->check()
               ? $scholarship->applications->first()
               : null;
           $matchScore = $userApplication?->ai_match_score ?? null;
@@ -625,9 +625,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
                class="btn-apply">
               View & Apply
             </a>
-            {{-- Bookmark / save button (wired to a POST route) --}}
-            <form method="POST" action="{{ route('scholarships.bookmark', $scholarship->id) }}" style="display:contents;">
-              @csrf
+            {{-- Save  / save button (wired to a POST route) --}}
+            <form method="POST" action="{{ route('scholarships.save', $scholarship->id) }}" style="display:contents;">              @csrf
               <button type="submit" class="btn-bm" title="Save scholarship">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
