@@ -204,22 +204,80 @@ class SuperadminController extends Controller
     // Admin Accounts
     // ─────────────────────────────────────────────
 
-    public function admins()
+    public function admins(Request $request)
     {
-        $admins = User::query()
+        // 1. Stats
+        $totalAdmins = User::where('role', 'admin')->count();
+        $totalOrgs = Organization::count();
+        $activeAdmins = User::where('role', 'admin')->where('is_active', true)->count();
+        $newAdminsToday = User::where('role', 'admin')->whereDate('created_at', Carbon::today())->count();
+        $deactivatedAdmins = User::where('role', 'admin')->where('is_active', false)->count();
+        $unassignedOrgs = Organization::whereDoesntHave('users', function ($query) {
+            $query->where('role', 'admin');
+        })->count();
+
+        // 2. Admin Query & Filters
+        $query = User::query()
             ->where('role', 'admin')
-            ->with('organization')
-            ->latest()
-            ->paginate(15);
+            ->with('organization');
 
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('last_name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+        
+        if ($request->filled('status')) {
+            $status = $request->status;
+            if ($status === 'active') {
+                $query->where('is_active', true);
+            } elseif ($status === 'deactivated') {
+                $query->where('is_active', false);
+            }
+        }
+        
+        if ($request->filled('organization_id')) {
+            $query->where('organization_id', $request->organization_id);
+        }
+
+        $admins = $query->latest()->paginate(15)->withQueryString();
+
+        // Post-process items
+        $admins->getCollection()->transform(function ($admin) {
+            $admin->full_name = $admin->first_name . ' ' . $admin->last_name;
+            $admin->status = $admin->is_active ? 'active' : 'deactivated';
+            $admin->managed_scholars_count = Application::where('status', 'approved')
+                ->whereHas('scholarship', function ($q) use ($admin) {
+                    $q->where('created_by', $admin->id);
+                })->count();
+            return $admin;
+        });
+
+        // 3. Organizations (for filters and creation modal)
         $organizations = Organization::query()
+            ->withCount(['users as admin_count' => function ($query) {
+                $query->where('role', 'admin');
+            }])
             ->where('is_active', true)
-            ->get(['id', 'name']);
+            ->get()
+            ->map(function ($org) {
+                $org->admin = $org->admin_count > 0;
+                return $org;
+            });
 
-        return view('superadmin.admins', [
-            'admins'        => $admins,
-            'organizations' => $organizations,
-        ]);
+        return view('superadmin.admin', compact(
+            'totalAdmins',
+            'totalOrgs',
+            'activeAdmins',
+            'newAdminsToday',
+            'deactivatedAdmins',
+            'unassignedOrgs',
+            'admins',
+            'organizations'
+        ));
     }
 
     public function storeAdmin(Request $request)
