@@ -107,11 +107,12 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .msc-bar-fill { height: 100%; background: linear-gradient(90deg, #0F4C5C, #E8A838); border-radius: 999px; }
 
 /* LOGOS */
-.logos { padding: 48px; border-top: 1px solid #EAF4F3; border-bottom: 1px solid #EAF4F3; }
-.logos-inner { max-width: 1160px; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
-.logos-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C8E8E4; white-space: nowrap; }
-.logos-row { display: flex; gap: 48px; align-items: center; flex: 1; }
-.logo-item { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #C8E8E4; letter-spacing: -0.5px; }
+.logos { padding: 48px; border-top: 1px solid #EAF4F3; border-bottom: 1px solid #EAF4F3; overflow: hidden; }
+.logos-inner { max-width: 100%; margin: 0 auto; display: flex; align-items: center; gap: 48px; }
+.logos-label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #C8E8E4; white-space: nowrap; padding-left: 48px; }
+.logos-row { display: flex; gap: 48px; align-items: center; flex: 1; animation: slideRight 30s linear infinite; }
+.logo-item { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700; color: #C8E8E4; letter-spacing: -0.5px; white-space: nowrap; }
+@keyframes slideRight { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
 /* HOW */
 .how { padding: 112px 48px; background: #fff; }
@@ -277,11 +278,16 @@ footer { background: #071820; padding: 64px 48px 32px; }
   <div class="logos-inner">
     <span class="logos-label">Trusted by</span>
     <div class="logos-row">
-      <span class="logo-item">Gabay Foundation</span>
-      <span class="logo-item">Abot-Kaya Inc.</span>
-      <span class="logo-item">TechBridge Corp.</span>
-      <span class="logo-item">Lumina Grants</span>
-      <span class="logo-item">PH Merit Fund</span>
+      @forelse($scholarships as $scholarship)
+        <span class="logo-item">{{ $scholarship->provider_name }}</span>
+      @empty
+        <span class="logo-item">Loading scholarships...</span>
+      @endforelse
+      @if($scholarships->count() > 0)
+        @forelse($scholarships as $scholarship)
+          <span class="logo-item">{{ $scholarship->provider_name }}</span>
+        @endforelse
+      @endif
     </div>
   </div>
 </div>
