@@ -316,16 +316,25 @@
       <span class="icon">👤</span> My Profile
     </a>
     
-    <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; margin-top: auto;">
-      @csrf
-      <button type="submit" class="sidebar-footer" style="width: 100%; border: none; border-top: 1px solid var(--border); background: transparent; cursor: pointer; text-align: left; font-family: inherit; margin-top: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(220,38,38,0.05)'" onmouseout="this.style.background='transparent'" onclick="return confirm('Are you sure you want to log out?');">
-        <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
-        <div>
-          <div class="name">{{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}</div>
-          <div class="sub">Evaluator <span style="font-size: 10px; margin-left: 4px; color: var(--red);">Log Out</span></div>
+    <div class="sidebar-footer" style="margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+      <div class="avatar" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(15,76,92,.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--primary); flex-shrink: 0;">
+        {{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}
+      </div>
+      <div>
+        <div class="name" style="font-size: 12px; color: var(--ink); font-weight: 500;">
+          {{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}
         </div>
-      </button>
-    </form>
+        <div class="sub" style="font-size: 10px; color: var(--muted); display:flex; align-items:center; gap:4px;">
+          Evaluator
+          <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; display:inline-block;">
+            @csrf
+            <button type="submit" style="background:none; border:none; color:var(--red); font-size:10px; cursor:pointer; font-family:inherit; padding:0; text-decoration:none;" title="Log Out" onclick="return confirm('Are you sure you want to log out?');">
+              Log Out
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
   </aside>
 
   <div class="main">
