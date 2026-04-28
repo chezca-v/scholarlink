@@ -13,6 +13,7 @@ use App\Models\ActivityLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\Notification;
+use App\Models\Setting;
 
 class SuperadminController extends Controller
 {
@@ -184,7 +185,7 @@ class SuperadminController extends Controller
             // Counts
             $userIds = $org->users->pluck('id');
             $scholarships = Scholarship::whereIn('created_by', $userIds)->get();
-            $org->active_scholarships_count = $scholarships->where('is_active', true)->count();
+            $org->active_scholarships_count = $scholarships->where('status', 'open')->count();
             
             $scholarshipIds = $scholarships->pluck('id');
             $org->applicants_count = Application::whereIn('scholarship_id', $scholarshipIds)->count();
@@ -639,109 +640,10 @@ class SuperadminController extends Controller
 
     public function settings()
     {
-        $featureFlags = [
-            'ai_matching' => [
-                'label' => 'AI Scholarship Matching',
-                'description' => 'Uses Gemini API to match applicants with scholarships.',
-                'enabled' => true,
-            ],
-            'sms_notifications' => [
-                'label' => 'SMS Notifications',
-                'description' => 'Send SMS updates via ESP32 gateway.',
-                'enabled' => true,
-            ],
-            'public_registration' => [
-                'label' => 'Public Applicant Registration',
-                'description' => 'Allow anyone to register as an applicant.',
-                'enabled' => true,
-            ],
-            'auto_approve_orgs' => [
-                'label' => 'Auto-Approve Organizations',
-                'description' => 'Skip manual review for new organizations.',
-                'enabled' => false,
-            ],
-        ];
-
-        $integrations = [
-            [
-                'name' => 'Gemini API',
-                'description' => 'AI engine for document parsing and matching.',
-                'status' => 'connected',
-            ],
-            [
-                'name' => 'ESP32 SMS Gateway',
-                'description' => 'Hardware interface for sending SMS alerts.',
-                'status' => 'online',
-            ],
-            [
-                'name' => 'Email SMTP',
-                'description' => 'Primary email delivery service.',
-                'status' => 'active',
-            ],
-            [
-                'name' => 'PhilSys ID Verify',
-                'description' => 'National ID validation endpoint.',
-                'status' => 'error',
-            ],
-        ];
-
-        $notificationTemplates = [
-            'welcome_email' => [
-                'label' => 'Welcome Email (Applicants)',
-                'rows' => 4,
-                'content' => "Hi {{name}},\n\nWelcome to ScholarLink! We're excited to help you find the right scholarships.\n\nBest,\nThe ScholarLink Team",
-            ],
-            'status_update' => [
-                'label' => 'Application Status Update',
-                'rows' => 3,
-                'content' => "Hello {{name}},\n\nYour application for {{scholarship}} is now {{status}}.",
-            ],
-            'admin_invite' => [
-                'label' => 'Admin Invitation',
-                'rows' => 3,
-                'content' => "Hi {{name}},\n\nYou've been invited to manage your organization. Click here to set up your account.",
-            ],
-        ];
-
-        $permissionsMatrix = [
-            'superadmin' => [
-                'icon' => '👑',
-                'label' => 'Superadmin',
-                'permissions' => [
-                    'manage_users' => ['label' => 'Manage Users', 'enabled' => true],
-                    'manage_orgs' => ['label' => 'Manage Orgs', 'enabled' => true],
-                    'system_settings' => ['label' => 'System Settings', 'enabled' => true],
-                    'view_logs' => ['label' => 'View Logs', 'enabled' => true],
-                ]
-            ],
-            'admin' => [
-                'icon' => '🏛️',
-                'label' => 'Org Admin',
-                'permissions' => [
-                    'manage_users' => ['label' => 'Manage Users', 'enabled' => false],
-                    'manage_orgs' => ['label' => 'Manage Orgs', 'enabled' => false],
-                    'manage_scholarships' => ['label' => 'Manage Scholarships', 'enabled' => true],
-                    'review_applications' => ['label' => 'Review Applications', 'enabled' => true],
-                ]
-            ],
-            'evaluator' => [
-                'icon' => '📋',
-                'label' => 'Evaluator',
-                'permissions' => [
-                    'manage_scholarships' => ['label' => 'Manage Scholarships', 'enabled' => false],
-                    'review_applications' => ['label' => 'Review Applications', 'enabled' => true],
-                    'add_notes' => ['label' => 'Add Notes', 'enabled' => true],
-                ]
-            ],
-            'applicant' => [
-                'icon' => '🎓',
-                'label' => 'Applicant',
-                'permissions' => [
-                    'apply_scholarships' => ['label' => 'Apply', 'enabled' => true],
-                    'view_status' => ['label' => 'View Status', 'enabled' => true],
-                ]
-            ],
-        ];
+        $featureFlags = Setting::where('key', 'featureFlags')->value('value') ?? [];
+        $integrations = Setting::where('key', 'integrations')->value('value') ?? [];
+        $notificationTemplates = Setting::where('key', 'notificationTemplates')->value('value') ?? [];
+        $permissionsMatrix = Setting::where('key', 'permissionsMatrix')->value('value') ?? [];
 
         return view('superadmin.settings', compact(
             'featureFlags',
@@ -753,8 +655,69 @@ class SuperadminController extends Controller
 
     public function updateSettings(Request $request)
     {
-        // Feature flags and RBAC permissions matrix
-        // Will expand once feature flag system is defined
+        // 1. AJAX Checkbox: toggle feature flag
+        if ($request->has('flag') && $request->has('enabled')) {
+            $setting = Setting::where('key', 'featureFlags')->first();
+            if ($setting) {
+                $data = $setting->value;
+                if (isset($data[$request->flag])) {
+                    $data[$request->flag]['enabled'] = $request->enabled;
+                    $setting->update(['value' => $data]);
+                }
+            }
+            return response()->json(['success' => true]);
+        }
+
+        // 2. AJAX Checkbox: toggle RBAC permission
+        if ($request->has('role') && $request->has('permission') && $request->has('enabled')) {
+            $setting = Setting::where('key', 'permissionsMatrix')->first();
+            if ($setting) {
+                $data = $setting->value;
+                if (isset($data[$request->role]['permissions'][$request->permission])) {
+                    $data[$request->role]['permissions'][$request->permission]['enabled'] = $request->enabled;
+                    $setting->update(['value' => $data]);
+                }
+            }
+            return response()->json(['success' => true]);
+        }
+        
+        // 3. AJAX: Reset templates
+        if ($request->action === 'reset_templates') {
+            $seeder = new \Database\Seeders\SettingSeeder();
+            // Just running the seeder resets it
+            $seeder->run();
+            return response()->json(['success' => true]);
+        }
+
+        // 4. Form Submission: Notification Templates
+        if ($request->has('templates')) {
+            $setting = Setting::where('key', 'notificationTemplates')->first();
+            if ($setting) {
+                $data = $setting->value;
+                foreach ($request->templates as $key => $content) {
+                    if (isset($data[$key])) {
+                        $data[$key]['content'] = $content;
+                    }
+                }
+                $setting->update(['value' => $data]);
+            }
+        }
+
+        // 5. Form Submission: Feature Flags
+        if ($request->has('flags')) {
+            $setting = Setting::where('key', 'featureFlags')->first();
+            if ($setting) {
+                $data = $setting->value;
+                foreach ($data as $key => $flag) {
+                    $data[$key]['enabled'] = isset($request->flags[$key]);
+                }
+                $setting->update(['value' => $data]);
+            }
+        }
+
+        // Permissions form doesn't need to be processed manually here because toggles use AJAX.
+        // But if submitted, we just redirect back with success.
+
         return redirect()->route('superadmin.settings')
             ->with('success', 'Settings updated successfully.');
     }
