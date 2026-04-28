@@ -665,8 +665,6 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     @csrf
 </form>
 
-<x-logout-modal />
-
 <style>
     @keyframes slideUp {
         from { opacity: 0; transform: translateY(20px); }

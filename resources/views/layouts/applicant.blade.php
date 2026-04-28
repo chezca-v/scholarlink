@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title', 'ScholarLink — Applicant Portal')</title>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>@yield('title', 'ScholarLink')</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,700&display=swap" rel="stylesheet">
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -19,12 +24,18 @@
   --mist:#E2E8F0;
   --slate:#8A95A3;
   --ink:#1C1C2E;
+  --green-bg:#dcfce7;
+  --green-text:#15803d;
+  --warn-bg:#fef9c3;
+  --warn-text:#854d0e;
+  --violet-bg:#ede9fe;
+  --violet-text:#6d28d9;
   --light-green:#F0FAFA;
   --sidebar-w:210px;
 }
 body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
-/* ── NAVBAR ── */
+/* ── NAVBAR (copied from browse page) ── */
 .navbar{
   background:#FFFF;height:56px;
   display:flex;align-items:center;padding:0 22px;gap:14px;
@@ -37,14 +48,17 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .nav-search{flex:1;max-width:440px;margin:0 auto;position:relative;}
 .nav-search input{width:100%;height:34px;background:var(--light-green);border:1px solid rgba(15,76,92,0.10);border-radius:30px;padding:0 54px 0 34px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--teal);outline:none;}
 .nav-search input::placeholder{color:rgba(15,76,92,0.48);}
+.nav-search input:focus{background:rgba(15,76,92,0);}
 .si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#0c3f4d;pointer-events:none;display:flex;}
+.skb{position:absolute;right:8px;top:50%;transform:translateY(-50%);display:flex;gap:2px;pointer-events:none;}
+.kb{background:rgba(255,255,255,0.14);border:1px solid rgba(15,76,92,0.5);border-radius:3px;color:#0c3f4d;font-size:10px;font-weight:600;padding:0 4px;line-height:16px;}
 .nav-right{display:flex;align-items:center;gap:8px;margin-left:auto;}
-.nav-ibtn{width:35px;height:35px;border-radius:10px;background:var(--light-green);border:2px solid rgba(15,76,92,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all 0.2s ease;color:var(--teal);}
+.nav-ibtn{width:35px;height:35px;border-radius:10px;background:var(--light-green);border:2px solid rgba(15,76,92,0.12);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:all 0.2s ease;}
 .nav-ibtn:hover{background:rgba(15,76,92,0.12);border-color:rgba(15,76,92,0.25);}
 .nav-logout{height:35px;padding:0 10px;border-radius:10px;background:#fff;border:2px solid rgba(220,38,38,0.18);color:#DC2626;font-size:11px;font-weight:700;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s ease;}
 .nav-logout:hover{background:rgba(220,38,38,0.06);border-color:rgba(220,38,38,0.35);}
 .nbadge{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#F9D679;border:1.5px solid var(--teal);}
-.nav-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(160deg,#0F4C5C,#2A8FA0);color:#F9D679;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(255,255,255,0.35);text-decoration:none;}
+.nav-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(160deg,#0F4C5C,#2A8FA0);color:#F9D679;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid rgba(255,255,255,0.35);}
 
 /* ── LAYOUT ── */
 .app{display:flex;min-height:calc(100vh - 56px);}
@@ -66,48 +80,227 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .sb-section-label:first-of-type{margin-top:0;}
 .sb-nav-item{display:flex;align-items:center;gap:10px;padding:8px 18px;font-size:13px;font-weight:500;color:#4a5568;cursor:pointer;border-left:3px solid transparent;transition:all .15s;text-decoration:none;position:relative;}
 .sb-nav-item:hover{background:var(--light-green);color:var(--teal);}
-.sb-nav-item.active{background:#FDF8EC;color:var(--teal);font-weight:700;border-left-color:var(--teal);}
+.sb-nav-item.active{background:var(--light-green);color:var(--teal);font-weight:700;border-left-color:var(--teal);}
 .sb-badge{margin-left:auto;background:#E8A838;color:#0F4C5C;font-size:10px;font-weight:700;border-radius:20px;padding:1px 7px;min-width:20px;text-align:center;}
-.sb-badge-transparent{margin-left:auto;color:#E8A838;font-size:11px;font-weight:700;}
 .sb-spacer{flex:1;}
-.sb-user-btn{display:flex;align-items:center;gap:10px;padding:12px 16px;margin:0 10px 4px;background:var(--light-green);border:2px solid rgba(15,76,92,0.2);border-radius:14px;cursor:pointer;text-align:left;width:calc(100% - 20px);transition:background 0.2s;text-decoration:none;}
-.sb-user-btn:hover{background:rgba(220,38,38,0.05);border-color:rgba(220,38,38,0.2);}
+.sb-user{display:flex;align-items:center;gap:10px;padding:12px 16px;margin:0 10px 4px;background:var(--light-green);border:2px solid rgba(15,76,92,0.2);border-radius:14px;}
 .sb-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0F4C5C,#1A6B7A);color:#F9D679;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sb-name{font-size:12.5px;font-weight:600;color:var(--ink);}
 .sb-sub{font-size:11px;color:var(--slate);}
 
-/* MAIN */
-.main{flex:1;padding:0;min-width:0;overflow-y:auto;display:flex;flex-direction:column;}
-.main-inner{padding:24px 28px 40px;flex:1;}
+/* ── MAIN CONTENT ── */
+.main{flex:1;padding:24px 28px 40px;min-width:0;overflow-y:auto;}
 
-@media (max-width: 768px) {
-  .sidebar { display: none; }
+/* ── HERO BANNER ── */
+.hero{
+  border-radius:18px;
+  background:linear-gradient(160deg, #0F4C5C, #2A8FA0);
+  padding:28px 32px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+  margin-bottom:20px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px;}
+.hero-name{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:6px;}
+.hero-name em{color:var(--amber-light);font-style:italic;}
+.hero-sub{font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:18px;}
+.btn-ai{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg, #E8A838, #F9D679);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border:none;border-radius:10px;padding:9px 18px;cursor:pointer;transition:all .15s;}
+.btn-ai:hover{background:#F9D679;transform:translateY(-1px);}
+.btn-ai svg{flex-shrink:0;}
+.hero-right{display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1;}
+.progress-ring{position:relative;width:80px;height:80px;}
+.progress-ring svg{transform:rotate(-90deg);}
+.ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:7;}
+.ring-fill{fill:none;stroke:var(--amber-light);stroke-width:7;stroke-dasharray:var(--ring-circumference, 207.35) var(--ring-circumference, 207.35);stroke-dashoffset:var(--ring-offset, 207.35);transition:stroke-dashoffset .6s ease;}
+.ring-label{font-family:'Fraunces',serif;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.ring-pct{font-size:18px;font-weight:700;color:#fff;line-height:1;}
+.ring-sub{font-size:8.5px;color:rgba(255,255,255,0.55);margin-top:1px;}
+.hero-right-label{font-size:10.5px;color:rgba(255,255,255,0.55);text-align:center;}
+.hero-right-hint{font-size:10px;color:rgba(255,255,255,0.55);text-align:center;}
+
+/* ── STAT CARDS ── */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
+.stat-card{background:#fff;border:1.5px solid var(--mist);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
+.stat-badge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
+.stat-badge.active{background:var(--green-bg);color:var(--green-text);}
+.stat-badge.ai{background:var(--violet-bg);color:var(--violet-text);}
+.stat-badge.won{background:var(--warn-bg);color:var(--warn-text);}
+.stat-badge.saved{background:var(--light-green);color:var(--teal);}
+.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.stat-icon.teal{background:var(--light-green);}
+.stat-icon.violet{background:var(--violet-bg);}
+.stat-icon.green{background:var(--green-bg);}
+.stat-icon.amber{background:#fff8e1;}
+.stat-num{font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:var(--ink);line-height:1;}
+.stat-lbl{font-size:12px;color:var(--slate);margin-top:3px;}
+
+/* ── SECTION HEADER ── */
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-title{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:700;color:var(--ink);}
+.sec-title svg{color:var(--amber);}
+.sec-sub{font-size:11.5px;color:var(--slate);margin-top:1px;}
+.see-all{font-size:12.5px;color:var(--teal);font-weight:600;cursor:pointer;display:flex;align-items:center;gap:3px;text-decoration:none;}
+.see-all:hover{text-decoration:underline;}
+
+/* ── AI MATCH CARDS ── */
+.ai-section{
+  background:#fff; /* or any color you want */
+  border:1.5px solid var(--mist);
+  border-radius:16px;
+  padding:18px 20px 2px;
+}
+.ai-scroll{display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;margin-bottom:28px;overflow-x:auto;}
+.ai-scroll::-webkit-scrollbar{height:3px;}
+.ai-scroll::-webkit-scrollbar-thumb{background:var(--mist);}
+.match-card{background:#fff;border:1.5px solid var(--mist);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:0;flex-shrink:0;transition:box-shadow .15s;}
+.match-card:hover{transform:translateY(-7px);box-shadow:0 16px 36px rgba(15,76,92,0.13);}
+.match-card.top{border-color:var(--amber);border-width:2px;}
+.mc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+.mc-cat{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--slate);}
+.mc-fit{font-size:9.5px;font-weight:700;padding:2px 7px;border-radius:20px;}
+.mc-fit.top{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
+.mc-fit.great{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
+.mc-fit.good{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
+.mc-fit.explore{background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#FFFF;}
+.mc-name{font-size:14px;font-weight:700;color:var(--ink);line-height:1.3;margin-bottom:3px;}
+.mc-org{font-size:11px;color:var(--slate);margin-bottom:10px;}
+.mc-amt{font-family:'Fraunces',serif;font-size:20px;font-weight:700;color:var(--teal);margin-bottom:2px;}
+.mc-amt-unit{font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--slate);}
+.mc-score-lbl{font-size:10.5px;color:var(--slate);margin-bottom:4px;margin-top:10px;}
+.mc-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;position:relative;}
+.mc-bar{flex:1;height:5px;background:var(--cloud);border-radius:20px;overflow:hidden;position:relative;}
+.mc-fill{height:100%;border-radius:20px;background:#0F4C5C;}
+.mc-fill.gold{background: linear-gradient(135deg, #E8A838, #F9D679);}
+.mc-pct{position:absolute;top: -20px;right:0;font-size:12.5px;font-weight:700;color:var(--teal);}
+.mc-btn-row{display:flex;gap:6px;margin-top:auto;}
+.btn-apply-full{flex:1;background:linear-gradient(135deg, #E8A838, #F9D679);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;border:none;border-radius:8px;padding:8px 0;cursor:pointer;transition:background .12s;}
+.btn-apply-full:hover{background:#F9D679;}
+.btn-view{flex:1;background: linear-gradient(160deg, #0F4C5C, #2A8FA0);color:#F9D679;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;border:1.5px solid var(--mist);border-radius:8px;padding:8px 0;cursor:pointer;transition:all .12s;}
+.btn-view:hover{border-color:var(--teal);}
+
+/* ── BOTTOM GRID ── */
+.bottom-grid{display:grid;grid-template-columns:1fr 260px;gap:18px;}
+
+/* ── ACTIVE APPLICATIONS ── */
+.panel{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:20px;}
+.app-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--cloud);}
+.app-item:last-child{border-bottom:none;padding-bottom:0;}
+.app-avatar{width:38px;height:38px;border:1px solid var(--mist);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',sans-serif;font-size:12px;font-weight:700;background: #F0FAFA;color:var(--teal);flex-shrink:0;}
+.app-info{flex:1;min-width:0;}
+.app-name{font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.app-org{font-size:11px;color:var(--slate);margin-top:1px;}
+.app-progress{display:flex;gap:4px;margin-top:6px;}
+.ap-dot{width:18px;height:4px;border-radius:20px;}
+.ap-dot.done{background:var(--teal);}
+.ap-dot.current{background:var(--amber);}
+.ap-dot.empty{background:var(--mist);}
+.app-status{flex-shrink:0;}
+.app-status-tag{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.app-status-tag.review{background:var(--warn-bg);color:var(--warn-text);}
+.app-status-tag.docs{background:#fee2e2;color:#b91c1c;}
+.app-status-tag.approved{background:var(--green-bg);color:var(--green-text);}
+
+/* ── DEADLINES ── */
+.deadline-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--cloud);}
+.deadline-item:last-child{border-bottom:none;padding-bottom:0;}
+.dl-cal{width:46px;height:52px;border-radius:12px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;}
+.dl-cal.urgent{background:#fff3e0;border:1.5px solid #f6c36a;}
+.dl-cal.normal{background:#eaf7f7;border:1.5px solid #b5dfe0;}
+.dl-day{font-family:'Fraunces',serif;font-size:22px;font-weight:700;line-height:1;}
+.dl-cal.urgent .dl-day{color:#b36b00;}
+.dl-cal.normal .dl-day{color:#0F4C5C;}
+.dl-month{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;line-height:1;}
+.dl-cal.urgent .dl-month{color:#c47f17;}
+.dl-cal.normal .dl-month{color:#2A8FA0;}
+.dl-info{flex:1;min-width:0;}
+.dl-name{font-size:13px;font-weight:600;color:var(--ink);line-height:1.3;}
+.dl-left{font-size:11.5px;margin-top:3px;font-weight:500;display:flex;align-items:center;gap:4px;}
+.dl-left.urgent{color:#c47f17;}
+.dl-left.soon{color:var(--warn-text);}
+.dl-left.ok{color:var(--teal);}
+
+/* ── QUICK ACTIONS ── */
+.qa-section{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:10px 20px 20px;}
+.qa-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px;}
+.qa-card{background:#fff;border:1.5px solid var(--mist);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:8px;}
+.qa-card:hover{border-color:var(--teal);box-shadow:0 2px 12px rgba(15,76,92,0.08);}
+.qa-icon{width:34px;height:34px;border-radius:9px;background:var(--light-green);display:flex;align-items:center;justify-content:center;color:var(--teal);}
+.qa-label{font-size:13px;font-weight:600;color:var(--ink);}
+.qa-hint{font-size:11px;color:var(--slate);}
+
+/* ── NOTIFICATIONS ── */
+.notif-item{display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--cloud);font-size:12px;}
+.notif-item:last-child{border-bottom:none;}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:4px;}
+.notif-dot.amber{background:var(--amber);}
+.notif-dot.red{background:#e53e3e;}
+.notif-txt{color:var(--ink);line-height:1.45;}
+.notif-time{font-size:10.5px;color:var(--slate);margin-top:2px;}
+
+/* ── SECTION SPACING ── */
+.section{margin-bottom:24px;}
+</style>
+
+<button class="fab-ai" title="AI Assistant">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="fab-badge">AI</span>
+</button>
+
+<style>
+.fab-ai{
+  position:fixed;
+  bottom:24px;right:24px;
+  width:54px;height:54px;
+  border-radius:50%;
+  background:linear-gradient(160deg,#0F4C5C,#2A8FA0);
+  border:none;
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:0 6px 24px rgba(15,76,92,0.35);
+  z-index:400;
+  transition:transform .2s ease, box-shadow .2s ease;
+  position:fixed;
+}
+.fab-ai:hover{transform:scale(1.08);box-shadow:0 10px 32px rgba(15,76,92,0.45);}
+.fab-badge{
+  position:absolute;
+  top:2px;right:2px;
+  background:var(--amber);
+  color:#fff;
+  font-family:'DM Sans',sans-serif;
+  font-size:9px;font-weight:800;
+  border-radius:20px;
+  padding:2px 5px;
+  border:2px solid #fff;
+  line-height:1;
 }
 </style>
-@stack('styles')
+
+    @stack('styles')
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar">
-  <a class="nav-logo" href="{{ route('dashboard') }}">
-    <img src="/favicon.ico" alt="ScholarLink Logo" style="width: 28px; height: 28px; object-fit: contain; border-radius: 4px;" />
+  <a class="nav-logo" href="{{ route('scholarships.index') }}" style="text-decoration:none">
+    <div class="logo-box">🎓</div>
     <span class="logo-text">ScholarLink</span>
   </a>
   <div class="nav-search">
     <span class="si"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-    <form action="{{ route('scholarships.index') }}" method="GET" style="display:inline; width:100%;">
-        <input type="text" name="q" placeholder="Search scholarship, organizations..." value="{{ request('q') }}">
-    </form>
+    <input type="text" placeholder="Search scholarships, requirements…">
   </div>
   <div class="nav-right">
-    <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
-      @if($navUnread > 0)
-      <span class="nbadge"></span>
+    <button class="nav-ibtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </button>
+    <a class="nav-ibtn" href="{{ route('notifications.index') }}">      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        @if(App\Models\Notification::where(\'user_id\', auth()->id())->whereNull(\'read_at\')->count() > 0)
+        <span class="nbadge"></span>
       @endif
     </a>
+    <div class="nav-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
     <form method="POST" action="{{ route('logout') }}" style="margin:0;">
       @csrf
       <button type="submit" class="nav-logout" title="Log Out">Log Out</button>
@@ -116,71 +309,82 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
   </div>
 </nav>
 
-<!-- APP LAYOUT -->
 <div class="app">
-
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-section-label">Main</div>
-    <a class="sb-nav-item {{ request()->routeIs('dashboard') || request()->routeIs('scholarships.index') ? 'active' : '' }}" href="{{ route('scholarships.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Browse
+    <a class="sb-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Dashboard
+    </a>
+    <a class="sb-nav-item {{ request()->routeIs('scholarships.*') ? 'active' : '' }}" href="{{ route('scholarships.index') }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Browse Scholarships
     </a>
     <a class="sb-nav-item {{ request()->routeIs('applications.*') ? 'active' : '' }}" href="{{ route('applications.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Applications
-      @php
-          $totalApplied = App\Models\Application::where('applicant_id', auth()->id())->count();
-      @endphp
-      @if($totalApplied > 0)
-        <span class="sb-badge-transparent">{{ $totalApplied }}</span>
-      @endif
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        My Applications
+        @php $activeAppsCount = App\Models\Application::where('applicant_id', auth()->id())->count(); @endphp
+        @if($activeAppsCount > 0)
+        <span class="sb-badge">{{ $activeAppsCount }}</span>
+        @endif
+    </a>
+
+    <div class="sb-section-label">Resources</div>
+    <a class="sb-nav-item {{ request()->routeIs('applicant.documents.*') ? 'active' : '' }}" href="{{ route('applicant.documents.index') }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Document Wallet
     </a>
     <a class="sb-nav-item {{ request()->routeIs('applicant.saved') ? 'active' : '' }}" href="{{ route('applicant.saved') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      Saved
-      @php $savedCount = App\Models\SavedScholarship::where('user_id', auth()->id())->count(); @endphp
-      @if($savedCount > 0)
-      <span class="sb-badge-transparent">{{ $savedCount }}</span>
-      @endif
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Saved
+        @php $savedCount = App\Models\SavedScholarship::where('user_id', auth()->id())->count(); @endphp
+        @if($savedCount > 0)
+        <span class="sb-badge teal">{{ $savedCount }}</span>
+        @endif
+    </a>
+    <a class="sb-nav-item" href="{{ route('scholarships.index') }}">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        AI Recommendations
     </a>
 
     <div class="sb-section-label">Account</div>
     <a class="sb-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.show') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      My Profile
-    </a>
-    <a class="sb-nav-item {{ request()->routeIs('applicant.documents.*') ? 'active' : '' }}" href="{{ route('applicant.documents.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      Documents
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        My Profile
     </a>
     <a class="sb-nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}" href="{{ route('notifications.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      Notifications
-      @if($navUnread > 0)
-      <span class="sb-badge">{{ $navUnread }}</span>
-      @endif
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        Notifications
+        @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->whereNull('read_at')->count(); @endphp
+        @if($navUnread > 0)
+        <span class="sb-badge">{{ $navUnread }}</span>
+        @endif
     </a>
 
     <div class="sb-spacer"></div>
-    <div class="sb-user-card" style="display:flex; align-items:center; gap:10px; padding:12px 16px; margin:0 10px 4px; background:var(--light-green); border:2px solid rgba(15,76,92,0.2); border-radius:14px;">
-      <div class="sb-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
-      <div style="flex:1; min-width:0;">
-        <div class="sb-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</div>
-        <div class="sb-sub" style="display:flex; align-items:center; justify-content: space-between; gap:4px;">
-          <span>Applicant</span>
-          <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; display:inline-block;">
-            @csrf
-            <button type="submit" style="background:none; border:none; color:#DC2626; cursor:pointer; font-weight:700; font-size:11px; font-family:inherit; padding:0; text-decoration:none;" title="Log Out" onclick="return confirm('Are you sure you want to log out?');">
-              Log Out
-            </button>
-          </form>
+    <a href="#" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-logout')" class="sb-nav-item text-red-600" style="color:#e53e3e;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Log Out
+    </a>
+
+    <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">
+        @csrf
+    </form>
+    <x-modal name="confirm-logout" :show="$errors->userDeletion->isNotEmpty()" focusable>
+        <div style="padding: 24px;">
+            <h2 style="font-size:18px;font-weight:700;color:var(--ink);">Are you sure you want to log out?</h2>
+            <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:12px;">
+                <button type="button" x-on:click="$dispatch('close')" style="padding:8px 16px;background:#f3f4f6;border:none;border-radius:8px;font-weight:600;color:#374151;cursor:pointer;">Cancel</button>
+                <button type="button" onclick="document.getElementById('logout-form').submit();" style="padding:8px 16px;background:#dc2626;border:none;border-radius:8px;font-weight:600;color:#fff;cursor:pointer;">Log Out</button>
+            </div>
         </div>
-      </div>
-    </div>
+    </x-modal>
   </aside>
 
-  <!-- MAIN -->
   <main class="main">
     @yield('content')
   </main>
@@ -188,6 +392,110 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 
 <!-- Chatbot Widget -->
 <x-chatbot-widget />
+
+<!-- Session Timeout Modal -->
+<div id="session-timeout-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); animation: slideUp 0.3s ease-out;">
+        <div style="text-align: center; margin-bottom: 20px; font-size: 48px;">⏱️</div>
+        <h2 style="font-size: 20px; font-weight: 700; color: #1a2e2c; margin-bottom: 12px; text-align: center;">Session Expiring Soon</h2>
+        <p style="font-size: 14px; color: #4a6460; line-height: 1.6; margin-bottom: 24px; text-align: center;">You've been inactive for 13 minutes. Your session will expire in 2 minutes for your security. Please click "Stay Logged In" to continue.</p>
+        <div style="display: flex; gap: 12px;">
+            <button onclick="if (window.sessionTracker) window.sessionTracker.stayLoggedIn(); else location.reload();" style="flex: 1; padding: 12px 16px; background: linear-gradient(135deg, #0F4C5C, #1A6B7A); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Stay Logged In</button>
+            <button onclick="if (window.sessionTracker) window.sessionTracker.logout(); else document.getElementById('auto-logout-form').submit();" style="flex: 1; padding: 12px 16px; background: #f5f5f5; color: #1a2e2c; border: 1px solid #e2e8e6; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px;">Log Out</button>
+        </div>
+        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #8aaba6;">Automatically logging out in <span id="session-timeout-countdown">2:00</span></div>
+    </div>
+</div>
+
+<!-- Auto Logout Form -->
+<form id="auto-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+
+<style>
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<script>
+    /**
+     * Session Timeout Tracker
+     */
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('sessionTracker', () => ({
+            idleSeconds: 0,
+            warningLimit: 13 * 60,
+            timeoutLimit: 15 * 60,
+            interval: null,
+            isWarningShown: false,
+
+            init() {
+                this.resetIdleTime();
+                const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+                events.forEach(event => {
+                    window.addEventListener(event, () => this.resetIdleTime(), true);
+                });
+
+                this.interval = setInterval(() => {
+                    this.idleSeconds++;
+                    if (this.idleSeconds === this.warningLimit && !this.isWarningShown) {
+                        this.isWarningShown = true;
+                        const modal = document.getElementById('session-timeout-modal');
+                        if (modal) modal.style.display = 'flex';
+                    }
+                    if (this.idleSeconds >= this.timeoutLimit) {
+                        clearInterval(this.interval);
+                        document.getElementById('auto-logout-form').submit();
+                    }
+                }, 1000);
+            },
+
+            resetIdleTime() {
+                this.idleSeconds = 0;
+                this.isWarningShown = false;
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+            },
+
+            logout() {
+                document.getElementById('auto-logout-form').submit();
+            },
+
+            stayLoggedIn() {
+                this.resetIdleTime();
+                const modal = document.getElementById('session-timeout-modal');
+                if (modal) modal.style.display = 'none';
+            }
+        }));
+    });
+
+    // Make tracker globally available
+    window.sessionTracker = null;
+    document.addEventListener('alpine:init', () => {
+        const root = document.querySelector('[x-data]');
+        if (root && root.__x && root.__x.$data) {
+            window.sessionTracker = root.__x.$data;
+        }
+    });
+
+    // Countdown timer
+    setInterval(() => {
+        const modal = document.getElementById('session-timeout-modal');
+        if (modal && modal.style.display !== 'none') {
+            const countdownEl = document.getElementById('session-timeout-countdown');
+            const text = countdownEl.textContent;
+            const [minutes, seconds] = text.split(':').map(Number);
+            let totalSeconds = minutes * 60 + seconds - 1;
+            if (totalSeconds < 0) totalSeconds = 0;
+            const newMinutes = Math.floor(totalSeconds / 60);
+            const newSeconds = totalSeconds % 60;
+            countdownEl.textContent = `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+        }
+    }, 1000);
+</script>
+
 
 @stack('scripts')
 </body>
