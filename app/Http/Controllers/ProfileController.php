@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Application;
+use App\Models\ApplicantProfile;
 use App\Models\Notification;
 use App\Models\Scholarship;
 use Illuminate\Http\RedirectResponse;
@@ -114,7 +115,8 @@ class ProfileController extends Controller
             ? 0
             : (int) round(($profileFields->filter(fn ($value) => !is_null($value) && $value !== '')->count() / $profileFields->count()) * 100);
 
-        return view('applicant.dashboard', compact(            'user',
+        return view('applicant.dashboard', compact(
+            'user',
             'profile',
             'stats',
             'activeApplications',
@@ -126,11 +128,85 @@ class ProfileController extends Controller
         ));
     }
 
-    public function setup()
-    {
-        return view('profile.setup');
+    public function setup(Request $request): View    {
+        $profile = ApplicantProfile::firstOrNew(['user_id' => $request->user()->id]);
+        $currentStep = max(1, min(4, (int) $request->integer('step', 1)));
+
+        return view('profile.setup', [
+            'profile' => $profile,
+            'currentStep' => $currentStep,
+        ]);
     }
 
+    public function setupStep1(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'date_of_birth' => ['required', 'date'],
+            'sex' => ['required', 'in:Male,Female'],
+            'home_address' => ['required', 'string'],
+            'city' => ['required', 'string', 'max:100'],
+            'province' => ['required', 'string', 'max:100'],
+            'zip_code' => ['required', 'string', 'max:10'],
+            'mobile_number' => ['required', 'string', 'max:20'],
+        ]);
+
+        ApplicantProfile::updateOrCreate(
+            ['user_id' => $request->user()->id],
+            $validated
+        );
+
+        return redirect()->route('profile.setup', ['step' => 2]);
+    }
+
+    public function setupStep2(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'university_name' => ['required', 'string', 'max:255'],
+            'university_address' => ['required', 'string'],
+            'university_email' => ['required', 'email', 'max:255'],
+            'course_program' => ['required', 'string', 'max:255'],
+            'student_number' => ['required', 'string', 'max:50'],
+            'year_level' => ['required', 'string', 'max:20'],
+            'semester' => ['required', 'string', 'max:20'],
+            'academic_year' => ['required', 'string', 'max:20'],
+            'gwa' => ['required', 'numeric', 'min:1', 'max:5'],
+        ]);
+
+        ApplicantProfile::updateOrCreate(
+            ['user_id' => $request->user()->id],
+            $validated
+        );
+
+        return redirect()->route('profile.setup', ['step' => 3]);
+    }
+
+    public function setupStep3(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'monthly_household_income' => ['required', 'numeric', 'min:0'],
+            'num_dependents' => ['required', 'integer', 'min:0'],
+            'is_breadwinner' => ['required', 'in:Yes,No,Partial Contributor'],
+            'is_4ps' => ['required', 'boolean'],
+            'father_employment_status' => ['nullable', 'string', 'max:100'],
+            'mother_employment_status' => ['nullable', 'string', 'max:100'],
+        ]);
+
+        ApplicantProfile::updateOrCreate(
+            ['user_id' => $request->user()->id],
+            $validated
+        );
+
+        return redirect()->route('profile.setup', ['step' => 4]);
+    }
+
+    public function setupSubmit(Request $request): RedirectResponse
+    {
+        ApplicantProfile::where('user_id', $request->user()->id)
+            ->update(['profile_completed_at' => now()]);
+
+        return redirect()->route('dashboard')
+            ->with('status', 'Profile setup completed successfully.');
+    }
     public function edit(Request $request): View
     {
         return view('profile.edit', [
