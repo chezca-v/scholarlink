@@ -69,6 +69,11 @@ class ProfileController extends Controller
             ->limit(5)
             ->get();
 
+        $unreadNotifications = Notification::query()
+            ->where('user_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
         $stats = [
             'active_applications' => (clone $applicationBaseQuery)
                 ->whereIn('status', ['pending', 'under_review', 'revision'])
@@ -116,8 +121,10 @@ class ProfileController extends Controller
             'recommendedScholarships',
             'upcomingDeadlines',
             'notifications',
-            'profileCompleteness'
-        ));    }
+            'profileCompleteness',
+            'unreadNotifications'
+        ));
+    }
 
     public function setup()
     {

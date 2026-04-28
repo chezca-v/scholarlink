@@ -288,10 +288,11 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <button class="nav-ibtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     </button>
-    <button class="nav-ibtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span class="nbadge"></span>
-    </button>
+    <a class="nav-ibtn" href="{{ route('notifications.index') }}">      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        @if($unreadNotifications > 0)
+        <span class="nbadge"></span>
+      @endif
+    </a>
     <div class="nav-av">{{ strtoupper(substr($user->first_name ?? 'U', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}</div>
   </div>
 </nav>
@@ -339,7 +340,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <a class="sb-nav-item" href="{{ route('notifications.index') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Notifications
-        <span class="sb-badge">{{ $notifications->count() }}</span>
+        <span class="sb-badge">{{ $unreadNotifications }}</span>
     </a>
 
     <a class="sb-nav-item text-red-600 hover:bg-red-50" href="#" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-logout')">
@@ -380,8 +381,12 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="progress-ring">
           <svg width="80" height="80" viewBox="0 0 80 80">
             <circle class="ring-bg" cx="40" cy="40" r="33"/>
-            <circle class="ring-fill" cx="40" cy="40" r="33"/>
-          </svg>
+           @php
+              $ringCircumference = 2 * pi() * 33;
+              $ringOffset = $ringCircumference * (1 - min(max($profileCompleteness, 0), 100) / 100);
+            @endphp
+            <circle class="ring-fill" cx="40" cy="40" r="33" style="--ring-circumference:{{ $ringCircumference }};--ring-offset:{{ $ringOffset }};"/>
+        </svg>
           <div class="ring-label">
             <span class="ring-pct">{{ $profileCompleteness }}%</span>
           </div>
