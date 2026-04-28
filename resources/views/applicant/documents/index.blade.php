@@ -469,7 +469,7 @@
   <div class="dw__grid">
     @foreach ($documentTypes as $typeKey => $typeLabel)
       @php
-        $doc        = $documents->get($typeKey);   {{-- Document|null --}}
+        $doc        = $documents->get($typeKey);   // Document|null
         $hasFile    = $doc && $doc->file_url;
 
         $isExpired  = $hasFile
