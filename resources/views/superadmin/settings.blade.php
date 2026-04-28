@@ -30,7 +30,7 @@
       <div class="card" id="tab-feature-flags" style="margin-bottom: 16px;">
         <div class="section-header" style="margin-bottom: 4px;">
           <div class="section-title">🏁 Feature Flags</div>
-          <form method="POST" action="{{ route('superadmin.settings.update-flags') }}" id="featureFlagsForm">
+          <form method="POST" action="{{ route('superadmin.settings.update') }}" id="featureFlagsForm">
             @csrf
             @method('PATCH')
             <button type="submit" class="btn btn-outline btn-sm">Save Changes</button>
@@ -99,7 +99,7 @@
           variables.
         </p>
 
-        <form method="POST" action="{{ route('superadmin.settings.update-templates') }}"
+        <form method="POST" action="{{ route('superadmin.settings.update') }}"
               id="notifTemplatesForm">
           @csrf
           @method('PATCH')
@@ -125,7 +125,7 @@
       <div class="card" id="tab-permissions">
         <div class="section-header" style="margin-bottom: 12px;">
           <div class="section-title">🔐 RBAC Permissions Matrix</div>
-          <form method="POST" action="{{ route('superadmin.settings.update-permissions') }}"
+          <form method="POST" action="{{ route('superadmin.settings.update') }}"
                 id="permissionsForm">
             @csrf
             @method('PATCH')
@@ -194,7 +194,7 @@
     el.classList.toggle('off', isOn);
 
     // Send AJAX update
-    fetch('{{ route("superadmin.settings.toggle-permission") }}', {
+    fetch('{{ route("superadmin.settings.update") }}', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -205,7 +205,7 @@
   }
 
   function autoSaveFlag(key, enabled) {
-    fetch('{{ route("superadmin.settings.toggle-flag") }}', {
+    fetch('{{ route("superadmin.settings.update") }}', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -217,7 +217,7 @@
 
   function resetTemplates() {
     if (confirm('Reset all notification templates to default? This cannot be undone.')) {
-      fetch('{{ route("superadmin.settings.reset-templates") }}', {
+      fetch('{{ route("superadmin.settings.update") }}', {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
       }).then(() => location.reload());

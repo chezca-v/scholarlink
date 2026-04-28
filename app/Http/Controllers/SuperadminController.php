@@ -12,6 +12,7 @@ use App\Models\Scholarship;
 use App\Models\ActivityLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Models\Notification;
 
 class SuperadminController extends Controller
 {
@@ -22,13 +23,13 @@ class SuperadminController extends Controller
     public function dashboard()
     {
         // 1. Stats
-        $orgCount = Organization::count();
+        $scholarshipCount = Scholarship::count();
         $applicantCount = User::where('role', 'applicant')->where('is_active', true)->count();
         $applicationCount = Application::count();
         $fraudAlertCount = ActivityLog::where('action', 'like', '%fraud%')->orWhere('action', 'like', '%alert%')->count();
 
         $stats = [
-            ['icon' => '🏛️', 'icon_bg' => '#E8F8F0',          'label' => 'Organizations',      'value' => number_format($orgCount),    'delta' => 'Total registered',   'delta_class' => 'neutral'],
+            ['icon' => '🏆', 'icon_bg' => '#E8F8F0',          'label' => 'Total Scholarships', 'value' => number_format($scholarshipCount), 'delta' => 'Available programs', 'delta_class' => 'neutral'],
             ['icon' => '🎓', 'icon_bg' => '#FDF4E3',          'label' => 'Active Applicants',  'value' => number_format($applicantCount), 'delta' => 'Verified users', 'delta_class' => 'neutral'],
             ['icon' => '📋', 'icon_bg' => 'rgba(15,76,92,.08)','label' => 'Total Applications', 'value' => number_format($applicationCount),'delta' => 'Across all orgs',   'delta_class' => 'neutral'],
             ['icon' => '⚠️', 'icon_bg' => '#FEF2F2',          'label' => 'Fraud Alerts',       'value' => number_format($fraudAlertCount),     'delta' => 'System detected',    'delta_class' => $fraudAlertCount > 0 ? 'down' : 'neutral'],
@@ -756,5 +757,33 @@ class SuperadminController extends Controller
         // Will expand once feature flag system is defined
         return redirect()->route('superadmin.settings')
             ->with('success', 'Settings updated successfully.');
+    }
+
+    // ─────────────────────────────────────────────
+    // Notifications
+    // ─────────────────────────────────────────────
+
+    public function notifications()
+    {
+        $user = Auth::user();
+        $notifications = Notification::query()
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+            
+        return view('superadmin.notifications', compact('user', 'notifications'));
+    }
+
+    public function markReadNotification($id)
+    {
+        $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
+        $notification->update(['is_read' => true]);
+        return back();
+    }
+
+    public function markAllReadNotifications()
+    {
+        Notification::where('user_id', Auth::id())->update(['is_read' => true]);
+        return back();
     }
 }

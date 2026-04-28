@@ -124,7 +124,7 @@
             </td>
             <td>
               <div style="display: flex; gap: 6px;">
-                <a href="{{ route('superadmin.organizations.edit', $org->id) }}"
+                <a href="#"
                    class="btn btn-ghost btn-sm">✏️ Edit</a>
                 @if(!$org->admin)
                   <button class="btn btn-amber btn-sm"
@@ -265,7 +265,7 @@
         <button class="modal-close"
                 onclick="document.getElementById('assignAdminModal').classList.remove('open')">✕</button>
       </div>
-      <form method="POST" action="{{ route('superadmin.organizations.assign-admin') }}" id="assignAdminForm">
+      <form method="POST" action="#" id="assignAdminForm">
         @csrf
         <input type="hidden" name="organization_id" id="assignOrgId">
         <div style="background: var(--page-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid var(--border);">
@@ -316,7 +316,7 @@
 
   function reactivateOrg(orgId) {
     if (confirm('Reactivate this organization?')) {
-      fetch('{{ route("superadmin.organizations.reactivate", ":id") }}'.replace(':id', orgId), {
+      fetch('/superadmin/organizations/' + orgId + '/reactivate', {
         method: 'POST',
         headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
       }).then(() => location.reload());

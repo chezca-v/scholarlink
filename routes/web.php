@@ -144,6 +144,11 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
         Route::get('/logs', 'logs')->name('logs');
         Route::get('/settings', 'settings')->name('settings');
         Route::patch('/settings', 'updateSettings')->name('settings.update');
+
+        // Notifications
+        Route::get('/notifications', 'notifications')->name('notifications');
+        Route::post('/notifications/mark-all-read', 'markAllReadNotifications')->name('notifications.markAllRead');
+        Route::post('/notifications/{id}/mark-read', 'markReadNotification')->name('notifications.markRead');
     });
 });
 
