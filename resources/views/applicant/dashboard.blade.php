@@ -343,14 +343,17 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <span class="sb-badge">{{ $unreadNotifications }}</span>
     </a>
 
-    <a class="sb-nav-item text-red-600 hover:bg-red-50" href="#" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-logout')">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-        <polyline points="16 17 21 12 16 7"></polyline>
-        <line x1="21" y1="12" x2="9" y2="12"></line>
-    </svg>
-    Log Out
-    </a>
+    <form method="POST" action="{{ route('logout') }}" style="margin:0;">
+        @csrf
+        <button type="submit" class="sb-nav-item text-red-600 hover:bg-red-50" style="width:100%; border:none; background:transparent; text-align:left;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+            Log Out
+        </button>
+    </form>
     <div class="sb-spacer"></div>
 
     <div class="sb-user">
@@ -637,4 +640,3 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 
       </div>
     </div>
-@endsection
