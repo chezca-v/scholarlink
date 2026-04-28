@@ -149,7 +149,7 @@ class ScholarshipController extends Controller
             $unreadCount = \App\Models\Notification::where('user_id', $user->id)->whereNull('read_at')->count();
         }
 
-        return view('applicant.dashboard', compact('scholarships', 'filters', 'statusCounts', 'incomeBrackets', 'applicationCount', 'savedCount', 'unreadCount'));
+        return view('scholarships.index', compact('scholarships', 'filters', 'statusCounts', 'incomeBrackets', 'applicationCount', 'savedCount', 'unreadCount'));
     }
 
     public function create()
