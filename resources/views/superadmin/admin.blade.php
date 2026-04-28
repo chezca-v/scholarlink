@@ -127,7 +127,7 @@
             <td>
               <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                 @if($admin->status === 'active')
-                  <a href="{{ route('superadmin.admins.edit', $admin->id) }}"
+                  <a href="#"
                      class="btn btn-ghost btn-sm">✏️</a>
                   <button class="btn btn-outline btn-sm"
                           onclick="openReassignModal({{ $admin->id }}, '{{ $admin->full_name }}')">
@@ -141,7 +141,7 @@
                     <button type="submit" class="btn btn-danger btn-sm">Deactivate</button>
                   </form>
                 @else
-                  <form method="POST" action="{{ route('superadmin.admins.restore', $admin->id) }}"
+                  <form method="POST" action="#"
                         style="display: inline;">
                     @csrf
                     @method('PATCH')
@@ -248,7 +248,7 @@
         <button class="modal-close"
                 onclick="document.getElementById('reassignAdminModal').classList.remove('open')">✕</button>
       </div>
-      <form method="POST" action="{{ route('superadmin.admins.reassign') }}" id="reassignAdminForm">
+      <form method="POST" action="" id="reassignAdminForm">
         @csrf
         @method('PATCH')
         <input type="hidden" name="admin_id" id="reassignAdminId">
@@ -285,6 +285,7 @@
   function openReassignModal(adminId, adminName) {
     document.getElementById('reassignAdminId').value = adminId;
     document.getElementById('reassignAdminName').textContent = adminName;
+    document.getElementById('reassignAdminForm').action = '/superadmin/admins/' + adminId + '/reassign';
     document.getElementById('reassignAdminModal').classList.add('open');
   }
 </script>

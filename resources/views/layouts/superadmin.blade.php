@@ -558,16 +558,18 @@
     <header class="sa-topbar">
         <div class="sa-topbar__left">
             <div class="sa-topbar__title">@yield('topnav_title', 'Dashboard')</div>
-            <div class="sa-topbar__subtitle">@yield('topnav_subtitle', '/superadmin')</div>
         </div>
         <div class="sa-topbar__actions">
             {{-- Page-specific topbar actions --}}
             @yield('topnav_actions')
 
             {{-- Notifications --}}
-            <a href="#" class="sa-topbar__bell" title="Notifications">
+            <a href="{{ route('superadmin.notifications') }}" class="sa-topbar__bell" title="Notifications">
                 🔔
-                <span class="sa-topbar__bell-dot"></span>
+                @php $unreadNotifs = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+                @if($unreadNotifs > 0)
+                    <span class="sa-topbar__bell-dot"></span>
+                @endif
             </a>
 
             {{-- Avatar --}}
