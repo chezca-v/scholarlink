@@ -109,8 +109,7 @@ class ProfileController extends Controller
             ? 0
             : (int) round(($profileFields->filter(fn ($value) => !is_null($value) && $value !== '')->count() / $profileFields->count()) * 100);
 
-        return view('dashboard', compact(
-            'user',
+        return view('applicant.dashboard', compact(            'user',
             'profile',
             'stats',
             'activeApplications',

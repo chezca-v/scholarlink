@@ -34,6 +34,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
 
     // Dashboard & Profile Management
     Route::controller(ProfileController::class)->group(function () {
+        Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
         Route::get('/profile/setup', 'setup')->name('profile.setup');
         Route::get('/profile', 'edit')->name('profile.show');
