@@ -333,8 +333,16 @@
       <div style="display:flex;align-items:center;gap:10px">
         @yield('topnav_actions')
         <span class="role-pill">📋 Evaluator</span>
-        <div class="icon-btn">🔔<span class="notif-dot"></span></div>
-        <div class="topnav-avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
+        <a href="{{ route('evaluator.notifications') }}" class="icon-btn" style="text-decoration: none;">
+          🔔
+          @php $unreadCount = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+          @if($unreadCount > 0)
+            <span class="notif-dot"></span>
+          @endif
+        </a>
+        <a href="{{ route('evaluator.profile') }}" class="topnav-avatar" style="text-decoration: none;">
+          {{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}
+        </a>
       </div>
     </nav>
 
