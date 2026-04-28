@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {{--
     resources/views/applicant/documents/index.blade.php
     Route      : GET /applicant/documents   (named: documents.index)
@@ -9,10 +8,7 @@
     Document model fields : id, document_type, file_url, status, expiry_date, updated_at
     Document model method : isExpiringSoon()
 --}}
-@extends('layouts.app')
-=======
 @extends('layouts.applicant')
->>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0
 
 @section('title', 'Document Wallet')
 
@@ -525,55 +521,8 @@
           </div>
         </div>
 
-<<<<<<< HEAD
         {{-- ── Uploaded: file info + actions ── --}}
         @if ($hasFile)
-=======
-                {{-- Used In count --}}
-                @if ($hasFile && $doc->used_in_count > 0)
-                    <a href="{{ url('/applicant/applications') }}" class="doc-used-in">
-                        Used in {{ $doc->used_in_count }} {{ Str::plural('application', $doc->used_in_count) }}
-                    </a>
-                @elseif ($hasFile)
-                    <span class="doc-used-in" style="color: var(--sl-muted); cursor: default; font-weight: 500; font-size: .8rem;">
-                        Not used in any application yet
-                    </span>
-                @endif
-
-                {{-- Action Buttons (only when a file exists) --}}
-                @if ($hasFile)
-                    <div class="doc-actions">
-                        <a
-                            href="{{ url('/applicant/documents/' . $doc->id . '/preview') }}"
-                            class="btn-doc btn-doc--preview"
-                            target="_blank"
-                        >
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                <circle cx="12" cy="12" r="3"/>
-                            </svg>
-                            Preview
-                        </a>
-
-                        <label class="btn-doc btn-doc--replace" for="replace-{{ $type['key'] }}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="16 16 12 12 8 16"/>
-                                <line x1="12" y1="12" x2="12" y2="21"/>
-                                <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
-                            </svg>
-                            Replace
-                            <input
-                                type="file"
-                                id="replace-{{ $type['key'] }}"
-                                name="replace_document[{{ $type['key'] }}]"
-                                accept=".pdf,.jpg,.jpeg,.png"
-                                style="display: none;"
-                                onchange="handleFileReplace(event, '{{ $type['key'] }}', {{ $doc->id }})"
-                            >
-                        </label>
-                    </div>
-                @endif
->>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0
 
           {{-- File row --}}
           <div class="doc-file">
@@ -613,7 +562,6 @@
               Preview
             </a>
 
-<<<<<<< HEAD
             {{-- Replace (re-uses documents.store, controller detects existing doc) --}}
             <form method="POST"
                   action="{{ route('documents.store') }}"
@@ -638,30 +586,12 @@
                 Replace
               </button>
             </form>
-=======
-    fetch('{{ url('/applicant/documents') }}', {
-        method: 'POST',
-        body: formData,
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            // Reload the page to reflect updated state
-            window.location.reload();
-        } else {
-            alert(data.message ?? 'Upload failed. Please try again.');
-        }
-    })
-    .catch(() => alert('Something went wrong. Please try again.'));
-}
->>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0
 
           </div>
 
         {{-- ── Empty: dropzone ── --}}
         @else
 
-<<<<<<< HEAD
           <form method="POST"
                 action="{{ route('documents.store') }}"
                 enctype="multipart/form-data"
@@ -711,21 +641,3 @@
 </div>{{-- /.dw --}}
 
 @endsection
-=======
-    fetch(`/applicant/documents/${documentId}`, {
-        method: 'POST',
-        body: formData,
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        } else {
-            alert(data.message ?? 'Replace failed. Please try again.');
-        }
-    })
-    .catch(() => alert('Something went wrong. Please try again.'));
-}
-</script>
-@endpush
->>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0
