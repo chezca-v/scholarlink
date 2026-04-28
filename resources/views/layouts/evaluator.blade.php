@@ -366,6 +366,7 @@
 
 @stack('modals')
 
+<x-chatbot-widget />
 @stack('scripts')
 </body>
 </html>

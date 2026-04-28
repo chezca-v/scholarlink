@@ -5,7 +5,7 @@
 @section('topnav_subtitle', '/superadmin/logs')
 
 @section('topnav_actions')
-  <a href="{{ route('superadmin.logs.export') }}"
+  <a href="{{ route('superadmin.logs') }}"
      class="btn btn-outline btn-sm"
      style="border-color: rgba(255,255,255,.3); color: rgba(255,255,255,.8); background: rgba(255,255,255,.08);">
     ⬇ Export CSV
@@ -20,7 +20,7 @@
 
   <!-- FILTER BAR -->
   <div class="card" style="padding: 14px 20px; margin-bottom: 16px;">
-    <form method="GET" action="{{ route('superadmin.logs.index') }}" id="logFilterForm">
+    <form method="GET" action="{{ route('superadmin.logs') }}" id="logFilterForm">
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
         <div class="search-wrap" style="flex: 1; min-width: 200px;">
           <span class="search-icon">🔍</span>
@@ -49,25 +49,25 @@
                  value="{{ request('date_to', now()->format('Y-m-d')) }}">
         </div>
         <button type="submit" class="btn btn-primary btn-sm">Apply</button>
-        <a href="{{ route('superadmin.logs.index') }}" class="btn btn-outline btn-sm">Reset</a>
+        <a href="{{ route('superadmin.logs') }}" class="btn btn-outline btn-sm">Reset</a>
       </div>
 
       <!-- QUICK FILTER PILLS -->
       <div style="margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
         <span style="font-size: 11px; color: var(--slate);">Quick filter:</span>
-        <a href="{{ route('superadmin.logs.index') }}"
+        <a href="{{ route('superadmin.logs') }}"
            class="badge {{ !request('quick') ? 'teal' : 'gray' }}"
            style="cursor: pointer; text-decoration: none;">All</a>
-        <a href="{{ route('superadmin.logs.index', ['quick' => 'login']) }}"
+        <a href="{{ route('superadmin.logs', ['quick' => 'login']) }}"
            class="badge {{ request('quick') === 'login' ? 'teal' : 'gray' }}"
            style="cursor: pointer; text-decoration: none;">Login/Logout</a>
-        <a href="{{ route('superadmin.logs.index', ['quick' => 'errors']) }}"
+        <a href="{{ route('superadmin.logs', ['quick' => 'errors']) }}"
            class="badge {{ request('quick') === 'errors' ? 'teal' : 'gray' }}"
            style="cursor: pointer; text-decoration: none;">Errors</a>
-        <a href="{{ route('superadmin.logs.index', ['quick' => 'data_changes']) }}"
+        <a href="{{ route('superadmin.logs', ['quick' => 'data_changes']) }}"
            class="badge {{ request('quick') === 'data_changes' ? 'teal' : 'gray' }}"
            style="cursor: pointer; text-decoration: none;">Data Changes</a>
-        <a href="{{ route('superadmin.logs.index', ['quick' => 'fraud']) }}"
+        <a href="{{ route('superadmin.logs', ['quick' => 'fraud']) }}"
            class="badge red"
            style="cursor: pointer; text-decoration: none;">Fraud Flags</a>
       </div>

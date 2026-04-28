@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     PublicController,
     ScholarshipController,
+    AiController,
     ProfileController,
     DocumentController,
     ApplicationController,
@@ -26,21 +27,8 @@ Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships', 'index')->name('scholarships.index');
     Route::get('/scholarships/{id}', 'show')->name('scholarships.show');
 });
-
-Route::middleware(['auth', 'role:applicant'])->group(function () {
-
-    // Profile setup (available immediately after registration)
-    Route::controller(ProfileController::class)->group(function () {
-        Route::get('/profile/setup', 'setup')->name('profile.setup');
-        Route::post('/profile/setup/step-1', 'setupStep1')->name('profile.setup.step1');
-        Route::post('/profile/setup/step-2', 'setupStep2')->name('profile.setup.step2');
-        Route::post('/profile/setup/step-3', 'setupStep3')->name('profile.setup.step3');
-        Route::post('/profile/setup/submit', 'setupSubmit')->name('profile.setup.submit');
-    });
-});
-
-/*
-Applicant Routes (Role: applicant + verified)
+Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');/*
+Applicant Routes (Role: applicant)
 */
 Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
 
@@ -50,6 +38,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
         Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
         Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
+        Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 
     //Document Wallet
@@ -154,6 +143,11 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
         Route::get('/logs', 'logs')->name('logs');
         Route::get('/settings', 'settings')->name('settings');
         Route::patch('/settings', 'updateSettings')->name('settings.update');
+
+        // Notifications
+        Route::get('/notifications', 'notifications')->name('notifications');
+        Route::post('/notifications/mark-all-read', 'markAllReadNotifications')->name('notifications.markAllRead');
+        Route::post('/notifications/{id}/mark-read', 'markReadNotification')->name('notifications.markRead');
     });
 });
 

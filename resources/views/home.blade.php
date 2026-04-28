@@ -81,7 +81,7 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .hero-title .accent { color: #E8A838; }
 .hero-sub { font-size: 17px; color: #7AACAA; line-height: 1.75; max-width: 520px; margin: 0 auto 40px; position: relative; z-index: 1; }
 .hero-actions { display: flex; align-items: center; gap: 16px; justify-content: center; margin-bottom: 72px; position: relative; z-index: 1; }
-.btn-hero-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 24px rgba(15,76,92,0.22); }
+.btn-hero-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; transition: all 0.25s; box-shadow: 0 8px 24px rgba(15,76,92,0.22); text-decoration: none; }
 .btn-hero-main:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(15,76,92,0.3); }
 .btn-hero-text { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: #4A7A80; background: transparent; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; }
 .hero-social-proof { display: flex; align-items: center; gap: 16px; position: relative; z-index: 1; }
@@ -181,9 +181,9 @@ nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba
 .cta-title em { font-style: italic; font-weight: 300; color: #0F4C5C; }
 .cta-sub { font-size: 15px; color: #7AACAA; line-height: 1.75; margin-bottom: 36px; }
 .cta-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-.btn-cta-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 24px rgba(15,76,92,0.22); transition: all 0.25s; }
+.btn-cta-main { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; padding: 14px 32px; border: none; background: #0F4C5C; color: #F9D679; border-radius: 12px; cursor: pointer; box-shadow: 0 8px 24px rgba(15,76,92,0.22); transition: all 0.25s; text-decoration: none; display: inline-block; }
 .btn-cta-main:hover { transform: translateY(-2px); }
-.btn-cta-sec { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; padding: 14px 32px; border: 1px solid #C8E8E4; background: transparent; color: #4A7A80; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+.btn-cta-sec { font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; padding: 14px 32px; border: 1px solid #C8E8E4; background: transparent; color: #4A7A80; border-radius: 12px; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
 .btn-cta-sec:hover { border-color: #0F4C5C; color: #0F4C5C; }
 .stats-row { display: flex; justify-content: center; gap: 48px; margin-top: 56px; padding-top: 56px; border-top: 1px solid #EAF4F3; }
 .stat { text-align: center; }
@@ -213,16 +213,16 @@ footer { background: #071820; padding: 64px 48px 32px; }
 
 <nav>
   <div class="nav-inner">
-    <a href="#" class="logo"><div class="logo-mark">🎓</div>ScholarLink</a>
+    <a href="{{ route('landing') }}" class="logo"><div class="logo-mark">🎓</div>ScholarLink</a>
     <ul class="nav-links">
       <li><a href="{{ route('scholarships.index') }}">Browse</a></li>
-      <li><a href="#">How It Works</a></li>
+      <li><a href="#how">How It Works</a></li>
       <li><a href="#">Organizations</a></li>
       <li><a href="#">About</a></li>
     </ul>
     <div class="nav-actions">
       <a href="{{ route('login') }}" class="btn-text">Log In</a>
-      <a href="{{ route('register') }}" class="btn-pill">Get Started →</a>
+      <a href="{{ route('register') }}" class="btn-pill" style="text-decoration: none;">Get Started →</a>
     </div>
   </div>
 </nav>
@@ -384,8 +384,8 @@ footer { background: #071820; padding: 64px 48px 32px; }
     <h2 class="cta-title reveal">Your scholarship<br>is <em>waiting for you.</em></h2>
     <p class="cta-sub reveal">Join thousands of Filipino students who found their funding through ScholarLink.</p>
     <div class="cta-btns reveal">
-      <a href="{{ route('register') }}" class="btn-cta-main" style="text-decoration: none; display: inline-block;">🎓 Create Free Account</a>
-      <a href="{{ route('scholarships.index') }}" class="btn-cta-sec" style="text-decoration: none; display: inline-block;">Browse Scholarships →</a>
+      <a href="{{ route('register') }}" class="btn-cta-main">🎓 Create Free Account</a>
+      <a href="{{ route('scholarships.index') }}" class="btn-cta-sec">Browse Scholarships →</a>
     </div>
     <div class="stats-row reveal">
       <div class="stat"><div class="stat-num">120+</div><div class="stat-label">Active Scholarships</div></div>
@@ -433,5 +433,7 @@ function typeWriter() {
 }
 typeWriter();
 </script>
+<x-chatbot-widget />
+@stack('scripts')
 </body>
 </html>

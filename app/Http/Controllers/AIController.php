@@ -2,155 +2,144 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ApplicantProfile;
-use App\Models\Scholarship;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
-class AIController extends Controller
+class AiController extends Controller
 {
-    /**
-     * AI match scoring API endpoint
-     * Compares student profile against scholarship requirements.
-     */
-    public function match(Request $request)
+    private string $apiKey;
+    private string $model;
+    private string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+    public function __construct()
     {
-        $request->validate([
-            'applicant_id' => 'required|exists:users,id',
-            'scholarship_id' => 'required|exists:scholarships,id',
-        ]);
+        $this->apiKey = config('services.gemini.key');
+        $this->model  = config('services.gemini.model');
+    }
 
-        $scholarship = Scholarship::findOrFail($request->scholarship_id);
-        $profile = ApplicantProfile::where('user_id', $request->applicant_id)->first();
+    /**
+     * Match a student profile against available scholarships.
+     */
+    public function matchScholarships(Request $request)
+    {
+        $profile = $request->user()->profile;
 
-        if (! $profile) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Applicant profile not found.',
-            ], 404);
-        }
+        $prompt = "
+            You are a scholarship matching assistant for ScholarLink, a Philippine scholarship platform.
 
-        $gpaScore = $this->scoreGpa($profile->gwa, $scholarship->gpa_requirement);
-        $incomeScore = $this->scoreIncome($profile->monthly_household_income, $scholarship->income_bracket);
-        $fitScore = $this->scoreFit($profile, $scholarship);
+            Student Profile:
+            - Name: {$request->user()->first_name}
+            - GPA: {$profile->gpa}
+            - Course: {$profile->course}
+            - University: {$profile->university_name}
+            - Income Bracket: {$profile->income_bracket}
+            - Location: {$profile->region}
 
-        $weightGpa = $this->normalizeWeight($scholarship->weight_gpa, 40);
-        $weightIncome = $this->normalizeWeight($scholarship->weight_income, 30);
-        $weightFit = max(100 - ($weightGpa + $weightIncome), 20);
+            Based on this profile, give a match score from 0-100 and a short reason for each scholarship.
+            Respond in JSON only, no markdown, like:
+            [{ \"scholarship_id\": 1, \"score\": 92, \"reason\": \"High GPA match\" }]
 
-        $matchScore = round((
-            $gpaScore * $weightGpa +
-            $incomeScore * $weightIncome +
-            $fitScore * $weightFit
-        ) / 100, 0);
+            Scholarships to evaluate:
+            " . $this->formatScholarships();
+
+        $response = $this->callGemini($prompt);
 
         return response()->json([
-            'status' => 'success',
-            'match_score' => $matchScore,
-            'analysis' => [
-                'gpa' => "GPA score: {$gpaScore}%",
-                'income' => "Income fit: {$incomeScore}%",
-                'eligibility' => "Eligibility and course match: {$fitScore}%",
-                'weights' => [
-                    'gpa_weight' => $weightGpa,
-                    'income_weight' => $weightIncome,
-                    'fit_weight' => $weightFit,
-                ],
-                'message' => $this->buildAnalysisMessage($profile, $scholarship, $gpaScore, $incomeScore),
-            ],
+            'matches' => json_decode($response, true),
         ]);
     }
+    public function chat(Request $request)
+        {
+            $request->validate(['message' => 'required|string|max:500']);
 
-    private function scoreGpa(?float $gwa, ?float $requirement): int
+            $user    = $request->user();
+            $profile = $user->profile;
+
+            $prompt = "
+                You are Scholar, a friendly AI scholarship assistant for ScholarLink —
+                a Philippine scholarship platform. Keep answers concise (2-4 sentences max).
+
+                Student context:
+                - Name: {$user->first_name}
+                - Course: {$profile->course ?? 'not set'}
+                - University: {$profile->university_name ?? 'not set'}
+                - GPA: {$profile->gpa ?? 'not set'}
+                - Income bracket: {$profile->income_bracket ?? 'not set'}
+
+                User message: {$request->message}
+
+                Reply helpfully and in a warm, encouraging tone.
+                If asked about scholarships, refer to ScholarLink's browse page.
+                Do not use markdown. Plain text only.
+            ";
+
+            $reply = $this->callGemini($prompt);
+
+            return response()->json(['reply' => $reply]);
+        }
+    /**
+     * Generate AI recommendation summary for the dashboard.
+     */
+    public function getDashboardSummary(Request $request)
     {
-        if (! $requirement || ! $gwa) {
-            return 100;
-        }
+        $profile = $request->user()->profile;
 
-        if ($gwa >= $requirement) {
-            return 100;
-        }
+        $prompt = "
+            You are a friendly scholarship advisor for ScholarLink.
+            Give a short 2-sentence encouragement and tip for a student named {$request->user()->first_name}
+            who is taking {$profile->course} with a GPA of {$profile->gpa}.
+            Keep it warm and motivating. No markdown.
+        ";
 
-        return max(0, min(100, (int) round(($gwa / $requirement) * 100)));
+        $text = $this->callGemini($prompt);
+
+        return response()->json(['message' => $text]);
     }
 
-    private function scoreIncome(?float $income, ?string $bracket): int
+    /**
+     * Core method — calls the Gemini REST API.
+     */
+    private function callGemini(string $prompt): string
     {
-        if (! $bracket || ! $income) {
-            return 100;
+        $url = "{$this->baseUrl}/{$this->model}:generateContent?key={$this->apiKey}";
+
+        $response = Http::timeout(30)->post($url, [
+            'contents' => [
+                [
+                    'parts' => [
+                        ['text' => $prompt]
+                    ]
+                ]
+            ],
+            'generationConfig' => [
+                'temperature'     => 0.7,
+                'maxOutputTokens' => 1024,
+            ],
+        ]);
+
+        if ($response->failed()) {
+            \Log::error('Gemini API error', [
+                'status' => $response->status(),
+                'body'   => $response->body(),
+            ]);
+            return 'Unable to get AI response at this time.';
         }
 
-        preg_match('/\d[\d,.]*/', $bracket, $matches);
-        if (empty($matches)) {
-            return 75;
-        }
-
-        $threshold = (float) str_replace(',', '', $matches[0]);
-        if ($threshold <= 0) {
-            return 75;
-        }
-
-        if ($income <= $threshold) {
-            return 100;
-        }
-
-        $ratio = $threshold / $income;
-        return max(0, min(100, (int) round($ratio * 100)));
+        return $response->json('candidates.0.content.parts.0.text', '');
     }
 
-    private function scoreFit(ApplicantProfile $profile, Scholarship $scholarship): int
+    /**
+     * Helper — format scholarships for the prompt.
+     */
+    private function formatScholarships(): string
     {
-        $courseMatch = $this->containsText($scholarship->eligibility, $profile->course_program) ? 100 : 80;
-        $schoolMatch = $this->containsText($scholarship->eligibility, $profile->university_name) ? 100 : 75;
-        $locationMatch = $this->containsText($scholarship->eligibility, $profile->province) ? 100 : 70;
-        $completion = $profile->profile_completed_at ? 100 : 65;
+        $scholarships = \App\Models\Scholarship::where('is_active', true)
+            ->select('id', 'name', 'provider_name', 'min_gpa', 'course_requirements', 'income_requirement')
+            ->get();
 
-        return (int) round(($courseMatch * 0.4) + ($schoolMatch * 0.2) + ($locationMatch * 0.2) + ($completion * 0.2));
-    }
-
-    private function containsText(?string $haystack, ?string $needle): bool
-    {
-        if (! $haystack || ! $needle) {
-            return false;
-        }
-
-        return str_contains(strtolower($haystack), strtolower($needle));
-    }
-
-    private function normalizeWeight(?int $value, int $default): int
-    {
-        if (is_null($value)) {
-            return $default;
-        }
-
-        return max(0, min(80, $value));
-    }
-
-    private function buildAnalysisMessage(ApplicantProfile $profile, Scholarship $scholarship, int $gpaScore, int $incomeScore): string
-    {
-        $parts = [];
-
-        if ($scholarship->gpa_requirement) {
-            $parts[] = $profile->gwa >= $scholarship->gpa_requirement
-                ? 'GPA exceeds the required threshold.'
-                : 'GPA is below the scholarship requirement.';
-        } else {
-            $parts[] = 'No GPA threshold is defined for this scholarship.';
-        }
-
-        if ($scholarship->income_bracket) {
-            $parts[] = $incomeScore === 100
-                ? 'Income falls within the target bracket.'
-                : 'Income is higher than the target bracket, which may reduce eligibility.';
-        }
-
-        if ($this->containsText($scholarship->eligibility, $profile->course_program)) {
-            $parts[] = 'Course program matches the scholarship eligibility description.';
-        }
-
-        if ($this->containsText($scholarship->eligibility, $profile->province)) {
-            $parts[] = 'Location is aligned with the scholarship eligibility.';
-        }
-
-        return implode(' ', $parts);
+        return $scholarships->map(fn($s) =>
+            "ID:{$s->id} | {$s->name} by {$s->provider_name} | Min GPA: {$s->min_gpa} | Courses: {$s->course_requirements} | Income: {$s->income_requirement}"
+        )->implode("\n");
     }
 }
