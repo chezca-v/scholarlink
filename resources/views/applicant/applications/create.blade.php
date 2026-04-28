@@ -220,7 +220,7 @@ body{
             <div>
               GPA of {{ $scholarship->gpa_requirement }} or better
               <span class="req-sub">
-                Your GWA: {{ number_format($profile->gwa, 2) }} —
+                Your GWA: {{ number_format((float) $profile->gwa, 2) }} —
                 {{ $gpa['pass'] ? 'qualifies' : 'does not qualify' }}
               </span>
             </div>
@@ -409,13 +409,13 @@ body{
         <div class="confirm-row"><span class="ck">Student number</span><span class="cv">{{ $profile->student_number }}</span></div>
         <div class="confirm-row">
           <span class="ck">GWA ({{ $profile->gwa_scale }} scale)</span>
-          <span class="cv ok">{{ number_format($profile->gwa, 2) }} — qualifies</span>
+          <span class="cv ok">{{ number_format((float) $profile->gwa, 2) }} — qualifies</span>
         </div>
         <div class="confirm-row">
           <span class="ck">Monthly household income</span>
           <span class="cv">
-            ₱{{ number_format($profile->monthly_household_income) }}
-            (₱{{ number_format($profile->monthly_household_income * 12) }}/yr)
+            ₱{{ number_format((float) $profile->monthly_household_income) }}
+            (₱{{ number_format(((float) $profile->monthly_household_income) * 12) }}/yr)
           </span>
         </div>
         <div class="confirm-row"><span class="ck">Household dependents</span><span class="cv">{{ $profile->num_dependents }}</span></div>
