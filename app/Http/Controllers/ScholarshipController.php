@@ -128,7 +128,28 @@ class ScholarshipController extends Controller
             'sort'     => $sort,
         ];
 
-        return view('applicant.dashboard', compact('scholarships', 'filters'));
+        // Prepare counts for the dashboard sidebar
+        $statusCounts = [
+            'open' => Scholarship::where('status', 'open')->count(),
+            'closing soon' => Scholarship::where('status', 'closing_soon')->count(),
+            'coming soon' => Scholarship::where('status', 'coming_soon')->count(),
+            'closed' => Scholarship::where('status', 'closed')->count(),
+        ];
+
+        $incomeBrackets = Scholarship::select('income_bracket')->distinct()->whereNotNull('income_bracket')->pluck('income_bracket');
+
+        $applicationCount = 0;
+        $savedCount = 0;
+        $unreadCount = 0;
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $applicationCount = \App\Models\Application::where('applicant_id', $user->id)->count();
+            $savedCount = \App\Models\SavedScholarship::where('user_id', $user->id)->count();
+            $unreadCount = \App\Models\Notification::where('user_id', $user->id)->whereNull('read_at')->count();
+        }
+
+        return view('applicant.dashboard', compact('scholarships', 'filters', 'statusCounts', 'incomeBrackets', 'applicationCount', 'savedCount', 'unreadCount'));
     }
 
     public function create()
