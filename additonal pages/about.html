@@ -112,7 +112,7 @@
       transform-origin: left;
       transition: transform .25s cubic-bezier(.22,1,.36,1);
     }
-    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover { color: var(--white); letter-spacing: 0.5px;}
     .nav-links a:hover::after,
     .nav-links a.active::after { transform: scaleX(1); }
     .nav-links a.active { color: var(--gold-light); }
@@ -132,6 +132,15 @@
         radial-gradient(ellipse 60% 60% at 20% 50%, rgba(201,168,76,.12) 0%, transparent 70%),
         radial-gradient(ellipse 50% 70% at 80% 40%, rgba(249,214,121,.08) 0%, transparent 60%);
       pointer-events: none;
+      animation: floatBg 12s ease-in-out infinite alternate;
+    }
+        @keyframes floatBg {
+    from {
+        transform: translateY(0px) scale(1);
+    }
+    to {
+        transform: translateY(-20px) scale(1.05);
+    }
     }
     .hero > * { position: relative; }
 
@@ -170,8 +179,16 @@
 
     /* hero fade-up */
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(26px); }
-      to   { opacity: 1; transform: translateY(0); }
+        from {
+        opacity: 0;
+        transform: translateY(40px) scale(.98);
+        filter: blur(6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
     }
     .hero-eyebrow { animation: fadeUp .6s ease both .05s; }
     .hero-title   { animation: fadeUp .6s ease both .18s; }
@@ -407,7 +424,7 @@
       margin: 0 8px;
       position: relative;
     }
-    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-primary:hover { transform: translateY(-2px) scale(1.03);box-shadow: 0 10px 25px rgba(232,168,56,.35); }
     .btn-secondary {
       border: 2px solid rgba(255,255,255,.3);
       color: var(--white);
@@ -420,27 +437,109 @@
       margin: 0 8px;
       position: relative;
     }
-    .btn-secondary:hover { border-color: var(--gold-light); background: rgba(255,255,255,.07); }
+    .btn-secondary:hover { transform: translateY(-2px); }
 
     /* ── FOOTER ── */
     footer {
-      background: var(--ink);
-      color: rgba(255,255,255,.5);
-      padding: 36px 40px;
-      text-align: center;
-      font-size: 13px;
+      background: #0d1f26;
+      padding: 64px 64px 36px;
+      font-size: 14px;
     }
-    footer span { color: var(--amber); }
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 64px;
+      margin-bottom: 64px;
+    }
+    /* Brand col */
+    .footer-brand-name {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--amber);
+      letter-spacing: -.2px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .footer-brand-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,.45);
+      line-height: 1.7;
+      max-width: 280px;
+    }
+    /* Link columns */
+    .footer-col-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.35);
+      margin-bottom: 22px;
+    }
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .footer-col ul li a {
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 400;
+      transition: color .18s;
+    }
+    .footer-col ul li a:hover { color: var(--white); }
+    /* Bottom bar */
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,.07);
+    }
+    .footer-copy {
+      font-size: 13px;
+      color: rgba(255,255,255,.4);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .footer-sdp-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+      padding: 7px 18px;
+      border-radius: 100px;
+      opacity: .8;
+      transition: opacity .2s;
+    }
+    .footer-sdp-badge:hover { opacity: 1; }
 
     /* ── SCROLL REVEAL ── */
     .reveal {
       opacity: 0;
-      transform: translateY(30px);
+      transform: translateY(50px) scale(.98);
+      filter: blur(8px);
       transition:
-        opacity .7s cubic-bezier(.22,1,.36,1),
-        transform .7s cubic-bezier(.22,1,.36,1);
+        opacity .9s cubic-bezier(.16,1,.3,1),
+        transform .9s cubic-bezier(.16,1,.3,1),
+        filter .9s ease;
     }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
@@ -653,28 +752,40 @@
     <h2 class="section-title reveal" style="transition-delay:.07s">Our Team</h2>
     <div class="team-grid">
       <div class="team-card reveal" style="transition-delay:.07s">
-        <div class="avatar">M</div>
-        <div class="team-name">Maria Santos</div>
-        <div class="team-role">Co-Founder & CEO</div>
-        <span class="team-badge">Leadership</span>
+        <div class="avatar">F</div>
+        <div class="team-name">Franchezca Banayad</div>
+        <div class="team-role">Full Stack Developer and Back End Lead</div>
+        <span class="team-badge">BSCpE 2-2</span>
       </div>
       <div class="team-card reveal" style="transition-delay:.13s">
         <div class="avatar amber">J</div>
-        <div class="team-name">Jose Reyes</div>
-        <div class="team-role">Co-Founder & CTO</div>
-        <span class="team-badge">Engineering</span>
+        <div class="team-name">Jose Jerico Escaño</div>
+        <div class="team-role">Front End Developer</div>
+        <span class="team-badge">BSCpE 2-2</span>
       </div>
       <div class="team-card reveal" style="transition-delay:.19s">
-        <div class="avatar">A</div>
-        <div class="team-name">Ana Lanuza</div>
-        <div class="team-role">Head of Design</div>
-        <span class="team-badge">Design</span>
+        <div class="avatar">K</div>
+        <div class="team-name">Karl Joseph Esteban</div>
+        <div class="team-role">Full Stack Developer</div>
+        <span class="team-badge">BSCpE 2-2</span>
       </div>
       <div class="team-card reveal" style="transition-delay:.25s">
-        <div class="avatar amber">R</div>
-        <div class="team-name">Ramon Cruz</div>
-        <div class="team-role">Partnerships Lead</div>
-        <span class="team-badge">Partnerships</span>
+        <div class="avatar amber">N</div>
+        <div class="team-name">Niña Ysabelle Frigillana</div>
+        <div class="team-role">UI/UX, Full Stack Developer, and Front End Lead</div>
+        <span class="team-badge">BSCpE 2-2</span>
+      </div>
+      <div class="team-card reveal" style="transition-delay:.31s">
+        <div class="avatar">E</div>
+        <div class="team-name">Elena Vale Lanuza</div>
+        <div class="team-role">Front End Developer</div>
+        <span class="team-badge">BSCpE 2-2</span>
+      </div>
+      <div class="team-card reveal" style="transition-delay:.37s">
+        <div class="avatar amber">P</div>
+        <div class="team-name">Princess Mae Sanchez</div>
+        <div class="team-role">Back End Developer and Database Lead</div>
+        <span class="team-badge">BSCpE 2-2</span>
       </div>
     </div>
   </div>
@@ -690,7 +801,55 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>© 2026 <span>ScholarLink</span> — Empowering Filipino scholars, one application at a time.</p>
+  <div class="footer-inner">
+    <div class="footer-top">
+
+      <!-- Brand -->
+      <div class="footer-brand">
+        <span class="footer-brand-name">ScholarLink</span>
+        <p class="footer-brand-desc">Bridging Filipino students to scholarship opportunities — one profile, every scholarship.</p>
+      </div>
+
+      <!-- Platform -->
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <ul>
+          <li><a href="#">Browse</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">For Organizations</a></li>
+          <li><a href="#">AI Matching</a></li>
+        </ul>
+      </div>
+
+      <!-- Account -->
+      <div class="footer-col">
+        <div class="footer-col-title">Account</div>
+        <ul>
+          <li><a href="#">Sign Up</a></li>
+          <li><a href="#">Log In</a></li>
+          <li><a href="#">My Applications</a></li>
+          <li><a href="#">Document Wallet</a></li>
+        </ul>
+      </div>
+
+      <!-- Legal -->
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Data Privacy Act</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 ScholarLink. Philippines 🇵🇭</p>
+      <span class="footer-sdp-badge">Software Design Project</span>
+    </div>
+  </div>
 </footer>
 
 <script>
