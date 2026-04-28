@@ -12,12 +12,16 @@ class CheckRole
     {
         if (!$request->user() || $request->user()->role !== $role) {
             // Redirect based on role if they try to access the wrong area
-            return match($request->user()?->role) {
-                'admin' => redirect()->route('admin.dashboard'),
-                'evaluator' => redirect()->route('evaluator.dashboard'),
-                'superadmin' => redirect()->route('superadmin.dashboard'),
-                default => redirect()->route('dashboard'), // Applicants
+            $userRole = $request->user()?->role;
+
+            $redirectPath = match ($userRole) {
+                'admin' => '/admin/dashboard',
+                'evaluator' => '/evaluator/dashboard',
+                'superadmin' => '/superadmin/dashboard',
+                default => '/dashboard', // Applicants and any other role
             };
+
+            return redirect($redirectPath);
         }
 
         return $next($request);

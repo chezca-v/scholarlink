@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     // Dashboard & Profile Management
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
+        Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
         Route::get('/profile/setup', 'setup')->name('profile.setup');
         Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
@@ -103,7 +104,7 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
         Route::get('/notifications', 'notifications')->name('notifications');
         Route::post('/notifications/mark-all-read', 'markAllRead')->name('notifications.markAllRead');
         Route::post('/notifications/{id}/mark-read', 'markRead')->name('notifications.markRead');
-        
+
         Route::get('/profile', 'profile')->name('profile');
         Route::patch('/profile', 'profileUpdate')->name('profile.update');
     });

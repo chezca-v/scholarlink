@@ -1,109 +1,88 @@
-@extends('layouts.evaluator')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ScholarLink - Evaluator Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Fraunces:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+</head>
+<body>
+@php
+    $adminName = trim((auth()->user()->first_name ?? '') . ' ' . (auth()->user()->last_name ?? ''));
+    $adminName = $adminName !== '' ? $adminName : (auth()->user()->email ?? 'Admin User');
+    $initials = strtoupper(substr(auth()->user()->first_name ?? 'A', 0, 1) . substr(auth()->user()->last_name ?? 'D', 0, 1));
+@endphp
 
-@section('page_title', 'Evaluator Dashboard')
+<div class="app-container">
+    <x-sidebar :user="auth()->user()" :adminName="$adminName" :initials="$initials" :organization="auth()->user()->organization" />
 
-@section('content')
-<div class="breadcrumb">
-  <span class="current">Dashboard</span>
+    <div class="main-wrapper">
+        <x-dashboard-header :initials="$initials" :unreadNotifications="$unreadNotifications ?? 0" />
+
+        <main class="dashboard-body">
+            <div class="dashboard-heading">
+                <div>
+                    @php
+                        $organization = auth()->user()->organization ?? null;
+                    @endphp
+                    <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">{{ $organization?->name ?? 'ScholarLink' }}</p>
+                    <h2 style="font-family:'Fraunces'; font-size:28px; font-weight:700;">Admin Dashboard</h2>
+                    <p style="font-size:12px; color:var(--muted); margin-top:2px;">{{ $now->format('l, F j, Y') }} · Academic Year {{ $now->year }}–{{ $now->copy()->addYear()->year }}</p>
+                </div>
+                <div class="heading-actions">
+                    <form method="POST" action="{{ route('admin.reports.export') ?? '#' }}" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
+                    </form>
+                    <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="btn-pri" style="text-decoration:none; display:inline-block;">New Scholarship</a>
+                </div>
+            </div>
+
+            @php
+                $stats = $stats ?? [];
+            @endphp
+            <x-stat-cards :stats="$stats" />
+
+            <div class="dashboard-main-area">
+                <div>
+                    @php
+                        $alerts = $alerts ?? [];
+                    @endphp
+                    <x-alerts-section :alerts="$alerts" />
+
+                    <x-activity-section :activities="$recentActivity ?? []" />
+
+                    <x-scholarship-overview :scholarships="$scholarshipOverview ?? []" />
+                </div>
+
+                <aside>
+                    @php
+                        $quickActions = $quickActions ?? [];
+                    @endphp
+                    <x-quick-actions :actions="$quickActions" />
+
+                    @php
+                        $breakdownItems = $breakdownItems ?? [];
+                    @endphp
+                    <x-application-breakdown :statusCounts="$statusCounts ?? []" :totalApplications="$totalApplications ?? 0" :breakdownItems="$breakdownItems" />
+
+                    <x-upcoming-deadlines :deadlines="$upcomingDeadlines ?? []" :now="$now" />
+                </aside>
+            </div>
+        </main>
+    </div>
 </div>
 
-<!-- STATS -->
-<div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
-  <div class="stat-card">
-    <div class="label">Total Assigned</div>
-    <div class="value">{{ $totalAssigned ?? 0 }}</div>
-    <div class="delta neutral">Applications to review</div>
-  </div>
-  <div class="stat-card">
-    <div class="label">Completed</div>
-    <div class="value">{{ $totalCompleted ?? 0 }}</div>
-    <div class="delta up" style="color:var(--green)">Evaluations done</div>
-  </div>
-  <div class="stat-card">
-    <div class="label">Pending in Queue</div>
-    <div class="value">{{ ($totalAssigned ?? 0) - ($totalCompleted ?? 0) }}</div>
-    <div class="delta neutral">Waiting for you</div>
-  </div>
-</div>
-
-<div class="grid-2" style="gap:20px; align-items:start;">
-  <!-- QUEUE COUNTS PER SCHOLARSHIP -->
-  <div class="card">
-    <div class="section-title" style="margin-bottom:12px">Scholarship Queues</div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Scholarship</th>
-            <th>Pending</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse($assignments as $assignment)
-          <tr>
-            <td>
-              <div style="font-size:13px;font-weight:500">{{ $assignment->scholarship->name ?? 'Unknown' }}</div>
-            </td>
-            <td>
-              <span class="badge yellow">{{ $queueCounts[$assignment->scholarship_id] ?? 0 }} pending</span>
-            </td>
-            <td>
-              <a href="{{ route('evaluator.queue') }}" class="btn btn-outline btn-sm">View Queue</a>
-            </td>
-          </tr>
-          @empty
-          <tr>
-            <td colspan="3" style="text-align:center;padding:20px;color:var(--slate)">No scholarships assigned yet.</td>
-          </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- RECENT COMPLETIONS -->
-  <div class="card">
-    <div class="section-title" style="margin-bottom:12px">Recent Completions</div>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>App ID</th>
-            <th>Score</th>
-            <th>Outcome</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          @forelse($recentCompletions as $eval)
-          <tr>
-            <td><span style="font-weight:600;color:var(--primary)">#{{ $eval->application->reference_code ?? 'A-'.$eval->application_id }}</span></td>
-            <td><span style="font-weight:700;">{{ $eval->final_score ?? 0 }}</span>/100</td>
-            <td>
-              @if($eval->decision === 'approved')
-                <span class="badge green">✅ Approved</span>
-              @elseif($eval->decision === 'rejected')
-                <span class="badge red">❌ Rejected</span>
-              @elseif($eval->decision === 'revision_requested')
-                <span class="badge teal">💬 Info Req.</span>
-              @endif
-            </td>
-            <td style="font-size:12px;color:var(--slate)">{{ $eval->evaluated_at ? $eval->evaluated_at->format('M d') : 'N/A' }}</td>
-          </tr>
-          @empty
-          <tr>
-            <td colspan="4" style="text-align:center;padding:20px;color:var(--slate)">No completed evaluations yet.</td>
-          </tr>
-          @endforelse
-        </tbody>
-      </table>
-    </div>
-    @if(count($recentCompletions) > 0)
-    <div style="margin-top:12px; text-align:right;">
-      <a href="{{ route('evaluator.completed') }}" style="font-size:12px; color:var(--primary); font-weight:600; text-decoration:none;">View All Completions →</a>
-    </div>
-    @endif
-  </div>
-</div>
-@endsection
+<script>
+    // INTERACTIVITY LOGIC
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("Admin Dashboard Live");
+        // 5 minute auto-refresh simulation
+        setInterval(() => { console.log("Checking for updates..."); }, 300000);
+    });
+</script>
+</body>
+</html>

@@ -52,11 +52,24 @@ class AuthenticatedSessionController extends Controller
      */
     private function dashboardRouteFor(?User $user): string
     {
-        return match ($user?->role) {
-            'admin' => route('admin.dashboard', absolute: false),
-            'evaluator' => route('evaluator.dashboard', absolute: false),
-            'superadmin' => route('superadmin.dashboard', absolute: false),
-            default => route('dashboard', absolute: false),
-        };
+        // Try to use named route if it exists, otherwise use path
+        try {
+            return match ($user?->role) {
+                'admin' => route('admin.dashboard', [], false),
+                'evaluator' => route('evaluator.dashboard', [], false),
+                'superadmin' => route('superadmin.dashboard', [], false),
+                'applicant' => route('applicant.dashboard', [], false),
+                default => route('dashboard', [], false),
+            };
+        } catch (\Symfony\Component\Routing\Exception\RouteNotFoundException $e) {
+            // Fallback to paths if route names don't exist
+            return match ($user?->role) {
+                'admin' => '/admin/dashboard',
+                'evaluator' => '/evaluator/dashboard',
+                'superadmin' => '/superadmin/dashboard',
+                'applicant' => '/applicant/dashboard',
+                default => '/dashboard',
+            };
+        }
     }
 }
