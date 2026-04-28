@@ -158,19 +158,23 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     
     <div class="sb-spacer"></div>
     
-    <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
-      @csrf
-      <button type="submit" class="sb-user-btn" onclick="return confirm('Are you sure you want to log out?');">
-        <div class="sb-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
-        <div style="flex:1;">
-          <div class="sb-name">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</div>
-          <div class="sb-sub" style="display:flex; justify-content:space-between;">
-             <span>Applicant</span>
-             <span style="color:#DC2626;font-weight:700;">Log Out</span>
-          </div>
-        </div>
-      </button>
-    </form>
+    <div class="sb-user-card" style="display:flex; align-items:center; gap:10px; padding:12px 16px; margin:0 10px 4px; background:var(--light-green); border:2px solid rgba(15,76,92,0.2); border-radius:14px;">
+      <div class="sb-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
+      <div style="flex:1; min-width:0;">
+        <div class="sb-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</div>
+        <div class="sb-sub">Applicant</div>
+      </div>
+      <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; flex-shrink:0;">
+        @csrf
+        <button type="submit" style="background:rgba(220,38,38,0.1); border:none; color:#DC2626; cursor:pointer; display:flex; align-items:center; justify-content:center; padding:6px; border-radius:8px; transition:background 0.2s;" title="Log Out" onmouseover="this.style.background='rgba(220,38,38,0.2)'" onmouseout="this.style.background='rgba(220,38,38,0.1)'" onclick="return confirm('Are you sure you want to log out?');">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
+      </form>
+    </div>
   </aside>
 
   <!-- MAIN -->
