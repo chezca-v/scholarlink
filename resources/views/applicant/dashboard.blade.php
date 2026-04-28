@@ -105,8 +105,8 @@
                 <span class="search-icon">🔎</span>
                 <form method="GET" action="{{ route('scholarships.index') }}" style="width:100%">
                     <input class="search"
-                           name="search"
-                           value="{{ request('search') }}"
+                           name="q"
+                           value="{{ request('q') }}"
                            placeholder="Search scholarship, organizations..." />
                 </form>
                 <span class="search-kbd">⌘K</span>
@@ -251,7 +251,7 @@
             @endphp
 
             <div class="mini-profile">
-                <div class="mini-profile-top">
+                <a href="{{ route('profile.show') }}" class="mini-profile-top" style="text-decoration:none; display:flex;">
                     <div class="photo">
                         {{ strtoupper(substr(auth()->user()->first_name, 0, 1) . substr(auth()->user()->last_name, 0, 1)) }}
                     </div>
@@ -259,7 +259,7 @@
                         <strong>{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</strong>
                         <small>Applicant · GPA {{ $authProfile->gwa ?? 'N/A' }}</small>
                     </div>
-                </div>
+                </a>
 
                 {{-- Profile completeness ring --}}
                 <div class="completeness-wrap">
@@ -286,18 +286,18 @@
                 </div>
                 
                 <div class="quick-stats">
-                    <div class="qs-item">
+                    <a href="{{ route('applications.index') }}" class="qs-item" style="text-decoration:none;">
                         <div class="qs-num">{{ $applicationCount ?? 0 }}</div>
                         <div class="qs-label">Applied</div>
-                    </div>
-                    <div class="qs-item">
+                    </a>
+                    <a href="{{ route('applicant.saved') }}" class="qs-item" style="text-decoration:none;">
                         <div class="qs-num">{{ $savedCount ?? 0 }}</div>
                         <div class="qs-label">Saved</div>
-                    </div>
-                    <div class="qs-item notif">
+                    </a>
+                    <a href="{{ route('notifications.index') }}" class="qs-item notif" style="text-decoration:none;">
                         <div class="qs-num">{{ $unreadCount ?? 0 }}</div>
                         <div class="qs-label">Notifs</div>
-                    </div>
+                    </a>
                 </div>
             </div>
             @endauth
@@ -308,7 +308,7 @@
             <h1 class="page-title">Scholarship Opportunities</h1>
 
             {{-- Active filter chips --}}
-            @if(request()->anyFilled(['status', 'income_bracket', 'deadline', 'min_match', 'search']))
+            @if(request()->anyFilled(['status', 'income_bracket', 'deadline', 'min_match', 'q']))
             <div class="active-filters">
                 <span class="label">Active:</span>
                 @foreach(request('status', []) as $s)
@@ -323,8 +323,8 @@
                 @if(request('min_match') > 0)
                     <span class="tag">Match ≥ {{ request('min_match') }}%</span>
                 @endif
-                @if(request('search'))
-                    <span class="tag">"{{ request('search') }}"</span>
+                @if(request('q'))
+                    <span class="tag">"{{ request('q') }}"</span>
                 @endif
                 <a href="{{ route('scholarships.index') }}" class="clear">Clear all</a>
             </div>
@@ -390,7 +390,7 @@
                     @endif
                     @endauth
 
-                    <a href="{{ route('scholarships.show', $scholarship->id) }}" class="apply" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                    <a href="{{ route('applications.create', $scholarship->id) }}" class="apply" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
                         Apply Now
                     </a>
                 </article>
