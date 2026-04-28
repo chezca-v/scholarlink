@@ -1,7 +1,7 @@
 @extends('layouts.evaluator')
 
 @section('page_title', 'Rejection Form')
-@section('page_subtitle', '/evaluator/review/' . ($application->reference_code ?? 'A-'.$application->id) . '/reject')
+
 
 @section('topnav_actions')
   <a href="{{ route('evaluator.review.show', $application->id) }}" class="btn btn-outline btn-sm">← Back to Review</a>

@@ -55,9 +55,122 @@ class ApplicationController extends Controller
     }
 
 
-    public function create()
+    public function create($id)
     {
-        return view('applicant.applications.create');
+        $scholarship = \App\Models\Scholarship::findOrFail($id);
+        $applicant = auth()->user();
+        $profile = $applicant->applicantProfile ?? new ApplicantProfile();
+
+        $savedDocuments = \App\Models\Document::where('user_id', $applicant->id)->get();
+
+        // Check GPA eligibility
+        $gpaPass = null;
+        if ($profile->gwa && $scholarship->gpa_requirement) {
+            $gpaPass = $profile->gwa <= $scholarship->gpa_requirement; // Assuming lower is better in PH system
+        }
+
+        // Check Income eligibility
+        $incomePass = null;
+        if ($profile->monthly_household_income !== null) {
+            $incomePass = true; // Placeholder for simple pass check
+        }
+
+        // Check concurrent scholarship
+        $hasActiveScholarship = Application::where('applicant_id', $applicant->id)
+                                ->where('status', 'approved')
+                                ->exists();
+        $concurrentPass = !$hasActiveScholarship;
+
+        // Check enrollment
+        $enrollmentPass = true; // Placeholder
+
+        $eligibility = [
+            'gpa' => [
+                'label' => 'GPA Requirement',
+                'pass' => $gpaPass,
+                'badge' => $gpaPass ? 'Passed' : ($gpaPass === false ? 'Failed' : 'Pending'),
+                'badgeClass' => $gpaPass ? 'b-green' : ($gpaPass === false ? 'b-red' : 'b-amber'),
+            ],
+            'income' => [
+                'label' => 'Income Bracket',
+                'pass' => $incomePass,
+                'badge' => $incomePass ? 'Passed' : ($incomePass === false ? 'Failed' : 'Pending'),
+                'badgeClass' => $incomePass ? 'b-green' : ($incomePass === false ? 'b-red' : 'b-amber'),
+            ],
+            'concurrent' => [
+                'label' => 'No Concurrent Scholarship',
+                'pass' => $concurrentPass,
+                'badge' => $concurrentPass ? 'Passed' : 'Failed',
+                'badgeClass' => $concurrentPass ? 'b-green' : 'b-red',
+            ],
+            'enrollment' => [
+                'label' => 'Currently Enrolled',
+                'pass' => $enrollmentPass,
+                'badge' => $enrollmentPass ? 'Passed' : 'Failed',
+                'badgeClass' => $enrollmentPass ? 'b-green' : 'b-red',
+            ]
+        ];
+
+        $documentGroups = [
+            [
+                'groupTitle' => 'Identity & Academic',
+                'slots' => [
+                    [
+                        'document_type' => 'Proof of Enrollment',
+                        'label' => 'Proof of Enrollment',
+                        'smallNote' => 'Certificate of Registration',
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Report Card / Transcript',
+                        'label' => 'Report Card',
+                        'smallNote' => 'Previous semester',
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Valid ID',
+                        'label' => 'Valid ID',
+                        'smallNote' => 'Student ID or Govt ID',
+                        'optional' => false,
+                    ],
+                ]
+            ],
+            [
+                'groupTitle' => 'Financial Documents',
+                'slots' => [
+                    [
+                        'document_type' => 'ITR / Tax Exemption',
+                        'label' => 'Income Tax Return',
+                        'smallNote' => 'Or Certificate of Tax Exemption',
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Barangay Indigency',
+                        'label' => 'Barangay Indigency',
+                        'smallNote' => null,
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Utility Bill',
+                        'label' => 'Utility Bill',
+                        'smallNote' => 'Recent within 3 months',
+                        'optional' => true,
+                    ]
+                ]
+            ]
+        ];
+
+        $endorsementSlot = [
+            'groupTitle' => 'Endorsement',
+            'document_type' => 'Endorsement Letter',
+            'label' => 'Endorsement Letter',
+            'smallNote' => 'From Dean or Guidance Counselor',
+            'optional' => false,
+        ];
+
+        return view('applicant.applications.create', compact(
+            'scholarship', 'applicant', 'profile', 'eligibility', 'documentGroups', 'savedDocuments', 'endorsementSlot'
+        ));
     }
 
 

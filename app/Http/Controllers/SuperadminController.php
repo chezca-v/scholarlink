@@ -11,8 +11,6 @@ use App\Models\Application;
 use App\Models\Scholarship;
 use App\Models\ActivityLog;
 use Carbon\Carbon;
-use App\Models\Application;
-use App\Models\Scholarship;
 use Illuminate\Support\Facades\DB;
 
 class SuperadminController extends Controller
