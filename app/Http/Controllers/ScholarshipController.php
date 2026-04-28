@@ -128,7 +128,7 @@ class ScholarshipController extends Controller
             'sort'     => $sort,
         ];
 
-        return view('scholarships.index', compact('scholarships', 'filters'));
+        return view('applicant.dashboard', compact('scholarships', 'filters'));
     }
 
     public function create()

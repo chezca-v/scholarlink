@@ -112,12 +112,12 @@
                 <span class="search-kbd">⌘K</span>
             </div>
             <div class="top-actions">
-                <button class="icon-btn">🔔</button>
-                <button class="icon-btn">▦</button>
+                <a href="{{ route('notifications.index') }}" class="icon-btn" style="text-decoration:none;">🔔</a>
+                <a href="{{ route('dashboard') }}" class="icon-btn" style="text-decoration:none;">▦</a>
                 @auth
-                    <div class="avatar">
+                    <a href="{{ route('profile.show') }}" class="avatar" style="text-decoration:none;">
                         {{ strtoupper(substr(auth()->user()->first_name, 0, 1) . substr(auth()->user()->last_name, 0, 1)) }}
-                    </div>
+                    </a>
                 @endauth
             </div>
         </div>
@@ -280,7 +280,7 @@
                         <strong>{{ $profilePct }}% Complete</strong>
                         {{ $filledCount }}/{{ $totalFields }} profile fields filled
                         @if($profilePct < 100)
-                            — <a href="{{ route('profile.edit') }}" style="color:#0b6378;font-size:9px;">Complete now</a>
+                            — <a href="{{ route('profile.show') }}" style="color:#0b6378;font-size:9px;">Complete now</a>
                         @endif
                     </div>
                 </div>
@@ -390,8 +390,8 @@
                     @endif
                     @endauth
 
-                    <a href="{{ route('scholarships.show', $scholarship->id) }}" style="text-decoration:none">
-                        <button class="apply">Apply Now</button>
+                    <a href="{{ route('scholarships.show', $scholarship->id) }}" class="apply" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                        Apply Now
                     </a>
                 </article>
                 @empty
