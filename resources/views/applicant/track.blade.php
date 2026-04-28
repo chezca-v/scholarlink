@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ScholarLink — My Applications</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,700;9..144,900&display=swap" rel="stylesheet">
+@extends('layouts.applicant')
+@section('title', 'ScholarLink - My Applications')
+
+@push('styles')
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -282,90 +277,10 @@ tr:last-child td {
     background: #FAFCFC;
 }
 </style>
-</head>
-<body>
+@endpush
 
-<!-- NAVBAR -->
-<nav class="navbar">
-  <a class="nav-logo" href="{{ route('dashboard') }}">
-    <div class="logo-box">🎓</div>
-    <span class="logo-text">ScholarLink</span>
-  </a>
-  <div class="nav-search">
-    <span class="si"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-    <form action="{{ route('scholarships.index') }}" method="GET" style="display:inline;">
-        <input type="text" name="search" placeholder="Search...">
-    </form>
-  </div>
-  <div class="nav-right">
-    <a href="{{ route('notifications.index') }}" class="nav-ibtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
-      @if($navUnread > 0)
-      <span class="nbadge"></span>
-      @endif
-    </a>
-    <div class="nav-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
-  </div>
-</nav>
-
-<!-- APP LAYOUT -->
-<div class="app">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sb-section-label">Main</div>
-    <a class="sb-nav-item" href="{{ route('dashboard') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Dashboard
-    </a>
-    <a class="sb-nav-item" href="{{ route('scholarships.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      Browse
-    </a>
-    <a class="sb-nav-item active" href="{{ route('applications.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-      Applications
-      @if(isset($stats) && $stats['totalApplied'] > 0)
-        <span class="sb-badge-transparent" style="color: #E8A838; font-size: 11px; font-weight: 700;">{{ $stats['totalApplied'] }}</span>
-      @endif
-    </a>
-    <a class="sb-nav-item" href="{{ route('applicant.saved') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
-      Saved
-      @php $savedCount = App\Models\SavedScholarship::where('user_id', auth()->id())->count(); @endphp
-      @if($savedCount > 0)
-      <span class="sb-badge-transparent" style="color: #E8A838; font-size: 11px; font-weight: 700; margin-left: auto;">{{ $savedCount }}</span>
-      @endif
-    </a>
-    <div class="sb-section-label">Account</div>
-    <a class="sb-nav-item" href="{{ route('profile.show') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      My Profile
-    </a>
-    <a class="sb-nav-item" href="{{ route('applicant.documents.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      Documents
-    </a>
-    <a class="sb-nav-item" href="{{ route('notifications.index') }}">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      Notifications
-      @if($navUnread > 0)
-      <span class="sb-badge">{{ $navUnread }}</span>
-      @endif
-    </a>
-    <div class="sb-spacer"></div>
-    <div class="sb-user">
-      <div class="sb-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
-      <div>
-        <div class="sb-name">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</div>
-        <div class="sb-sub">Applicant</div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main">
+@section('content')
+<div class="main-inner">
     <div class="header-row">
         <div class="page-title-area">
             <span class="page-eyebrow">MY APPLICATIONS</span>
@@ -457,9 +372,10 @@ tr:last-child td {
         </div>
         @endif
     </div>
-  </main>
-</div>
+  </div>
+@endsection
 
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const tabs = document.querySelectorAll('.tab');
@@ -485,5 +401,5 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 </script>
-</body>
-</html>
+@endpush
+

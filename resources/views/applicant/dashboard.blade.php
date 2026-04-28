@@ -1,12 +1,8 @@
-{{-- resources/views/scholarships/index.blade.php --}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScholarLink - Browse Scholarships</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+@extends('layouts.applicant')
+@section('title', 'ScholarLink - Browse Scholarships')
+
+@push('styles')
+<style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: "DM Sans", sans-serif; background: #edf3f5; color: #1f3f4f; }
         .topbar { height: 58px; border-bottom: 1px solid #d8e7ea; background: #ffffff; display: flex; justify-content: center; align-items: center; }
@@ -21,7 +17,7 @@
         .icon-btn { width: 30px; height: 30px; border: 1px solid #dce9ed; border-radius: 8px; background: #fff; color: #88a1ab; display: grid; place-items: center; font-size: 12px; cursor: pointer; }
         .avatar { width: 30px; height: 30px; border-radius: 50%; background: #0b6378; color: #fff; display: grid; place-items: center; font-size: 10px; font-weight: 700; }
         .layout { max-width: 1380px; margin: 0 auto; display: grid; grid-template-columns: 275px 1fr; min-height: calc(100vh - 58px); }
-        .sidebar { background: #f7fbfc; border-right: 1px solid #dce9ed; padding: 14px 16px; }
+        .filter-sidebar { background: #f7fbfc; border-right: 1px solid #dce9ed; padding: 14px 16px; }
         .row-between { display: flex; justify-content: space-between; align-items: center; }
         .filters-title { font-size: 28px; line-height: 1; font-family: "Fraunces", serif; font-weight: 800; color: #21485a; }
         .clear { font-size: 11px; font-weight: 700; color: #0b6378; cursor: pointer; text-decoration: none; }
@@ -59,7 +55,7 @@
         .qs-label { font-size: 8px; color: #89a2ac; margin-top: 2px; text-transform: uppercase; letter-spacing: .08em; }
         .qs-item.notif .qs-num { color: #C9A84C; }
 
-        .main { padding: 16px 18px 24px; }
+        .main-content-area { padding: 16px 18px 24px; }
         .eyebrow { font-size: 10px; letter-spacing: .2em; color: #cb9f3e; font-weight: 700; text-transform: uppercase; }
         .page-title { margin-top: 1px; font-family: "Fraunces", serif; font-size: 46px; line-height: 1.05; color: #1d4254; font-weight: 800; }
         .active-filters { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -137,7 +133,7 @@
     </header>
 
     <div class="layout">
-        <aside class="sidebar">
+        <aside class="filter-sidebar">
             <form method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
 
                 <div class="row-between">
@@ -316,7 +312,7 @@
             @endauth
         </aside>
 
-        <main class="main">
+        <main class="main-content-area">
             <div class="eyebrow">Browse</div>
             <h1 class="page-title">Scholarship Opportunities</h1>
 
@@ -483,5 +479,4 @@
     });
 </script>
 
-</body>
-</html>
+@endsection
