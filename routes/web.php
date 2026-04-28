@@ -36,15 +36,21 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/profile/setup', 'setup')->name('profile.setup');
+        Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
     });
 
-    // Document Wallet
-    Route::controller(DocumentController::class)->prefix('applicant/documents')->name('documents.')->group(function () {
-        Route::get('/', 'index')->name('index');
-        Route::post('/', 'store')->name('store');
+    //Document Wallet
+    Route::controller(DocumentController::class)->prefix('applicant/documents')->name('applicant.documents.')->group(function () {
+        Route::get('', 'index')->name('index');
+        Route::post('', 'store')->name('store');
         Route::get('/{id}/preview', 'preview')->name('preview');
     });
+
+    // Backward-compatible route aliases used by older views/scripts
+    Route::post('/applicant/documents', [DocumentController::class, 'store'])->name('applicant.documents.store');
+    Route::get('/applicant/documents/{id}/preview', [DocumentController::class, 'preview'])->name('applicant.documents.preview');
+    Route::get('/applicant/applications', [ApplicationController::class, 'index'])->name('applicant.applications.index');
 
     // Application Lifecycle
     Route::controller(ApplicationController::class)->group(function () {
@@ -55,9 +61,12 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     });
 
     // Saved Scholarships & Notifications
+    Route::get('/applicant/saved', [SavedScholarshipController::class, 'index'])->name('applicant.saved');
     Route::post('/scholarships/{id}/save', [SavedScholarshipController::class, 'store'])->name('scholarships.save');
     Route::delete('/scholarships/{id}/unsave', [SavedScholarshipController::class, 'destroy'])->name('scholarships.unsave');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllRead'])->name('notifications.markAllRead');
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markRead'])->name('notifications.markRead');
 });
 
 /*
@@ -89,10 +98,22 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
     Route::get('/dashboard', [EvaluatorController::class, 'dashboard'])->name('dashboard');
     Route::get('/queue', [EvaluatorController::class, 'queue'])->name('queue');
 
+    // Notifications & Profile
+    Route::controller(EvaluatorController::class)->group(function () {
+        Route::get('/notifications', 'notifications')->name('notifications');
+        Route::post('/notifications/mark-all-read', 'markAllRead')->name('notifications.markAllRead');
+        Route::post('/notifications/{id}/mark-read', 'markRead')->name('notifications.markRead');
+        
+        Route::get('/profile', 'profile')->name('profile');
+        Route::patch('/profile', 'profileUpdate')->name('profile.update');
+    });
+
     // Evaluation Logic
     Route::controller(EvaluationController::class)->group(function () {
         Route::get('/review/{id}', 'show')->name('review.show');
         Route::post('/review/{id}', 'store')->name('review.store');
+        Route::get('/review/{id}/reject', 'reject')->name('rejection');
+        Route::post('/review/{id}/reject', 'submitRejection')->name('rejection.store');
         Route::get('/completed', 'completed')->name('completed');
     });
 });
@@ -103,10 +124,24 @@ Superadmin Routes (Role: superadmin)
 Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
     Route::controller(SuperadminController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
+
+        // Organizations
         Route::get('/organizations', 'organizations')->name('organizations');
+        Route::post('/organizations', 'storeOrganization')->name('organizations.store');
+        Route::put('/organizations/{id}', 'updateOrganization')->name('organizations.update');
+        Route::delete('/organizations/{id}', 'destroyOrganization')->name('organizations.destroy');
+
+        // Admin Accounts
         Route::get('/admins', 'admins')->name('admins');
+        Route::post('/admins', 'storeAdmin')->name('admins.store');
+        Route::put('/admins/{id}', 'updateAdmin')->name('admins.update');
+        Route::patch('/admins/{id}/deactivate', 'deactivateAdmin')->name('admins.deactivate');
+        Route::patch('/admins/{id}/reassign', 'reassignAdmin')->name('admins.reassign');
+
+        // Logs & Settings
         Route::get('/logs', 'logs')->name('logs');
         Route::get('/settings', 'settings')->name('settings');
+        Route::patch('/settings', 'updateSettings')->name('settings.update');
     });
 });
 

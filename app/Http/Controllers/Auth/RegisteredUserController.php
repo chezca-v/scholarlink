@@ -11,11 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-use App\Support\RedirectsUsersByRole;
 
 class RegisteredUserController extends Controller
 {
-    use RedirectsUsersByRole;
     /**
      * Display the registration view.
      */

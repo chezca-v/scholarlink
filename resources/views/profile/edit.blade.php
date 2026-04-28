@@ -1,29 +1,28 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.applicant')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
+@section('title', 'ScholarLink - My Profile')
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
+@section('content')
+<div class="main-inner">
+    <div class="header-row" style="margin-bottom: 24px;">
+        <div class="page-title-area">
+            <span class="page-eyebrow">ACCOUNT</span>
+            <h1 class="page-title" style="font-family: 'Fraunces', serif; font-size: 28px; font-weight: 900; color: #0F4C5C;">My Profile</h1>
         </div>
     </div>
-</x-app-layout>
+
+    <div style="display: flex; flex-direction: column; gap: 24px; max-width: 800px;">
+        <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(15, 76, 92, 0.03);">
+            @include('profile.partials.update-profile-information-form')
+        </div>
+
+        <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(15, 76, 92, 0.03);">
+            @include('profile.partials.update-password-form')
+        </div>
+
+        <div style="background: #fff; border: 1px solid #E2E8F0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 12px rgba(15, 76, 92, 0.03);">
+            @include('profile.partials.delete-user-form')
+        </div>
+    </div>
+</div>
+@endsection

@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Application;
+use App\Models\ApplicantProfile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
 {
@@ -43,7 +46,7 @@ class ApplicationController extends Controller
             'actionNeeded' => $applications->where('status', 'revision')->count(),
         ];
 
-        return view('applicant.applications.index', [
+        return view('applicant.track', [
             'applications' => $applications,
             'stats' => $stats,
             'statusMap' => $statusMap,
@@ -52,15 +55,178 @@ class ApplicationController extends Controller
     }
 
 
-    public function create()
+    public function create($id)
     {
-        return view('applicant.applications.create');
+        $scholarship = \App\Models\Scholarship::findOrFail($id);
+        $applicant = auth()->user();
+        $profile = $applicant->applicantProfile ?? new ApplicantProfile();
+
+        $savedDocuments = \App\Models\Document::where('user_id', $applicant->id)->get();
+
+        // Check GPA eligibility
+        $gpaPass = null;
+        if ($profile->gwa && $scholarship->gpa_requirement) {
+            $gpaPass = $profile->gwa <= $scholarship->gpa_requirement; // Assuming lower is better in PH system
+        }
+
+        // Check Income eligibility
+        $incomePass = null;
+        if ($profile->monthly_household_income !== null) {
+            $incomePass = true; // Placeholder for simple pass check
+        }
+
+        // Check concurrent scholarship
+        $hasActiveScholarship = Application::where('applicant_id', $applicant->id)
+                                ->where('status', 'approved')
+                                ->exists();
+        $concurrentPass = !$hasActiveScholarship;
+
+        // Check enrollment
+        $enrollmentPass = true; // Placeholder
+
+        $eligibility = [
+            'gpa' => [
+                'label' => 'GPA Requirement',
+                'pass' => $gpaPass,
+                'badge' => $gpaPass ? 'Passed' : ($gpaPass === false ? 'Failed' : 'Pending'),
+                'badgeClass' => $gpaPass ? 'b-green' : ($gpaPass === false ? 'b-red' : 'b-amber'),
+            ],
+            'income' => [
+                'label' => 'Income Bracket',
+                'pass' => $incomePass,
+                'badge' => $incomePass ? 'Passed' : ($incomePass === false ? 'Failed' : 'Pending'),
+                'badgeClass' => $incomePass ? 'b-green' : ($incomePass === false ? 'b-red' : 'b-amber'),
+            ],
+            'concurrent' => [
+                'label' => 'No Concurrent Scholarship',
+                'pass' => $concurrentPass,
+                'badge' => $concurrentPass ? 'Passed' : 'Failed',
+                'badgeClass' => $concurrentPass ? 'b-green' : 'b-red',
+            ],
+            'enrollment' => [
+                'label' => 'Currently Enrolled',
+                'pass' => $enrollmentPass,
+                'badge' => $enrollmentPass ? 'Passed' : 'Failed',
+                'badgeClass' => $enrollmentPass ? 'b-green' : 'b-red',
+            ]
+        ];
+
+        $documentGroups = [
+            [
+                'groupTitle' => 'Identity & Academic',
+                'slots' => [
+                    [
+                        'document_type' => 'Proof of Enrollment',
+                        'label' => 'Proof of Enrollment',
+                        'smallNote' => 'Certificate of Registration',
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Report Card / Transcript',
+                        'label' => 'Report Card',
+                        'smallNote' => 'Previous semester',
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Valid ID',
+                        'label' => 'Valid ID',
+                        'smallNote' => 'Student ID or Govt ID',
+                        'optional' => false,
+                    ],
+                ]
+            ],
+            [
+                'groupTitle' => 'Financial Documents',
+                'slots' => [
+                    [
+                        'document_type' => 'ITR / Tax Exemption',
+                        'label' => 'Income Tax Return',
+                        'smallNote' => 'Or Certificate of Tax Exemption',
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Barangay Indigency',
+                        'label' => 'Barangay Indigency',
+                        'smallNote' => null,
+                        'optional' => false,
+                    ],
+                    [
+                        'document_type' => 'Utility Bill',
+                        'label' => 'Utility Bill',
+                        'smallNote' => 'Recent within 3 months',
+                        'optional' => true,
+                    ]
+                ]
+            ]
+        ];
+
+        $endorsementSlot = [
+            'groupTitle' => 'Endorsement',
+            'document_type' => 'Endorsement Letter',
+            'label' => 'Endorsement Letter',
+            'smallNote' => 'From Dean or Guidance Counselor',
+            'optional' => false,
+        ];
+
+        return view('applicant.applications.create', compact(
+            'scholarship', 'applicant', 'profile', 'eligibility', 'documentGroups', 'savedDocuments', 'endorsementSlot'
+        ));
     }
 
 
     public function store(Request $request)
     {
-        // Logic to save scholarship application
+        $request->validate([
+            'scholarship_id' => 'required|exists:scholarships,id',
+            // Profile fields (optional updates)
+            'date_of_birth' => 'nullable|date|before:today',
+            'sex' => 'nullable|in:male,female,other',
+            'home_address' => 'nullable|string|max:255',
+            'city' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'zip_code' => 'nullable|string|max:10',
+            'mobile_number' => 'nullable|string|max:15',
+            'university_name' => 'nullable|string|max:255',
+            'university_email' => 'nullable|email|max:255',
+            'course_program' => 'nullable|string|max:255',
+            'student_number' => 'nullable|string|max:50',
+            'year_level' => 'nullable|integer|min:1|max:5',
+            'semester' => 'nullable|in:1st,2nd,summer',
+            'academic_year' => 'nullable|string|max:20',
+            'gwa' => 'nullable|numeric|min:0|max:5',
+            'gwa_scale' => 'nullable|numeric|min:1|max:5',
+            'monthly_household_income' => 'nullable|numeric|min:0',
+            'num_dependents' => 'nullable|integer|min:0',
+            'is_breadwinner' => 'nullable|boolean',
+            'is_4ps' => 'nullable|boolean',
+            'father_employment_status' => 'nullable|string|max:100',
+            'mother_employment_status' => 'nullable|string|max:100',
+        ]);
+
+        // Update or create applicant profile
+        ApplicantProfile::updateOrCreate(
+            ['user_id' => auth()->id()],
+            $request->only([
+                'date_of_birth', 'sex', 'home_address', 'city', 'province', 'zip_code',
+                'mobile_number', 'university_name', 'university_email', 'course_program',
+                'student_number', 'year_level', 'semester', 'academic_year', 'gwa',
+                'gwa_scale', 'monthly_household_income', 'num_dependents', 'is_breadwinner',
+                'is_4ps', 'father_employment_status', 'mother_employment_status',
+                'profile_completed_at' => now(), // Mark as completed
+            ])
+        );
+
+        // Create the application
+        $application = Application::create([
+            'reference_code' => 'APP-' . Str::upper(Str::random(8)), // Generate unique code
+            'applicant_id' => auth()->id(),
+            'scholarship_id' => $request->scholarship_id,
+            'status' => 'pending', // Default status
+            'stage' => 'submitted',
+            'submitted_at' => now(),
+        ]);
+
+        return redirect()->route('applications.show', $application->id)->with('success', 'Application submitted successfully.');
     }
 
 

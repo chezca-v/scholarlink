@@ -14,7 +14,7 @@ The system enables students to:
 - Browse scholarships without logging in
 - Create a professional academic profile
 - Apply and track applications
-- Receive real-time updates via In-App, Email, and SMS
+- Receive real-time updates via In-App and Email
 
 Organizations can:
 
@@ -23,7 +23,7 @@ Organizations can:
 - Apply dynamic weighted scoring
 - Ensure blind screening for fairness
 
-ScholarLink integrates both **web-based software architecture** and **embedded hardware systems (ESP32 + GSM)** to ensure accessibility, transparency, and inclusivity.
+ScholarLink integrates web-based software architecture to ensure accessibility, transparency, and inclusivity.
 
 ---
 
@@ -32,7 +32,7 @@ ScholarLink integrates both **web-based software architecture** and **embedded h
 ### 🔎 Public Scholarship Browsing
 - Filter by course, GPA, income bracket, location
 - Deadline countdown timer
-- “Coming Soon” indicator
+- "Coming Soon" indicator
 - Philippine scholarships only
 
 ---
@@ -94,98 +94,37 @@ Color-coded visual indicators.
 Automated reminders:
 - 14 days – Email
 - 7 days – Email + In-app
-- 3 days – Email + SMS
-- 1 day – Email + SMS
-- 6 hours – SMS only
-
-Includes:
-- Deadline extensions
-- Google Calendar integration
+- 3 days – Email + In-app
+- 1 day – Email + In-app
 
 ---
 
-### 📩 Embedded SMS Notification Gateway
-Hardware Integration:
-- ESP32
-- GSM Module (SIM800L)
-
-Workflow:
-1. Admin updates application status.
-2. Laravel backend triggers API request.
-3. ESP32 receives JSON command.
-4. GSM sends SMS to applicant.
-
-Ensures accessibility for students with limited internet.
-
----
-
-### 🤖 AI Help Desk Chatbot
-- 24/7 FAQ Support
-- Scholarship suggestion assistance
-- Step-by-step guidance
-
----
-
-## 🏗 System Architecture
-
-### Backend
-- PHP (Laravel Framework)
-
-### Frontend
-- HTML5
-- Tailwind CSS
-- JavaScript
-
-### Database
+## 📋 System Requirements
+- PHP 8.2+
+- Laravel 12
 - MySQL
+- Node.js & NPM
 
-### Authentication
-- Email & Password
-- Google OAuth
-- Facebook OAuth
-- Microsoft OAuth
+## 🚀 Installation
+1. Clone the repository
+2. Run `composer install`
+3. Run `npm install`
+4. Copy `.env.example` to `.env` and configure
+5. Run `php artisan key:generate`
+6. Run `php artisan migrate`
+7. Run `npm run build`
+8. Run `php artisan serve`
 
-### Notifications
-- PHP Mailer (Email)
-- ESP32 + GSM (SMS)
+## 📚 Usage
+- Register as an applicant or admin
+- Admins can create scholarships
+- Applicants can browse, apply, and track
+- Evaluators review applications
 
-### Embedded System
-- ESP32 Development Board
-- SIM800L GSM Module
-- HTTP REST API (JSON Communication)
+## 🤝 Contributing
+- Follow Laravel conventions
+- Add tests for new features
+- Ensure code quality
 
----
-
-## 👥 User Roles
-
-### 1️⃣ Superadmin
-- System-wide management
-- Organization oversight
-- Analytics dashboard
-
-### 2️⃣ Admin
-- Manages assigned scholarships
-- Adjusts deadlines
-- Reviews metrics
-
-### 3️⃣ Evaluator
-- Reviews applications
-- Verifies documents
-- Applies weighted scoring
-
-### 4️⃣ Applicant
-- Creates profile
-- Applies to scholarships
-- Tracks application status
-- Receives notifications
-
----
-
-## 🗄 Database Design Highlights
-
-Implements:
-- Multi-Tenancy Architecture
-- Role-Based Access Control (RBAC)
-- Logical isolation of organizations
-- Conflict detection & fraud prevention
-
+## 📄 License
+MIT License
