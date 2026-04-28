@@ -276,7 +276,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 
 <!-- NAVBAR (from browse page) -->
 <nav class="navbar">
-  <a class="nav-logo" href="#">
+  <a class="nav-logo" href="{{ route('dashboard') }}" style="text-decoration:none">
     <div class="logo-box">🎓</div>
     <span class="logo-text">ScholarLink</span>
   </a>
@@ -302,18 +302,18 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sb-section-label">Main</div>
-    <a class="sb-nav-item active" href="#">
+    <a class="sb-nav-item active" href="{{ route('dashboard') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
         Dashboard
     </a>
-    <a class="sb-nav-item" href="#">
+    <a class="sb-nav-item" href="{{ route('scholarships.index') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Browse Scholarships
     </a>
-    <a class="sb-nav-item" href="#">
+    <a class="sb-nav-item" href="{{ route('applications.index') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
         My Applications
-        <span class="sb-badge">3</span>
+        <span class="sb-badge">{{ $stats['active_applications'] }}</span>
     </a>
 
     <div class="sb-section-label">Resources</div>
@@ -321,25 +321,25 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
         Document Wallet
     </a>
-    <a class="sb-nav-item" href="#">
+    <a class="sb-nav-item" href="{{ route('applicant.saved') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
         Saved
-        <span class="sb-badge teal">5</span>
+        <span class="sb-badge teal">{{ $stats['saved'] }}</span>
     </a>
-    <a class="sb-nav-item" href="#">
+    <a class="sb-nav-item" href="{{ route('scholarships.index') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         AI Recommendations
     </a>
 
     <div class="sb-section-label">Account</div>
-    <a class="sb-nav-item" href="#">
+    <a class="sb-nav-item" href="{{ route('profile.show') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
         My Profile
     </a>
-    <a class="sb-nav-item" href="#">
+    <a class="sb-nav-item" href="{{ route('notifications.index') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Notifications
-        <span class="sb-badge">2</span>
+        <span class="sb-badge">{{ $notifications->count() }}</span>
     </a>
 
     <a class="sb-nav-item text-red-600 hover:bg-red-50" href="#" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-logout')">
@@ -370,10 +370,10 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="hero-eyebrow">Good Afternoon</div>
         <div class="hero-name">Kamusta, <em>{{ $user->first_name }}!</em></div>
         <div class="hero-sub">You have {{ $upcomingDeadlines->count() }} deadlines this week and {{ $stats['ai_matched'] }} new AI-matched scholarships ready.</div>
-        <button class="btn-ai">
+        <a href="{{ route('scholarships.index') }}" class="btn-ai" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
           View AI Recommendations
-        </button>
+        </a>
       </div>
       <div class="hero-right">
         <div class="hero-right-label">Profile Completeness</div>
@@ -436,7 +436,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
           </div>
           <div class="sec-sub">Based on your GPA, income bracket &amp; course — updated today.</div>
         </div>
-        <a class="see-all" href="#">See all {{ $stats['ai_matched'] }} →</a>
+        <a class="see-all" href="{{ route('scholarships.index') }}">See all {{ $stats['ai_matched'] }} →</a>
       </div>
       <div class="ai-scroll">
 
@@ -457,14 +457,17 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
           <div class="mc-score-lbl">Match Score</div>
           <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill {{ $isTop ? 'gold' : '' }}" style="width:{{ $matchScore }}%"></div></div><span class="mc-pct">{{ round($matchScore) }}%</span></div>
           @endif
-          <div class="mc-btn-row"><button class="btn-apply-full">Apply Now</button></div>
+          <div class="mc-btn-row">
+            <a href="{{ route('applications.create', $scholarship->id) }}" class="btn-apply-full" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Apply Now</a>
+            <a href="{{ route('scholarships.show', $scholarship->id) }}" class="btn-view" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">View</a>
+          </div>
         </div>
         @empty
         <div class="match-card">
           <div class="mc-top"><span class="mc-cat">No matches</span></div>
           <div class="mc-name">Complete your profile</div>
           <div class="mc-org">Add your GPA and income details to get personalized scholarship recommendations.</div>
-          <div class="mc-btn-row"><button class="btn-view">Set Up Profile</button></div>
+          <div class="mc-btn-row"><a href="{{ route('profile.show') }}" class="btn-view" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Set Up Profile</a></div>
         </div>
         @endforelse
 
@@ -479,7 +482,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="panel section">
           <div class="sec-hd" style="margin-bottom:10px;">
             <div class="sec-title">Active Applications</div>
-            <a class="see-all" href="#">View all →</a>
+            <a class="see-all" href="{{ route('applications.index') }}">View all →</a>
           </div>
 
           @forelse($activeApplications as $application)
@@ -491,7 +494,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
               $stages = ['submitted' => 1, 'doc_review' => 2, 'scoring' => 3, 'interview' => 4, 'decided' => 5];
               $currentStage = $stages[$stage] ?? 1;
           @endphp
-          <div class="app-item">
+          <a href="{{ route('applications.track', $application->id) }}" class="app-item" style="text-decoration:none">
             <div class="app-avatar" style="background:#F0FAFA;">{{ $initials }}</div>
             <div class="app-info">
               <div class="app-name">{{ $scholarship->name ?? 'Scholarship' }}</div>
@@ -513,7 +516,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
               <span class="app-status-tag review">Pending</span>
               @endif
             </div>
-          </div>
+          </a>
           @empty
           <div class="app-item">
             <div class="app-info">
@@ -530,20 +533,20 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
             <div class="sec-title">Quick Actions</div>
             </div>
             <div class="qa-row">
-            <div class="qa-card">
+            <a href="{{ route('scholarships.index') }}" class="qa-card" style="text-decoration:none">
               <div class="qa-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               </div>
               <div class="qa-label">Browse All</div>
               <div class="qa-hint">Find scholarships</div>
-            </div>
-            <div class="qa-card">
+            </a>
+            <a href="{{ route('applicant.documents.index') }}" class="qa-card" style="text-decoration:none">
               <div class="qa-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               </div>
               <div class="qa-label">Upload Docs</div>
               <div class="qa-hint">Add to wallet</div>
-            </div>
+            </a>
           </div>
         </div>
       </div>
@@ -554,7 +557,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="panel">
           <div class="sec-hd" style="margin-bottom:10px;">
             <div class="sec-title">Upcoming Deadlines</div>
-            <a class="see-all" href="#">Calendar →</a>
+            <a class="see-all" href="{{ route('applications.index') }}">All Deadlines →</a>
           </div>
 
           @forelse($upcomingDeadlines as $application)
@@ -565,7 +568,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
               $isUrgent = $daysLeft !== null && $daysLeft <= 3;
               $isSoon = $daysLeft !== null && $daysLeft <= 7;
           @endphp
-          <div class="deadline-item">
+          <a href="{{ route('applications.track', $application->id) }}" class="deadline-item" style="text-decoration:none">
             <div class="dl-cal {{ $isUrgent ? 'urgent' : 'normal' }}">
               <div class="dl-day">{{ $deadline ? \Carbon\Carbon::parse($deadline)->format('d') : '--' }}</div>
               <div class="dl-month">{{ $deadline ? \Carbon\Carbon::parse($deadline)->format('M') : '' }}</div>
@@ -584,7 +587,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                 @endif
               </div>
             </div>
-          </div>
+          </a>
           @empty
           <div class="deadline-item">
             <div class="dl-info">
@@ -599,7 +602,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="panel">
           <div class="sec-hd" style="margin-bottom:10px;">
             <div class="sec-title">Notifications</div>
-            <a class="see-all" href="#">View all →</a>
+            <a class="see-all" href="{{ route('notifications.index') }}">View all →</a>
           </div>
 
           @forelse($notifications as $notif)
