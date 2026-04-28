@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ScholarLink – Apply</title>
+@extends('layouts.applicant')
+
+@section('title', 'ScholarLink - Apply')
+
+@push('styles')
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --teal:#0F4C5C;
   --teal-mid:#1a6878;
@@ -30,13 +28,12 @@
   --r:10px;
   --r-lg:14px;
 }
-body{
-  font-family:"DM Sans",sans-serif;
+.wizard-container{
   background:linear-gradient(135deg,#0F4C5C 0%,#1A6B7A 100%);
-  min-height:100vh;
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
   padding:40px 16px 60px;
-  color:var(--ink);
+  border-radius: 18px;
+  min-height: calc(100vh - 120px);
 }
 .wizard{width:100%;max-width:900px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 24px 64px rgba(0,0,0,.30)}
 .wizard.is-success .stepper-wrap{display:none}
@@ -153,392 +150,397 @@ body{
 .btn-primary-outline{padding:11px 22px;border-radius:var(--r-lg);border:1.5px solid var(--mist);background:var(--white);font-size:13px;font-weight:600;color:var(--ink);cursor:pointer;transition:all .15s;font-family:"DM Sans",sans-serif;min-width:160px}
 .btn-primary-outline:hover{border-color:var(--teal);color:var(--teal)}
 </style>
-</head>
-<body>
+@endpush
 
-<form
-  id="apply-form"
-  method="POST"
-  action="{{ route('applications.store', $scholarship->id) }}"
-  enctype="multipart/form-data"
->
-@csrf
-<input type="hidden" name="scholarship_id" value="{{ $scholarship->id }}">
+@section('content')
+<div class="wizard-container">
+    <form
+      id="apply-form"
+      method="POST"
+      action="{{ route('applications.store', $scholarship->id) }}"
+      enctype="multipart/form-data"
+      style="width: 100%; max-width: 900px;"
+    >
+    @csrf
+    <input type="hidden" name="scholarship_id" value="{{ $scholarship->id }}">
 
-<div class="wizard" id="wizard">
+    <div class="wizard" id="wizard">
 
-  {{-- ── Stepper ── --}}
-  <div class="stepper-wrap">
-    <div class="stepper" id="stepper">
-      <div class="step-item active" id="sn1">
-        <div class="step-circle"><span class="step-number">1</span></div>
-        <div class="step-label">Review<br>Requirements</div>
-      </div>
-      <div class="step-item" id="sn2">
-        <div class="step-circle"><span class="step-number">2</span></div>
-        <div class="step-label">Select<br>Documents</div>
-      </div>
-      <div class="step-item" id="sn3">
-        <div class="step-circle"><span class="step-number">3</span></div>
-        <div class="step-label">Confirm &amp;<br>Submit</div>
-      </div>
-    </div>
-  </div>
-
-  {{-- ── Alert bar — Step 1 only ── --}}
-  <div class="alerts-bar" id="alerts-bar">
-    <p class="panel-hint top-hint">Check that you meet all eligibility criteria before proceeding with your scholarship application.</p>
-    <div class="alert alert-blue">
-      <span class="alert-star">★</span>
-      <span>Scholarship: {{ $scholarship->name }}</span>
-    </div>
-    @php
-      $pendingCount = collect($eligibility)->filter(fn($e) => $e['pass'] === null)->count();
-    @endphp
-    @if($pendingCount > 0)
-    <div class="alert alert-gold">
-      <span class="alert-dot"></span>
-      <span>
-        {{ $pendingCount }} eligibility item{{ $pendingCount > 1 ? 's' : '' }}
-        need{{ $pendingCount === 1 ? 's' : '' }} attention — you may still proceed.
-      </span>
-    </div>
-    @endif
-  </div>
-
-  <div class="panel active" id="panel-1">
-    <div class="two-col">
-
-      <div>
-        <div class="sec-label">Requirements checklist</div>
-        <div class="req-list">
-
-          {{-- GPA --}}
-          @php $gpa = $eligibility['gpa']; @endphp
-          <div class="req-item">
-            <div class="req-check {{ $gpa['pass'] ? 'ok' : 'warn' }}">{{ $gpa['pass'] ? '✓' : '' }}</div>
-            <div>
-              GPA of {{ $scholarship->gpa_requirement }} or better
-              <span class="req-sub">
-                Your GWA: {{ number_format((float) $profile->gwa, 2) }} —
-                {{ $gpa['pass'] ? 'qualifies' : 'does not qualify' }}
-              </span>
-            </div>
+      {{-- ── Stepper ── --}}
+      <div class="stepper-wrap">
+        <div class="stepper" id="stepper">
+          <div class="step-item active" id="sn1">
+            <div class="step-circle"><span class="step-number">1</span></div>
+            <div class="step-label">Review<br>Requirements</div>
           </div>
-
-          {{-- Income --}}
-          @php $inc = $eligibility['income']; @endphp
-          <div class="req-item">
-            <div class="req-check {{ $inc['pass'] === true ? 'ok' : 'warn' }}">{{ $inc['pass'] === true ? '✓' : '' }}</div>
-            <div>
-              Annual family income
-              <span class="req-sub">Limit: {{ $scholarship->income_bracket }} — income not yet verified</span>
-            </div>
+          <div class="step-item" id="sn2">
+            <div class="step-circle"><span class="step-number">2</span></div>
+            <div class="step-label">Select<br>Documents</div>
           </div>
-
-          {{-- No concurrent scholarship --}}
-          @php $conc = $eligibility['concurrent']; @endphp
-          <div class="req-item">
-            <div class="req-check {{ $conc['pass'] ? 'ok' : 'warn' }}">{{ $conc['pass'] ? '✓' : '' }}</div>
-            <div>No active scholarship grant</div>
+          <div class="step-item" id="sn3">
+            <div class="step-circle"><span class="step-number">3</span></div>
+            <div class="step-label">Confirm &amp;<br>Submit</div>
           </div>
-
-          {{-- Enrollment --}}
-          @php $enr = $eligibility['enrollment']; @endphp
-          <div class="req-item">
-            <div class="req-check {{ $enr['pass'] ? 'ok' : 'warn' }}">{{ $enr['pass'] ? '✓' : '' }}</div>
-            <div>Currently enrolled (college level)</div>
-          </div>
-
-          {{-- Endorsement letter — always shows as pending until Step 2 --}}
-          <div class="req-item">
-            <div class="req-check warn"></div>
-            <div>
-              Endorsement letter from school
-              <span class="req-sub">Must be uploaded in Step 2</span>
-            </div>
-          </div>
-
         </div>
       </div>
 
-      {{-- Eligibility results — loops over $eligibility from controller --}}
-      <div>
-        <div class="sec-label">Eligibility check results</div>
-        <div class="elig-table">
-          @foreach($eligibility as $item)
-          <div class="elig-row">
-            <span class="elig-key">{{ $item['label'] }}</span>
-            <span class="badge {{ $item['badgeClass'] }}">{{ $item['badge'] }}</span>
-          </div>
-          @endforeach
+      {{-- ── Alert bar — Step 1 only ── --}}
+      <div class="alerts-bar" id="alerts-bar">
+        <p class="panel-hint top-hint">Check that you meet all eligibility criteria before proceeding with your scholarship application.</p>
+        <div class="alert alert-blue">
+          <span class="alert-star">★</span>
+          <span>Scholarship: {{ $scholarship->name }}</span>
         </div>
-      </div>
-
-    </div>
-    <div class="footer-nav">
-      <span class="step-counter">Step 1 of 3</span>
-      <button type="button" class="btn-next" onclick="goTo(2)">Next </button>
-    </div>
-  </div>
-
-  <div class="panel" id="panel-2">
-    <p class="panel-hint">Pick from your saved documents or upload new files. All items are required unless marked optional.</p>
-
-    <div class="doc-cols">
-      @foreach($documentGroups as $group)
-      <div class="doc-group">
-        <div class="doc-group-title">{{ $group['groupTitle'] }}</div>
-
-        @foreach($group['slots'] as $slot)
         @php
-          $matches     = $savedDocuments->where('document_type', $slot['document_type']);
-          $slug        = Str::slug($slot['document_type']);
-          $preSelected = $matches->firstWhere('status', 'verified');
+          $pendingCount = collect($eligibility)->filter(fn($e) => $e['pass'] === null)->count();
         @endphp
-
-        <div class="doc-subcard">
-          <div class="doc-card-label">
-            {{ $slot['label'] }}
-            @if(!empty($slot['smallNote']))<small>({{ $slot['smallNote'] }})</small>@endif
-            @if($slot['optional'])<small style="color:var(--slate);font-weight:400">Optional</small>@endif
-          </div>
-
-          {{-- Saved documents from the vault --}}
-          @foreach($matches as $doc)
-          @php
-            $ext   = strtoupper(pathinfo($doc->file_url, PATHINFO_EXTENSION));
-            $isImg = in_array($ext, ['PNG','JPG','JPEG']);
-            $isPre = $preSelected && $preSelected->id === $doc->id;
-            $statusColor = match($doc->status) {
-              'verified' => 'var(--green)',
-              'pending'  => '#92700a',
-              default    => 'var(--red)',
-            };
-          @endphp
-          <div
-            class="doc-file"
-            onclick="selectDoc('{{ $slug }}', {{ $doc->id }}, '{{ basename($doc->file_url) }}', this)"
-            data-doc-id="{{ $doc->id }}"
-          >
-            <div class="file-icon {{ $isImg ? 'img' : '' }}">{{ substr($ext,0,3) }}</div>
-            <div class="file-meta">
-              <div class="file-name">{{ basename($doc->file_url) }}</div>
-              <div class="file-size" style="color:{{ $statusColor }}">{{ ucfirst($doc->status) }}</div>
-            </div>
-            <div class="radio {{ $isPre ? 'sel' : '' }}" id="radio-{{ $doc->id }}"></div>
-            {{-- Real radio — carries doc ID in POST --}}
-            <input
-              type="radio"
-              name="documents[{{ $slug }}]"
-              value="{{ $doc->id }}"
-              style="display:none"
-              id="doc-radio-{{ $doc->id }}"
-              {{ $isPre ? 'checked' : '' }}
-            >
-          </div>
-          @endforeach
-
-          {{-- Upload new file — real file input overlaid on the button --}}
-          <div class="upload-trigger" id="upload-trigger-{{ $slug }}">
-            <div class="upload-icon-box">↑</div>
-            <div class="upload-text" id="upload-text-{{ $slug }}">
-              <strong>Upload new file</strong><br>PDF, JPG, PNG up to 5MB
-            </div>
-            <input
-              type="file"
-              name="uploads[{{ $slug }}]"
-              accept=".pdf,.jpg,.jpeg,.png"
-              class="real-file-input"
-              data-slug="{{ $slug }}"
-              onchange="handleUpload(this)"
-            >
-          </div>
-        </div>
-        @endforeach
-
-      </div>
-      @endforeach
-    </div>
-
-    {{-- Endorsement letter — separate row below the 3-col grid --}}
-    @php $endorseSlug = Str::slug($endorsementSlot['document_type']); @endphp
-    <div class="doc-endorsement">
-      <div class="doc-group-title">{{ $endorsementSlot['groupTitle'] }}</div>
-      <div class="doc-subcard">
-        <div class="doc-card-label">{{ $endorsementSlot['label'] }}</div>
-        <div class="upload-trigger" id="upload-trigger-{{ $endorseSlug }}">
-          <div class="upload-icon-box">↑</div>
-          <div class="upload-text" id="upload-text-{{ $endorseSlug }}">
-            <strong>Upload new file</strong><br>PDF, JPG, PNG up to 5MB
-          </div>
-          <input
-            type="file"
-            name="uploads[{{ $endorseSlug }}]"
-            accept=".pdf,.jpg,.jpeg,.png"
-            class="real-file-input"
-            data-slug="{{ $endorseSlug }}"
-            onchange="handleUpload(this)"
-          >
-        </div>
-      </div>
-    </div>
-
-    <div class="footer-nav">
-      <button type="button" class="btn-back" onclick="goTo(1)">Back</button>
-      <div style="display:flex;align-items:center;gap:14px">
-        <span class="step-counter">Step 2 of 3</span>
-        <button type="button" class="btn-next" onclick="goTo(3)">Next </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel" id="panel-3">
-    <p class="panel-hint">Review your application carefully. You will not be able to make changes after submission.</p>
-
-    {{-- Scholarship & applicant details --}}
-    <div class="confirm-block">
-      <div class="confirm-heading">Scholarship details</div>
-      <div class="confirm-table">
-        <div class="confirm-row"><span class="ck">Scholarship</span><span class="cv">{{ $scholarship->name }}</span></div>
-        <div class="confirm-row"><span class="ck">Provider</span><span class="cv">{{ $scholarship->provider_name }}</span></div>
-        <div class="confirm-row"><span class="ck">Applicant</span><span class="cv">{{ $applicant->first_name }} {{ $applicant->last_name }}</span></div>
-        <div class="confirm-row"><span class="ck">Course &amp; Year</span><span class="cv">{{ $profile->course_program }}, {{ $profile->year_level }}</span></div>
-        <div class="confirm-row"><span class="ck">School</span><span class="cv">{{ $profile->university_name }}</span></div>
-        <div class="confirm-row"><span class="ck">Academic year</span><span class="cv">{{ $profile->academic_year }} — {{ $profile->semester }} Semester</span></div>
-        <div class="confirm-row"><span class="ck">Student number</span><span class="cv">{{ $profile->student_number }}</span></div>
-        <div class="confirm-row">
-          <span class="ck">GWA ({{ $profile->gwa_scale }} scale)</span>
-          <span class="cv ok">{{ number_format((float) $profile->gwa, 2) }} — qualifies</span>
-        </div>
-        <div class="confirm-row">
-          <span class="ck">Monthly household income</span>
-          <span class="cv">
-            ₱{{ number_format((float) $profile->monthly_household_income) }}
-            (₱{{ number_format(((float) $profile->monthly_household_income) * 12) }}/yr)
+        @if($pendingCount > 0)
+        <div class="alert alert-gold">
+          <span class="alert-dot"></span>
+          <span>
+            {{ $pendingCount }} eligibility item{{ $pendingCount > 1 ? 's' : '' }}
+            need{{ $pendingCount === 1 ? 's' : '' }} attention — you may still proceed.
           </span>
         </div>
-        <div class="confirm-row"><span class="ck">Household dependents</span><span class="cv">{{ $profile->num_dependents }}</span></div>
-        <div class="confirm-row"><span class="ck">Breadwinner status</span><span class="cv">{{ $profile->is_breadwinner }}</span></div>
-        <div class="confirm-row">
-          <span class="ck">4Ps beneficiary</span>
-          <span class="cv">{{ $profile->is_4ps ? 'Yes' : 'No' }}</span>
+        @endif
+      </div>
+
+      <div class="panel active" id="panel-1">
+        <div class="two-col">
+
+          <div>
+            <div class="sec-label">Requirements checklist</div>
+            <div class="req-list">
+
+              {{-- GPA --}}
+              @php $gpa = $eligibility['gpa']; @endphp
+              <div class="req-item">
+                <div class="req-check {{ $gpa['pass'] ? 'ok' : 'warn' }}">{{ $gpa['pass'] ? '✓' : '' }}</div>
+                <div>
+                  GPA of {{ $scholarship->gpa_requirement }} or better
+                  <span class="req-sub">
+                    Your GWA: {{ number_format((float) $profile->gwa, 2) }} —
+                    {{ $gpa['pass'] ? 'qualifies' : 'does not qualify' }}
+                  </span>
+                </div>
+              </div>
+
+              {{-- Income --}}
+              @php $inc = $eligibility['income']; @endphp
+              <div class="req-item">
+                <div class="req-check {{ $inc['pass'] === true ? 'ok' : 'warn' }}">{{ $inc['pass'] === true ? '✓' : '' }}</div>
+                <div>
+                  Annual family income
+                  <span class="req-sub">Limit: {{ $scholarship->income_bracket }} — income not yet verified</span>
+                </div>
+              </div>
+
+              {{-- No concurrent scholarship --}}
+              @php $conc = $eligibility['concurrent']; @endphp
+              <div class="req-item">
+                <div class="req-check {{ $conc['pass'] ? 'ok' : 'warn' }}">{{ $conc['pass'] ? '✓' : '' }}</div>
+                <div>No active scholarship grant</div>
+              </div>
+
+              {{-- Enrollment --}}
+              @php $enr = $eligibility['enrollment']; @endphp
+              <div class="req-item">
+                <div class="req-check {{ $enr['pass'] ? 'ok' : 'warn' }}">{{ $enr['pass'] ? '✓' : '' }}</div>
+                <div>Currently enrolled (college level)</div>
+              </div>
+
+              {{-- Endorsement letter — always shows as pending until Step 2 --}}
+              <div class="req-item">
+                <div class="req-check warn"></div>
+                <div>
+                  Endorsement letter from school
+                  <span class="req-sub">Must be uploaded in Step 2</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {{-- Eligibility results — loops over $eligibility from controller --}}
+          <div>
+            <div class="sec-label">Eligibility check results</div>
+            <div class="elig-table">
+              @foreach($eligibility as $item)
+              <div class="elig-row">
+                <span class="elig-key">{{ $item['label'] }}</span>
+                <span class="badge {{ $item['badgeClass'] }}">{{ $item['badge'] }}</span>
+              </div>
+              @endforeach
+            </div>
+          </div>
+
+        </div>
+        <div class="footer-nav">
+          <span class="step-counter">Step 1 of 3</span>
+          <button type="button" class="btn-next" onclick="goTo(2)">Next </button>
         </div>
       </div>
-    </div>
 
-    {{-- Eligibility results --}}
-    <div class="confirm-block">
-      <div class="confirm-heading">Eligibility results</div>
-      <div class="confirm-table">
-        @foreach($eligibility as $item)
-        @php $cls = $item['pass'] === true ? 'ok' : ($item['pass'] === null ? 'pending' : 'none'); @endphp
-        <div class="confirm-row">
-          <span class="ck">{{ $item['label'] }}</span>
-          <span class="cv {{ $cls }}">{{ $item['badge'] }}</span>
-        </div>
-        @endforeach
-      </div>
-    </div>
+      <div class="panel" id="panel-2">
+        <p class="panel-hint">Pick from your saved documents or upload new files. All items are required unless marked optional.</p>
 
-    {{-- Documents submitted — rows start with Blade-seeded values,
-         then JS updates them as the user changes selection in Step 2 --}}
-    <div class="confirm-block">
-      <div class="confirm-heading">Documents submitted</div>
-      <div class="confirm-table">
-        @foreach($documentGroups as $group)
-          @foreach($group['slots'] as $slot)
-          @php
-            $slug     = Str::slug($slot['document_type']);
-            $preMatch = $savedDocuments->where('document_type', $slot['document_type'])->firstWhere('status', 'verified');
-          @endphp
-          <div class="confirm-row">
-            <span class="ck">{{ $slot['label'] }}</span>
-            <span class="cv {{ $preMatch ? '' : 'none' }}" id="confirm-val-{{ $slug }}">
-              {{ $preMatch ? basename($preMatch->file_url) : 'Not selected' }}
-            </span>
+        <div class="doc-cols">
+          @foreach($documentGroups as $group)
+          <div class="doc-group">
+            <div class="doc-group-title">{{ $group['groupTitle'] }}</div>
+
+            @foreach($group['slots'] as $slot)
+            @php
+              $matches     = $savedDocuments->where('document_type', $slot['document_type']);
+              $slug        = Str::slug($slot['document_type']);
+              $preSelected = $matches->firstWhere('status', 'verified');
+            @endphp
+
+            <div class="doc-subcard">
+              <div class="doc-card-label">
+                {{ $slot['label'] }}
+                @if(!empty($slot['smallNote']))<small>({{ $slot['smallNote'] }})</small>@endif
+                @if($slot['optional'])<small style="color:var(--slate);font-weight:400">Optional</small>@endif
+              </div>
+
+              {{-- Saved documents from the vault --}}
+              @foreach($matches as $doc)
+              @php
+                $ext   = strtoupper(pathinfo($doc->file_url, PATHINFO_EXTENSION));
+                $isImg = in_array($ext, ['PNG','JPG','JPEG']);
+                $isPre = $preSelected && $preSelected->id === $doc->id;
+                $statusColor = match($doc->status) {
+                  'verified' => 'var(--green)',
+                  'pending'  => '#92700a',
+                  default    => 'var(--red)',
+                };
+              @endphp
+              <div
+                class="doc-file"
+                onclick="selectDoc('{{ $slug }}', {{ $doc->id }}, '{{ basename($doc->file_url) }}', this)"
+                data-doc-id="{{ $doc->id }}"
+              >
+                <div class="file-icon {{ $isImg ? 'img' : '' }}">{{ substr($ext,0,3) }}</div>
+                <div class="file-meta">
+                  <div class="file-name">{{ basename($doc->file_url) }}</div>
+                  <div class="file-size" style="color:{{ $statusColor }}">{{ ucfirst($doc->status) }}</div>
+                </div>
+                <div class="radio {{ $isPre ? 'sel' : '' }}" id="radio-{{ $doc->id }}"></div>
+                {{-- Real radio — carries doc ID in POST --}}
+                <input
+                  type="radio"
+                  name="documents[{{ $slug }}]"
+                  value="{{ $doc->id }}"
+                  style="display:none"
+                  id="doc-radio-{{ $doc->id }}"
+                  {{ $isPre ? 'checked' : '' }}
+                >
+              </div>
+              @endforeach
+
+              {{-- Upload new file — real file input overlaid on the button --}}
+              <div class="upload-trigger" id="upload-trigger-{{ $slug }}">
+                <div class="upload-icon-box">↑</div>
+                <div class="upload-text" id="upload-text-{{ $slug }}">
+                  <strong>Upload new file</strong><br>PDF, JPG, PNG up to 5MB
+                </div>
+                <input
+                  type="file"
+                  name="uploads[{{ $slug }}]"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  class="real-file-input"
+                  data-slug="{{ $slug }}"
+                  onchange="handleUpload(this)"
+                >
+              </div>
+            </div>
+            @endforeach
+
           </div>
           @endforeach
-        @endforeach
+        </div>
 
-        {{-- Endorsement letter row --}}
-        <div class="confirm-row">
-          <span class="ck">{{ $endorsementSlot['label'] }}</span>
-          <span class="cv pending" id="confirm-val-{{ $endorseSlug }}">Pending upload</span>
+        {{-- Endorsement letter — separate row below the 3-col grid --}}
+        @php $endorseSlug = Str::slug($endorsementSlot['document_type']); @endphp
+        <div class="doc-endorsement">
+          <div class="doc-group-title">{{ $endorsementSlot['groupTitle'] }}</div>
+          <div class="doc-subcard">
+            <div class="doc-card-label">{{ $endorsementSlot['label'] }}</div>
+            <div class="upload-trigger" id="upload-trigger-{{ $endorseSlug }}">
+              <div class="upload-icon-box">↑</div>
+              <div class="upload-text" id="upload-text-{{ $endorseSlug }}">
+                <strong>Upload new file</strong><br>PDF, JPG, PNG up to 5MB
+              </div>
+              <input
+                type="file"
+                name="uploads[{{ $endorseSlug }}]"
+                accept=".pdf,.jpg,.jpeg,.png"
+                class="real-file-input"
+                data-slug="{{ $endorseSlug }}"
+                onchange="handleUpload(this)"
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-nav">
+          <button type="button" class="btn-back" onclick="goTo(1)">Back</button>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span class="step-counter">Step 2 of 3</span>
+            <button type="button" class="btn-next" onclick="goTo(3)">Next </button>
+          </div>
         </div>
       </div>
-    </div>
 
-    {{-- Certify checkbox — must be checked before POST is allowed --}}
-    <label class="certify-box" id="certify-label">
-      <input type="checkbox" name="certified" id="certify" value="1"
-             onchange="this.closest('.certify-box').classList.remove('error')"/>
-      I certify that all information and documents submitted are true, correct, and complete.
-      I understand that any misrepresentation may result in disqualification and legal action under applicable laws.
-    </label>
+      <div class="panel" id="panel-3">
+        <p class="panel-hint">Review your application carefully. You will not be able to make changes after submission.</p>
 
-    <div class="footer-nav">
-      <button type="button" class="btn-back" onclick="goTo(2)">Back</button>
-      <div style="display:flex;align-items:center;gap:14px">
-        <span class="step-counter">Step 3 of 3</span>
-        <button type="submit" class="btn-submit" onclick="return guardSubmit()">Submit Application</button>
-      </div>
-    </div>
-  </div>
+        {{-- Scholarship & applicant details --}}
+        <div class="confirm-block">
+          <div class="confirm-heading">Scholarship details</div>
+          <div class="confirm-table">
+            <div class="confirm-row"><span class="ck">Scholarship</span><span class="cv">{{ $scholarship->name }}</span></div>
+            <div class="confirm-row"><span class="ck">Provider</span><span class="cv">{{ $scholarship->provider_name }}</span></div>
+            <div class="confirm-row"><span class="ck">Applicant</span><span class="cv">{{ $applicant->first_name }} {{ $applicant->last_name }}</span></div>
+            <div class="confirm-row"><span class="ck">Course &amp; Year</span><span class="cv">{{ $profile->course_program }}, {{ $profile->year_level }}</span></div>
+            <div class="confirm-row"><span class="ck">School</span><span class="cv">{{ $profile->university_name }}</span></div>
+            <div class="confirm-row"><span class="ck">Academic year</span><span class="cv">{{ $profile->academic_year }} — {{ $profile->semester }} Semester</span></div>
+            <div class="confirm-row"><span class="ck">Student number</span><span class="cv">{{ $profile->student_number }}</span></div>
+            <div class="confirm-row">
+              <span class="ck">GWA ({{ $profile->gwa_scale }} scale)</span>
+              <span class="cv ok">{{ number_format((float) $profile->gwa, 2) }} — qualifies</span>
+            </div>
+            <div class="confirm-row">
+              <span class="ck">Monthly household income</span>
+              <span class="cv">
+                ₱{{ number_format((float) $profile->monthly_household_income) }}
+                (₱{{ number_format(((float) $profile->monthly_household_income) * 12) }}/yr)
+              </span>
+            </div>
+            <div class="confirm-row"><span class="ck">Household dependents</span><span class="cv">{{ $profile->num_dependents }}</span></div>
+            <div class="confirm-row"><span class="ck">Breadwinner status</span><span class="cv">{{ $profile->is_breadwinner }}</span></div>
+            <div class="confirm-row">
+              <span class="ck">4Ps beneficiary</span>
+              <span class="cv">{{ $profile->is_4ps ? 'Yes' : 'No' }}</span>
+            </div>
+          </div>
+        </div>
 
-  @if(session('application_submitted'))
-  @php $flash = session('application_submitted'); @endphp
-  <div class="success-panel active" id="panel-success">
-    <div class="success-check">
-      <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M6 14.5l5.5 5.5 10.5-11" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </div>
-    <div class="success-title">Application Submitted!</div>
-    <div class="success-note">
-      Your application for <strong>{{ $flash['scholarship_name'] }}</strong> has been received. You'll get updates via email and SMS.
-    </div>
-    <div class="appid-label">Application ID</div>
-    <div class="appid-badge">{{ $flash['reference_code'] }}</div><br>
-    <div class="review-pill">
-      <span></span>
-      Estimated review: 7–14 days
-    </div>
-    <div class="progress-steps">
-      <div class="progress-step">
-        <div class="ps-circle done">✓</div>
-        <span class="ps-label done">Application submitted</span>
-      </div>
-      <div class="progress-step">
-        <div class="ps-circle">2</div>
-        <span class="ps-label">Document verification</span>
-      </div>
-      <div class="progress-step">
-        <div class="ps-circle">3</div>
-        <span class="ps-label">Evaluation and scoring</span>
-      </div>
-      <div class="progress-step">
-        <div class="ps-circle">4</div>
-        <span class="ps-label">Final decision</span>
-      </div>
-    </div>
-    <hr class="success-divider"/>
-    <div class="success-actions">
-      <button type="button" class="btn-secondary"
-        onclick="window.location='{{ route('scholarships.index') }}'">
-        Browse more scholarships
-      </button>
-      <button type="button" class="btn-primary-outline"
-        onclick="window.location='{{ route('applications.show', $flash['application_id']) }}'">
-        Track my application
-      </button>
-    </div>
-  </div>
-  @endif
+        {{-- Eligibility results --}}
+        <div class="confirm-block">
+          <div class="confirm-heading">Eligibility results</div>
+          <div class="confirm-table">
+            @foreach($eligibility as $item)
+            @php $cls = $item['pass'] === true ? 'ok' : ($item['pass'] === null ? 'pending' : 'none'); @endphp
+            <div class="confirm-row">
+              <span class="ck">{{ $item['label'] }}</span>
+              <span class="cv {{ $cls }}">{{ $item['badge'] }}</span>
+            </div>
+            @endforeach
+          </div>
+        </div>
 
+        {{-- Documents submitted — rows start with Blade-seeded values,
+             then JS updates them as the user changes selection in Step 2 --}}
+        <div class="confirm-block">
+          <div class="confirm-heading">Documents submitted</div>
+          <div class="confirm-table">
+            @foreach($documentGroups as $group)
+              @foreach($group['slots'] as $slot)
+              @php
+                $slug     = Str::slug($slot['document_type']);
+                $preMatch = $savedDocuments->where('document_type', $slot['document_type'])->firstWhere('status', 'verified');
+              @endphp
+              <div class="confirm-row">
+                <span class="ck">{{ $slot['label'] }}</span>
+                <span class="cv {{ $preMatch ? '' : 'none' }}" id="confirm-val-{{ $slug }}">
+                  {{ $preMatch ? basename($preMatch->file_url) : 'Not selected' }}
+                </span>
+              </div>
+              @endforeach
+            @endforeach
+
+            {{-- Endorsement letter row --}}
+            <div class="confirm-row">
+              <span class="ck">{{ $endorsementSlot['label'] }}</span>
+              <span class="cv pending" id="confirm-val-{{ $endorseSlug }}">Pending upload</span>
+            </div>
+          </div>
+        </div>
+
+        {{-- Certify checkbox — must be checked before POST is allowed --}}
+        <label class="certify-box" id="certify-label">
+          <input type="checkbox" name="certified" id="certify" value="1"
+                 onchange="this.closest('.certify-box').classList.remove('error')"/>
+          I certify that all information and documents submitted are true, correct, and complete.
+          I understand that any misrepresentation may result in disqualification and legal action under applicable laws.
+        </label>
+
+        <div class="footer-nav">
+          <button type="button" class="btn-back" onclick="goTo(2)">Back</button>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span class="step-counter">Step 3 of 3</span>
+            <button type="submit" class="btn-submit" onclick="return guardSubmit()">Submit Application</button>
+          </div>
+        </div>
+      </div>
+
+      @if(session('application_submitted'))
+      @php $flash = session('application_submitted'); @endphp
+      <div class="success-panel active" id="panel-success">
+        <div class="success-check">
+          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 14.5l5.5 5.5 10.5-11" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="success-title">Application Submitted!</div>
+        <div class="success-note">
+          Your application for <strong>{{ $flash['scholarship_name'] }}</strong> has been received. You'll get updates via email and SMS.
+        </div>
+        <div class="appid-label">Application ID</div>
+        <div class="appid-badge">{{ $flash['reference_code'] }}</div><br>
+        <div class="review-pill">
+          <span></span>
+          Estimated review: 7–14 days
+        </div>
+        <div class="progress-steps">
+          <div class="progress-step">
+            <div class="ps-circle done">✓</div>
+            <span class="ps-label done">Application submitted</span>
+          </div>
+          <div class="progress-step">
+            <div class="ps-circle">2</div>
+            <span class="ps-label">Document verification</span>
+          </div>
+          <div class="progress-step">
+            <div class="ps-circle">3</div>
+            <span class="ps-label">Evaluation and scoring</span>
+          </div>
+          <div class="progress-step">
+            <div class="ps-circle">4</div>
+            <span class="ps-label">Final decision</span>
+          </div>
+        </div>
+        <hr class="success-divider"/>
+        <div class="success-actions">
+          <button type="button" class="btn-secondary"
+            onclick="window.location='{{ route('scholarships.index') }}'">
+            Browse more scholarships
+          </button>
+          <button type="button" class="btn-primary-outline"
+            onclick="window.location='{{ route('applications.show', $flash['application_id']) }}'">
+            Track my application
+          </button>
+        </div>
+      </div>
+      @endif
+
+    </div>
+    </form>
 </div>
-</form>
+@endsection
 
+@push('scripts')
 <script>
 /* ─────────────────────────────────────────────────────────────────
    PAGE INIT
@@ -616,6 +618,4 @@ function guardSubmit() {
   return true;
 }
 </script>
-
-</body>
-</html>
+@endpush
