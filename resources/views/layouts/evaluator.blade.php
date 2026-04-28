@@ -316,13 +316,16 @@
       <span class="icon">👤</span> My Profile
     </a>
     
-    <div class="sidebar-footer">
-      <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
-      <div>
-        <div class="name">{{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}</div>
-        <div class="sub">Evaluator</div>
-      </div>
-    </div>
+    <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; margin-top: auto;">
+      @csrf
+      <button type="submit" class="sidebar-footer" style="width: 100%; border: none; border-top: 1px solid var(--border); background: transparent; cursor: pointer; text-align: left; font-family: inherit; margin-top: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(220,38,38,0.05)'" onmouseout="this.style.background='transparent'" onclick="return confirm('Are you sure you want to log out?');">
+        <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
+        <div>
+          <div class="name">{{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}</div>
+          <div class="sub">Evaluator <span style="font-size: 10px; margin-left: 4px; color: var(--red);">Log Out</span></div>
+        </div>
+      </button>
+    </form>
   </aside>
 
   <div class="main">
