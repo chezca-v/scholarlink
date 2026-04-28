@@ -1,7 +1,7 @@
 @extends('layouts.evaluator')
 
 @section('page_title', 'Application Review')
-@section('page_subtitle', '$application->reference_code ?? 'A-'.$application->id)
+
 
 @section('topnav_actions')
   <a href="{{ route('evaluator.queue') }}" class="btn btn-outline btn-sm">← Back to Queue</a>

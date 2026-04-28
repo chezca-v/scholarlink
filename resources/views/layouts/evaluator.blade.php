@@ -64,8 +64,7 @@
     background: var(--eval-nav-bg); display: flex; align-items: center; padding: 0 24px; gap: 12px;
     z-index: 99; border-bottom: 1.5px solid var(--border);
   }
-  .topnav .page-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 17px; color: var(--ink); flex: 1; }
-  .topnav .page-title small { display: block; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  .topnav .page-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; color: var(--ink); flex: 1; }
   .role-pill { padding: 4px 12px; border-radius: 20px; background: #EFF6FF; border: 1.5px solid #BFDBFE; font-size: 11px; font-weight: 600; color: #1D4ED8; }
   .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: white; border: 1.5px solid var(--border-mid); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--slate); font-size: 16px; transition: all .15s; position: relative; }
   .icon-btn:hover { border-color: var(--primary-light); color: var(--primary); }
@@ -330,7 +329,6 @@
     <nav class="topnav">
       <div class="page-title">
         @yield('page_title', 'Evaluator Pages')
-        <small>@yield('page_subtitle', '/evaluator')</small>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         @yield('topnav_actions')
