@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             // 3. Scholarships — depends on users (created_by)
             ScholarshipSeeder::class,
 
+            // 3.5 Organizations — depends on scholarships and users
+            OrganizationSeeder::class,
+
             // 4. Documents — depends on users
             DocumentSeeder::class,
 

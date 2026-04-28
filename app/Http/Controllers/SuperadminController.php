@@ -184,7 +184,7 @@ class SuperadminController extends Controller
             // Counts
             $userIds = $org->users->pluck('id');
             $scholarships = Scholarship::whereIn('created_by', $userIds)->get();
-            $org->active_scholarships_count = $scholarships->where('is_active', true)->count();
+            $org->active_scholarships_count = $scholarships->where('status', 'open')->count();
             
             $scholarshipIds = $scholarships->pluck('id');
             $org->applicants_count = Application::whereIn('scholarship_id', $scholarshipIds)->count();
