@@ -242,6 +242,41 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .section{margin-bottom:24px;}
 </style>
 
+<button class="fab-ai" title="AI Assistant">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <span class="fab-badge">AI</span>
+</button>
+
+<style>
+.fab-ai{
+  position:fixed;
+  bottom:24px;right:24px;
+  width:54px;height:54px;
+  border-radius:50%;
+  background:linear-gradient(160deg,#0F4C5C,#2A8FA0);
+  border:none;
+  color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  box-shadow:0 6px 24px rgba(15,76,92,0.35);
+  z-index:400;
+  transition:transform .2s ease, box-shadow .2s ease;
+  position:fixed;
+}
+.fab-ai:hover{transform:scale(1.08);box-shadow:0 10px 32px rgba(15,76,92,0.45);}
+.fab-badge{
+  position:absolute;
+  top:2px;right:2px;
+  background:var(--amber);
+  color:#fff;
+  font-family:'DM Sans',sans-serif;
+  font-size:9px;font-weight:800;
+  border-radius:20px;
+  padding:2px 5px;
+  border:2px solid #fff;
+  line-height:1;
+}
+</style>
 
     @stack('styles')
 </head>
@@ -261,9 +296,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     </button>
     <a class="nav-ibtn" href="{{ route('notifications.index') }}">      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        @if(App\Models\Notification::where('user_id', auth()->id())->whereNull('read_at')->count() > 0)
-        <span class="nbadge"></span>
-      @endif
+            <span class="nbadge"></span>
     </a>
     <div class="nav-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
     <form method="POST" action="{{ route('logout') }}" style="margin:0;">
@@ -320,8 +353,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <a class="sb-nav-item {{ request()->routeIs('notifications.*') ? 'active' : '' }}" href="{{ route('notifications.index') }}">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
         Notifications
-        @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->whereNull('read_at')->count(); @endphp
-        @if($navUnread > 0)
+        @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp        @if($navUnread > 0)
         <span class="sb-badge">{{ $navUnread }}</span>
         @endif
     </a>
