@@ -27,8 +27,20 @@ Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships/{id}', 'show')->name('scholarships.show');
 });
 
+Route::middleware(['auth', 'role:applicant'])->group(function () {
+
+    // Profile setup (available immediately after registration)
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('/profile/setup', 'setup')->name('profile.setup');
+        Route::post('/profile/setup/step-1', 'setupStep1')->name('profile.setup.step1');
+        Route::post('/profile/setup/step-2', 'setupStep2')->name('profile.setup.step2');
+        Route::post('/profile/setup/step-3', 'setupStep3')->name('profile.setup.step3');
+        Route::post('/profile/setup/submit', 'setupSubmit')->name('profile.setup.submit');
+    });
+});
+
 /*
-Applicant Routes (Role: applicant)
+Applicant Routes (Role: applicant + verified)
 */
 Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
 
@@ -36,7 +48,6 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
-        Route::get('/profile/setup', 'setup')->name('profile.setup');
         Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
     });
