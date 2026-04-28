@@ -124,7 +124,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
       Applications
       @php
-          $totalApplied = App\Models\Application::where('user_id', auth()->id())->count();
+          $totalApplied = App\Models\Application::where('applicant_id', auth()->id())->count();
       @endphp
       @if($totalApplied > 0)
         <span class="sb-badge-transparent">{{ $totalApplied }}</span>
@@ -138,7 +138,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       <span class="sb-badge-transparent">{{ $savedCount }}</span>
       @endif
     </a>
-    
+
     <div class="sb-section-label">Account</div>
     <a class="sb-nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}" href="{{ route('profile.show') }}">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -155,9 +155,9 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       <span class="sb-badge">{{ $navUnread }}</span>
       @endif
     </a>
-    
+
     <div class="sb-spacer"></div>
-    
+
     <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
       @csrf
       <button type="submit" class="sb-user-btn" onclick="return confirm('Are you sure you want to log out?');">
