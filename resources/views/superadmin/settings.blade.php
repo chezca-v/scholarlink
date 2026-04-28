@@ -195,7 +195,7 @@
 
     // Send AJAX update
     fetch('{{ route("superadmin.settings.update") }}', {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -206,7 +206,7 @@
 
   function autoSaveFlag(key, enabled) {
     fetch('{{ route("superadmin.settings.update") }}', {
-      method: 'POST',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -218,8 +218,12 @@
   function resetTemplates() {
     if (confirm('Reset all notification templates to default? This cannot be undone.')) {
       fetch('{{ route("superadmin.settings.update") }}', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content }
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content 
+        },
+        body: JSON.stringify({ action: 'reset_templates' })
       }).then(() => location.reload());
     }
   }

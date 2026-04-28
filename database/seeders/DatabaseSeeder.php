@@ -38,6 +38,9 @@ class DatabaseSeeder extends Seeder
 
             // 9. Evaluator assignments — depends on users + scholarships
             EvaluatorAssignmentSeeder::class,
+
+            // 10. System Settings
+            SettingSeeder::class,
         ]);
     }
 }
