@@ -31,7 +31,7 @@
 
   <!-- FILTER + ACTIONS -->
   <div class="card" style="padding: 14px 20px; margin-bottom: 16px;">
-    <form method="GET" action="{{ route('superadmin.organizations.index') }}">
+    <form method="GET" action="{{ route('superadmin.organizations') }}">
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
         <div class="search-wrap" style="flex: 1; min-width: 200px;">
           <span class="search-icon">🔍</span>
