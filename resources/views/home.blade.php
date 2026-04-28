@@ -215,7 +215,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
   <div class="nav-inner">
     <a href="#" class="logo"><div class="logo-mark">🎓</div>ScholarLink</a>
     <ul class="nav-links">
-      <li><a href="#">Browse</a></li>
+      <li><a href="{{ route('scholarships.index') }}">Browse</a></li>
       <li><a href="#">How It Works</a></li>
       <li><a href="#">Organizations</a></li>
       <li><a href="#">About</a></li>
@@ -384,8 +384,8 @@ footer { background: #071820; padding: 64px 48px 32px; }
     <h2 class="cta-title reveal">Your scholarship<br>is <em>waiting for you.</em></h2>
     <p class="cta-sub reveal">Join thousands of Filipino students who found their funding through ScholarLink.</p>
     <div class="cta-btns reveal">
-      <button class="btn-cta-main">🎓 Create Free Account</button>
-      <button class="btn-cta-sec">Browse Scholarships →</button>
+      <a href="{{ route('register') }}" class="btn-cta-main" style="text-decoration: none; display: inline-block;">🎓 Create Free Account</a>
+      <a href="{{ route('scholarships.index') }}" class="btn-cta-sec" style="text-decoration: none; display: inline-block;">Browse Scholarships →</a>
     </div>
     <div class="stats-row reveal">
       <div class="stat"><div class="stat-num">120+</div><div class="stat-label">Active Scholarships</div></div>
