@@ -233,10 +233,10 @@ footer { background: #071820; padding: 64px 48px 32px; }
 <div class="floating-icon" style="bottom: 20%; left: 20%; font-size: 50px;">💡</div>
 <div class="floating-icon" style="bottom: 10%; right: 20%; font-size: 45px;">📘</div>
 
-<div class="hero-badge"><span class="badge-dot"></span>Now live — Philippines' first AI scholarship platform</div>
+<div class="hero-badge"><span class="badge-dot"></span>Now live — Philippines' premier scholarship platform</div>
 
 <h1 class="hero-title" id="typing-text"></h1>
-  <p class="hero-sub">Stop repeating yourself. Build your academic profile once and apply to every scholarship in the Philippines — AI-matched, just for you.</p>
+  <p class="hero-sub">Stop repeating yourself. Build your academic profile once and discover every scholarship opportunity in the Philippines — effortlessly and seamlessly.</p>
   <div class="hero-actions">
     <a href="{{ route('scholarships.index') }}" class="btn-hero-main">🎓 Browse Scholarships</a>
     <button class="btn-hero-text">▶ Watch how it works</button>
@@ -260,9 +260,8 @@ footer { background: #071820; padding: 64px 48px 32px; }
             <span class="msc-open {{ $scholarship->status === 'closing' ? 'warn' : '' }}">{{ ucfirst($scholarship->status) }}</span>
           </div>
           <div class="msc-title">{{ Str::limit($scholarship->name, 40) }}</div>
-          <div class="msc-match">{{ rand(75, 95) }}%</div>
-          <div class="msc-match-label">Match Score</div>
-          <div class="msc-bar"><div class="msc-bar-fill" style="width:{{ rand(75, 95) }}%"></div></div>
+          <div class="msc-match">{{ $scholarship->slots }} Slots</div>
+          <div class="msc-match-label">Available</div>
         </div>
       @empty
         <div class="mini-schol-card">
@@ -299,8 +298,8 @@ footer { background: #071820; padding: 64px 48px 32px; }
       </div>
       <div class="step reveal d2">
         <div class="step-num-circle">02</div>
-        <div class="step-title">Get Matched by AI</div>
-        <div class="step-desc">Our AI analyzes your profile and shows your match percentage for every scholarship — apply only where you actually qualify.</div>
+        <div class="step-title">Find Your Fit</div>
+        <div class="step-desc">Our platform helps you discover scholarships that align with your qualifications — apply where you actually qualify.</div>
       </div>
       <div class="step reveal d3">
         <div class="step-num-circle">03</div>
@@ -345,15 +344,6 @@ footer { background: #071820; padding: 64px 48px 32px; }
               {{ $scholarship->slots }} available slots
             </div>
           </div>
-          <div class="sc-match">
-            <div class="sc-match-row">
-              <span class="sc-match-label">Your Match Score</span>
-              <span class="sc-match-pct">{{ rand(65, 95) }}%</span>
-            </div>
-            <div class="sc-bar-bg">
-              <div class="sc-bar-fill" style="width:{{ rand(65, 95) }}%"></div>
-            </div>
-          </div>
         </div>
       @empty
         <div class="s-card">
@@ -371,14 +361,14 @@ footer { background: #071820; padding: 64px 48px 32px; }
     <div class="feat-grid">
       <div class="feat-card highlighted reveal">
         <div>
-          <div class="feat-icon" style="font-size:24px;width:52px;height:52px;">🤖</div>
-          <div class="feat-title">AI-Powered Scholarship Matching</div>
-          <div class="feat-desc">Our engine analyzes your GPA, income, course, and location — then ranks every scholarship by how likely you are to qualify. Stop applying blindly.</div>
+          <div class="feat-icon" style="font-size:24px;width:52px;height:52px;">🎯</div>
+          <div class="feat-title">Smart Scholarship Discovery</div>
+          <div class="feat-desc">Easily browse and find scholarships based on your GPA, income, course, and location. Stop applying blindly and find the best fit for your academic journey.</div>
         </div>
         <div class="feat-right-items">
-          <div class="feat-right-item"><span class="fri-icon">⚡</span><div><div class="fri-title">Instant Match Calculation</div><div class="fri-sub">Results in under 2 seconds</div></div></div>
-          <div class="feat-right-item"><span class="fri-icon">🎯</span><div><div class="fri-title">86% Average Accuracy</div><div class="fri-sub">Powered by Gemini AI</div></div></div>
-          <div class="feat-right-item"><span class="fri-icon">🔄</span><div><div class="fri-title">Auto-Updates</div><div class="fri-sub">Re-matches as you update profile</div></div></div>
+          <div class="feat-right-item"><span class="fri-icon">⚡</span><div><div class="fri-title">Instant Searching</div><div class="fri-sub">Browse thousands of grants</div></div></div>
+          <div class="feat-right-item"><span class="fri-icon">🔍</span><div><div class="fri-title">Advanced Filtering</div><div class="fri-sub">Narrow down your options</div></div></div>
+          <div class="feat-right-item"><span class="fri-icon">🔄</span><div><div class="fri-title">Real-time Updates</div><div class="fri-sub">Never miss a new deadline</div></div></div>
         </div>
       </div>
       <div class="feat-card reveal d1"><div class="feat-icon">🙈</div><div class="feat-title">Blind Screening</div><div class="feat-desc">Evaluators review without seeing your name, gender, or school — promoting merit-based, bias-free selection.</div></div>
@@ -409,7 +399,7 @@ footer { background: #071820; padding: 64px 48px 32px; }
   <div class="footer-inner">
     <div class="footer-grid">
       <div><div class="footer-logo">ScholarLink</div><div class="footer-tagline">Bridging Filipino students to scholarship opportunities — one profile, every scholarship.</div></div>
-      <div><div class="footer-col-title">Platform</div><ul class="footer-links"><li>Browse</li><li>How It Works</li><li>For Organizations</li><li>AI Matching</li></ul></div>
+      <div><div class="footer-col-title">Platform</div><ul class="footer-links"><li>Browse</li><li>How It Works</li><li>For Organizations</li><li>Smart Discovery</li></ul></div>
       <div><div class="footer-col-title">Account</div><ul class="footer-links"><li>Sign Up</li><li>Log In</li><li>My Applications</li><li>Document Wallet</li></ul></div>
       <div><div class="footer-col-title">Legal</div><ul class="footer-links"><li>Privacy Policy</li><li>Terms of Service</li><li>Data Privacy Act</li><li>Contact</li></ul></div>
     </div>
