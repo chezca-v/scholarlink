@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     PublicController,
     ScholarshipController,
+    AiController,
     ProfileController,
     DocumentController,
     ApplicationController,
@@ -26,8 +27,7 @@ Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships', 'index')->name('scholarships.index');
     Route::get('/scholarships/{id}', 'show')->name('scholarships.show');
 });
-
-/*
+Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');/*
 Applicant Routes (Role: applicant)
 */
 Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
