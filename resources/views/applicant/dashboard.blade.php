@@ -106,7 +106,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .progress-ring{position:relative;width:80px;height:80px;}
 .progress-ring svg{transform:rotate(-90deg);}
 .ring-bg{fill:none;stroke:rgba(255,255,255,0.12);stroke-width:7;}
-.ring-fill{fill:none;stroke:var(--amber-light);stroke-width:7;stroke-linecap:round;stroke-dasharray:220;stroke-dashoffset:55;transition:stroke-dashoffset .6s ease;}
+.ring-fill{fill:none;stroke:var(--amber-light);stroke-width:7;stroke-dasharray:var(--ring-circumference, 207.35) var(--ring-circumference, 207.35);stroke-dashoffset:var(--ring-offset, 207.35);transition:stroke-dashoffset .6s ease;}
 .ring-label{font-family:'Fraunces',serif;position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .ring-pct{font-size:18px;font-weight:700;color:#fff;line-height:1;}
 .ring-sub{font-size:8.5px;color:rgba(255,255,255,0.55);margin-top:1px;}
@@ -380,13 +380,15 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <div class="hero-right-label">Profile Completeness</div>
         <div class="progress-ring">
           <svg width="80" height="80" viewBox="0 0 80 80">
-            <circle class="ring-bg" cx="40" cy="40" r="33"/>
-           @php
+            @php
+              $normalizedCompleteness = min(max($profileCompleteness, 0), 100);
               $ringCircumference = 2 * pi() * 33;
-              $ringOffset = $ringCircumference * (1 - min(max($profileCompleteness, 0), 100) / 100);
+              $ringOffset = $normalizedCompleteness >= 100
+                ? 0
+                : round($ringCircumference * (1 - ($normalizedCompleteness / 100)), 3);
+              $ringLinecap = $normalizedCompleteness >= 100 ? 'butt' : 'round';
             @endphp
-            <circle class="ring-fill" cx="40" cy="40" r="33" style="--ring-circumference:{{ $ringCircumference }};--ring-offset:{{ $ringOffset }};"/>
-        </svg>
+            <circle class="ring-fill" cx="40" cy="40" r="33" style="--ring-circumference:{{ $ringCircumference }};--ring-offset:{{ $ringOffset }};stroke-linecap:{{ $ringLinecap }};"/>
           <div class="ring-label">
             <span class="ring-pct">{{ $profileCompleteness }}%</span>
           </div>
