@@ -198,7 +198,7 @@
             @php
                 $authProfile  = auth()->user()->applicantProfile;
 
-                {{--
+                /*
                     Profile completeness — 10 fields tracked.
                     Each filled field = 10 points.
 
@@ -216,7 +216,7 @@
 
                     avatar_url, profile_completed_at are excluded — they are
                     system/optional fields, not user-fillable checklist items.
-                --}}
+                */
                 $profileFields = [
                     'date_of_birth',
                     'sex',
@@ -241,11 +241,11 @@
                 $totalFields = count($profileFields);
                 $profilePct  = $totalFields > 0 ? (int) round(($filledCount / $totalFields) * 100) : 0;
 
-                {{--
+                /*
                     SVG ring math.
                     r = 14, circumference = 2π × 14 ≈ 87.96
                     dashoffset = circumference × (1 − pct/100)
-                --}}
+                */
                 $ringCircumference = 2 * M_PI * 14;
                 $ringOffset        = $ringCircumference * (1 - $profilePct / 100);
             @endphp
