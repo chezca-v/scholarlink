@@ -64,8 +64,7 @@
     background: var(--eval-nav-bg); display: flex; align-items: center; padding: 0 24px; gap: 12px;
     z-index: 99; border-bottom: 1.5px solid var(--border);
   }
-  .topnav .page-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 17px; color: var(--ink); flex: 1; }
-  .topnav .page-title small { display: block; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  .topnav .page-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; color: var(--ink); flex: 1; }
   .role-pill { padding: 4px 12px; border-radius: 20px; background: #EFF6FF; border: 1.5px solid #BFDBFE; font-size: 11px; font-weight: 600; color: #1D4ED8; }
   .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: white; border: 1.5px solid var(--border-mid); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--slate); font-size: 16px; transition: all .15s; position: relative; }
   .icon-btn:hover { border-color: var(--primary-light); color: var(--primary); }
@@ -306,29 +305,47 @@
     </a>
     
     <div class="sidebar-section">Account</div>
-    <a href="#" class="sidebar-link"><span class="icon">🔔</span> Notifications <span class="badge">3</span></a>
-    <a href="#" class="sidebar-link"><span class="icon">👤</span> My Profile</a>
+    <a href="{{ route('evaluator.notifications') }}" class="sidebar-link {{ request()->routeIs('evaluator.notifications') ? 'active' : '' }}">
+      <span class="icon">🔔</span> Notifications 
+      @php $unreadNotifs = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+      @if($unreadNotifs > 0)
+        <span class="badge">{{ $unreadNotifs }}</span>
+      @endif
+    </a>
+    <a href="{{ route('evaluator.profile') }}" class="sidebar-link {{ request()->routeIs('evaluator.profile') ? 'active' : '' }}">
+      <span class="icon">👤</span> My Profile
+    </a>
     
-    <div class="sidebar-footer">
-      <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
-      <div>
-        <div class="name">{{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}</div>
-        <div class="sub">Evaluator</div>
-      </div>
-    </div>
+    <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; margin-top: auto;">
+      @csrf
+      <button type="submit" class="sidebar-footer" style="width: 100%; border: none; border-top: 1px solid var(--border); background: transparent; cursor: pointer; text-align: left; font-family: inherit; margin-top: 0; transition: background 0.2s;" onmouseover="this.style.background='rgba(220,38,38,0.05)'" onmouseout="this.style.background='transparent'" onclick="return confirm('Are you sure you want to log out?');">
+        <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
+        <div>
+          <div class="name">{{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}</div>
+          <div class="sub">Evaluator <span style="font-size: 10px; margin-left: 4px; color: var(--red);">Log Out</span></div>
+        </div>
+      </button>
+    </form>
   </aside>
 
   <div class="main">
     <nav class="topnav">
       <div class="page-title">
         @yield('page_title', 'Evaluator Pages')
-        <small>@yield('page_subtitle', '/evaluator')</small>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         @yield('topnav_actions')
         <span class="role-pill">📋 Evaluator</span>
-        <div class="icon-btn">🔔<span class="notif-dot"></span></div>
-        <div class="topnav-avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
+        <a href="{{ route('evaluator.notifications') }}" class="icon-btn" style="text-decoration: none;">
+          🔔
+          @php $unreadCount = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+          @if($unreadCount > 0)
+            <span class="notif-dot"></span>
+          @endif
+        </a>
+        <a href="{{ route('evaluator.profile') }}" class="topnav-avatar" style="text-decoration: none;">
+          {{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}
+        </a>
       </div>
     </nav>
 

@@ -98,6 +98,16 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
     Route::get('/dashboard', [EvaluatorController::class, 'dashboard'])->name('dashboard');
     Route::get('/queue', [EvaluatorController::class, 'queue'])->name('queue');
 
+    // Notifications & Profile
+    Route::controller(EvaluatorController::class)->group(function () {
+        Route::get('/notifications', 'notifications')->name('notifications');
+        Route::post('/notifications/mark-all-read', 'markAllRead')->name('notifications.markAllRead');
+        Route::post('/notifications/{id}/mark-read', 'markRead')->name('notifications.markRead');
+        
+        Route::get('/profile', 'profile')->name('profile');
+        Route::patch('/profile', 'profileUpdate')->name('profile.update');
+    });
+
     // Evaluation Logic
     Route::controller(EvaluationController::class)->group(function () {
         Route::get('/review/{id}', 'show')->name('review.show');
