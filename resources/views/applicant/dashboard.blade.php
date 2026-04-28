@@ -101,37 +101,9 @@
         .cards.list-view .bar { margin-top: 4px; }
         .cards.list-view .apply { margin-top: 10px; padding: 8px 0; }
     </style>
-</head>
-<body>
+@endpush
 
-    {{-- NOTE: Replace with shared nav component on integration --}}
-    <header class="topbar">
-        <div class="topbar-inner">
-            <div class="brand">
-                <img src="/favicon.ico" alt="ScholarLink Logo" style="width: 24px; height: 24px; object-fit: contain; border-radius: 4px;" />
-                ScholarLink
-            </div>
-            <div class="search-wrap">
-                <span class="search-icon">🔎</span>
-                <form method="GET" action="{{ route('scholarships.index') }}" style="width:100%">
-                    <input class="search"
-                           name="q"
-                           value="{{ request('q') }}"
-                           placeholder="Search scholarship, organizations..." />
-                </form>
-            </div>
-            <div class="top-actions">
-                <a href="{{ route('notifications.index') }}" class="icon-btn" style="text-decoration:none;">🔔</a>
-                <a href="{{ route('dashboard') }}" class="icon-btn" style="text-decoration:none;">▦</a>
-                @auth
-                    <a href="{{ route('profile.show') }}" class="avatar" style="text-decoration:none;">
-                        {{ strtoupper(substr(auth()->user()->first_name, 0, 1) . substr(auth()->user()->last_name, 0, 1)) }}
-                    </a>
-                @endauth
-            </div>
-        </div>
-    </header>
-
+@section('content')
     <div class="layout">
         <aside class="filter-sidebar">
             <form method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
@@ -355,7 +327,7 @@
                 </div>
             </div>
 
-            <section class="cards">
+            <section class="cards" id="cards-container">
                 @forelse($scholarships as $index => $scholarship)
                 @php
                     $isFeatured  = $index === 0;
@@ -438,6 +410,7 @@
             </div>
         </main>
     </div>
+@push('scripts')
 <script>
     // Handle grid/list view toggles
     function setView(view) {
@@ -478,5 +451,6 @@
         }
     });
 </script>
+@endpush
 
 @endsection
