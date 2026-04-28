@@ -53,7 +53,8 @@
 
         /* ─── Quick-stats row ─── */
         .quick-stats { margin-top: 10px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; }
-        .qs-item { background: #f0f8fa; border: 1px solid #ddeef2; border-radius: 8px; padding: 6px 4px; text-align: center; }
+        .qs-item { background: #f0f8fa; border: 1px solid #ddeef2; border-radius: 8px; padding: 6px 4px; text-align: center; display: block; transition: all 0.2s; }
+        .qs-item:hover { background: #e2f1f5; border-color: #c5e1e8; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .qs-num  { font-family: "Fraunces", serif; font-size: 18px; font-weight: 700; color: #0b6378; line-height: 1; }
         .qs-label { font-size: 8px; color: #89a2ac; margin-top: 2px; text-transform: uppercase; letter-spacing: .08em; }
         .qs-item.notif .qs-num { color: #C9A84C; }
@@ -90,6 +91,19 @@
         .pg.active { background: #0b6378; color: #fff; border-color: #0b6378; font-weight: 700; }
         .pg.disabled { opacity: 0.4; pointer-events: none; }
         .dots { color: #8fa8b1; font-size: 12px; padding: 0 2px; }
+
+        /* ─── List View Overrides ─── */
+        .cards.list-view { grid-template-columns: 1fr; }
+        .cards.list-view .card { display: flex; flex-direction: row; align-items: stretch; justify-content: space-between; gap: 16px; min-height: auto; padding: 16px 20px; }
+        .cards.list-view .card-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+        .cards.list-view .org-row { justify-content: flex-start; gap: 12px; }
+        .cards.list-view .card h3 { font-size: 22px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cards.list-view p.meta { margin-top: 4px; }
+        .cards.list-view .kpis { margin-top: 8px; }
+        .cards.list-view .card-side { width: 150px; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-end; border-left: 1.5px solid #deebef; padding-left: 18px; margin-left: 4px; }
+        .cards.list-view .score { margin-top: 0; }
+        .cards.list-view .bar { margin-top: 4px; }
+        .cards.list-view .apply { margin-top: 10px; padding: 8px 0; }
     </style>
 </head>
 <body>
@@ -98,8 +112,8 @@
     <header class="topbar">
         <div class="topbar-inner">
             <div class="brand">
-                {{-- NOTE: Replace with actual ScholarLink logo asset --}}
-                <span class="brand-icon">S</span>ScholarLink
+                <img src="/favicon.ico" alt="ScholarLink Logo" style="width: 24px; height: 24px; object-fit: contain; border-radius: 4px;" />
+                ScholarLink
             </div>
             <div class="search-wrap">
                 <span class="search-icon">🔎</span>
@@ -109,7 +123,6 @@
                            value="{{ request('q') }}"
                            placeholder="Search scholarship, organizations..." />
                 </form>
-                <span class="search-kbd">⌘K</span>
             </div>
             <div class="top-actions">
                 <a href="{{ route('notifications.index') }}" class="icon-btn" style="text-decoration:none;">🔔</a>
@@ -341,8 +354,8 @@
                         <option value="deadline" {{ request('sort') === 'deadline' ? 'selected' : '' }}>Deadline ↑</option>
                         <option value="slots"    {{ request('sort') === 'slots'    ? 'selected' : '' }}>Most Slots</option>
                     </select>
-                    <button class="icon-btn" style="background:#0b6378;color:#fff;border-color:#0b6378;">▦</button>
-                    <button class="icon-btn">☰</button>
+                    <button class="icon-btn" id="btn-grid" onclick="setView('grid')" style="background:#0b6378;color:#fff;border-color:#0b6378;">▦</button>
+                    <button class="icon-btn" id="btn-list" onclick="setView('list')">☰</button>
                 </div>
             </div>
 
@@ -353,46 +366,50 @@
                     $statusClass = $scholarship->status === 'closed' ? 'closed' : '';
                 @endphp
                 <article class="card {{ $isFeatured ? 'featured' : '' }}">
-                    <div class="org-row">
-                        <span>{{ strtoupper($scholarship->provider_name) }}</span>
-                        <span class="status {{ $statusClass }}">{{ ucfirst($scholarship->status) }}</span>
+                    <div class="card-main">
+                        <div class="org-row">
+                            <span>{{ strtoupper($scholarship->provider_name) }}</span>
+                            <span class="status {{ $statusClass }}">{{ ucfirst($scholarship->status) }}</span>
+                        </div>
+
+                        <h3>{{ $scholarship->name }}</h3>
+
+                        <p class="meta">
+                            Deadline: {{ \Carbon\Carbon::parse($scholarship->deadline)->format('M d, Y') }}
+                        </p>
+
+                        <div class="kpis">
+                            @if($scholarship->gpa_requirement)
+                                <span class="kpi">GPA {{ $scholarship->gpa_requirement }}+</span>
+                            @endif
+                            @if($scholarship->income_bracket)
+                                <span class="kpi">{{ $scholarship->income_bracket }}</span>
+                            @endif
+                            @if($scholarship->slots)
+                                <span class="kpi">{{ $scholarship->slots }} slots</span>
+                            @endif
+                            @if($scholarship->benefit_snippet_1)
+                                <span class="kpi">{{ $scholarship->benefit_snippet_1 }}</span>
+                            @endif
+                        </div>
                     </div>
 
-                    <h3>{{ $scholarship->name }}</h3>
+                    <div class="card-side">
+                        @auth
+                        @if(isset($scholarship->ai_match_score))
+                        <div class="score">
+                            Your Match Score <strong>{{ round($scholarship->ai_match_score) }}%</strong>
+                        </div>
+                        <div class="bar">
+                            <span style="width:{{ $scholarship->ai_match_score }}%"></span>
+                        </div>
+                        @endif
+                        @endauth
 
-                    <p class="meta">
-                        Deadline: {{ \Carbon\Carbon::parse($scholarship->deadline)->format('M d, Y') }}
-                    </p>
-
-                    <div class="kpis">
-                        @if($scholarship->gpa_requirement)
-                            <span class="kpi">GPA {{ $scholarship->gpa_requirement }}+</span>
-                        @endif
-                        @if($scholarship->income_bracket)
-                            <span class="kpi">{{ $scholarship->income_bracket }}</span>
-                        @endif
-                        @if($scholarship->slots)
-                            <span class="kpi">{{ $scholarship->slots }} slots</span>
-                        @endif
-                        @if($scholarship->benefit_snippet_1)
-                            <span class="kpi">{{ $scholarship->benefit_snippet_1 }}</span>
-                        @endif
+                        <a href="{{ route('applications.create', $scholarship->id) }}" class="apply" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
+                            Apply Now
+                        </a>
                     </div>
-
-                    @auth
-                    @if(isset($scholarship->ai_match_score))
-                    <div class="score">
-                        Your Match Score <strong>{{ round($scholarship->ai_match_score) }}%</strong>
-                    </div>
-                    <div class="bar">
-                        <span style="width:{{ $scholarship->ai_match_score }}%"></span>
-                    </div>
-                    @endif
-                    @endauth
-
-                    <a href="{{ route('applications.create', $scholarship->id) }}" class="apply" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;">
-                        Apply Now
-                    </a>
                 </article>
                 @empty
                 <div class="empty-state">No scholarships found matching your filters.</div>
@@ -425,5 +442,46 @@
             </div>
         </main>
     </div>
+<script>
+    // Handle grid/list view toggles
+    function setView(view) {
+        const cards = document.getElementById('cards-container');
+        const btnGrid = document.getElementById('btn-grid');
+        const btnList = document.getElementById('btn-list');
+        
+        if (view === 'list') {
+            cards.classList.add('list-view');
+            // Update buttons visually
+            btnList.style.background = '#0b6378';
+            btnList.style.color = '#fff';
+            btnList.style.borderColor = '#0b6378';
+            
+            btnGrid.style.background = '#fff';
+            btnGrid.style.color = '#496b79';
+            btnGrid.style.borderColor = '#e0ecf0';
+            localStorage.setItem('scholarships_view', 'list');
+        } else {
+            cards.classList.remove('list-view');
+            // Update buttons visually
+            btnGrid.style.background = '#0b6378';
+            btnGrid.style.color = '#fff';
+            btnGrid.style.borderColor = '#0b6378';
+            
+            btnList.style.background = '#fff';
+            btnList.style.color = '#496b79';
+            btnList.style.borderColor = '#e0ecf0';
+            localStorage.setItem('scholarships_view', 'grid');
+        }
+    }
+
+    // Restore view preference on load
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedView = localStorage.getItem('scholarships_view');
+        if (savedView === 'list') {
+            setView('list');
+        }
+    });
+</script>
+
 </body>
 </html>
