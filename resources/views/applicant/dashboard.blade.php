@@ -743,7 +743,6 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         }
     }, 1000);
 </script>
-@endpush
 
 </body>
 </html>
