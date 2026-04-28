@@ -159,7 +159,7 @@ body{
 <form
   id="apply-form"
   method="POST"
-  action="{{ route('scholarships.apply.store', $scholarship->id) }}"
+  action="{{ route('applications.store', $scholarship->id) }}"
   enctype="multipart/form-data"
 >
 @csrf
