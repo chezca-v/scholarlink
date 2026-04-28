@@ -1,7 +1,7 @@
 @extends('layouts.evaluator')
 
 @section('page_title', 'My Completed Reviews')
-@section('page_subtitle', '/evaluator/completed')
+
 
 @section('topnav_actions')
   <button class="btn btn-outline btn-sm">⬇ Export CSV</button>

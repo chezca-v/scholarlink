@@ -64,8 +64,7 @@
     background: var(--eval-nav-bg); display: flex; align-items: center; padding: 0 24px; gap: 12px;
     z-index: 99; border-bottom: 1.5px solid var(--border);
   }
-  .topnav .page-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 17px; color: var(--ink); flex: 1; }
-  .topnav .page-title small { display: block; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 400; color: var(--muted); margin-top: 1px; }
+  .topnav .page-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; color: var(--ink); flex: 1; }
   .role-pill { padding: 4px 12px; border-radius: 20px; background: #EFF6FF; border: 1.5px solid #BFDBFE; font-size: 11px; font-weight: 600; color: #1D4ED8; }
   .icon-btn { width: 36px; height: 36px; border-radius: 10px; background: white; border: 1.5px solid var(--border-mid); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--slate); font-size: 16px; transition: all .15s; position: relative; }
   .icon-btn:hover { border-color: var(--primary-light); color: var(--primary); }
@@ -306,14 +305,34 @@
     </a>
     
     <div class="sidebar-section">Account</div>
-    <a href="#" class="sidebar-link"><span class="icon">🔔</span> Notifications <span class="badge">3</span></a>
-    <a href="#" class="sidebar-link"><span class="icon">👤</span> My Profile</a>
+    <a href="{{ route('evaluator.notifications') }}" class="sidebar-link {{ request()->routeIs('evaluator.notifications') ? 'active' : '' }}">
+      <span class="icon">🔔</span> Notifications 
+      @php $unreadNotifs = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+      @if($unreadNotifs > 0)
+        <span class="badge">{{ $unreadNotifs }}</span>
+      @endif
+    </a>
+    <a href="{{ route('evaluator.profile') }}" class="sidebar-link {{ request()->routeIs('evaluator.profile') ? 'active' : '' }}">
+      <span class="icon">👤</span> My Profile
+    </a>
     
-    <div class="sidebar-footer">
-      <div class="avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
+    <div class="sidebar-footer" style="margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
+      <div class="avatar" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(15,76,92,.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--primary); flex-shrink: 0;">
+        {{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}
+      </div>
       <div>
-        <div class="name">{{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}</div>
-        <div class="sub">Evaluator</div>
+        <div class="name" style="font-size: 12px; color: var(--ink); font-weight: 500;">
+          {{ auth()->user()->first_name ?? 'Eva' }} {{ auth()->user()->last_name ?? 'Cordero' }}
+        </div>
+        <div class="sub" style="font-size: 10px; color: var(--muted); display:flex; align-items:center; gap:4px;">
+          Evaluator
+          <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; display:inline-block;">
+            @csrf
+            <button type="submit" style="background:none; border:none; color:var(--red); font-size:10px; cursor:pointer; font-family:inherit; padding:0; text-decoration:none;" title="Log Out" onclick="return confirm('Are you sure you want to log out?');">
+              Log Out
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   </aside>
@@ -322,13 +341,20 @@
     <nav class="topnav">
       <div class="page-title">
         @yield('page_title', 'Evaluator Pages')
-        <small>@yield('page_subtitle', '/evaluator')</small>
       </div>
       <div style="display:flex;align-items:center;gap:10px">
         @yield('topnav_actions')
         <span class="role-pill">📋 Evaluator</span>
-        <div class="icon-btn">🔔<span class="notif-dot"></span></div>
-        <div class="topnav-avatar">{{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}</div>
+        <a href="{{ route('evaluator.notifications') }}" class="icon-btn" style="text-decoration: none;">
+          🔔
+          @php $unreadCount = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+          @if($unreadCount > 0)
+            <span class="notif-dot"></span>
+          @endif
+        </a>
+        <a href="{{ route('evaluator.profile') }}" class="topnav-avatar" style="text-decoration: none;">
+          {{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}
+        </a>
       </div>
     </nav>
 

@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\Application;
 use App\Models\EvaluatorAssignment;
 use App\Models\Evaluation;
+use App\Models\Notification;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class EvaluatorController extends Controller
 {
@@ -75,5 +78,60 @@ class EvaluatorController extends Controller
         return view('evaluator.queue', [
             'applications' => $applications,
         ]);
+    }
+
+    public function notifications()
+    {
+        $user = auth()->user();
+        
+        $notifications = Notification::query()
+            ->where('user_id', $user->id)
+            ->latest()
+            ->get();
+            
+        return view('evaluator.notifications', compact('notifications', 'user'));
+    }
+    
+    public function markRead($id) 
+    { 
+        $notification = Notification::where('user_id', auth()->id())->findOrFail($id);
+        $notification->markAsRead();
+        return back();
+    }
+    
+    public function markAllRead() 
+    { 
+        Notification::where('user_id', auth()->id())->update(['is_read' => true]);
+        return back();
+    }
+
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('evaluator.profile', compact('user'));
+    }
+
+    public function profileUpdate(Request $request)
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user->first_name = $validated['first_name'];
+        $user->last_name = $validated['last_name'];
+        $user->email = $validated['email'];
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return redirect()->route('evaluator.profile')->with('success', 'Profile updated successfully.');
     }
 }

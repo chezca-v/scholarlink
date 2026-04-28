@@ -1,401 +1,534 @@
+<<<<<<< HEAD
+{{--
+    resources/views/applicant/documents/index.blade.php
+    Route      : GET /applicant/documents   (named: documents.index)
+    Controller : DocumentWalletController@index
+    Variables  :
+        $documents    – Collection<Document> keyed by document_type
+        $documentTypes – array<string, string>  e.g. ['psa_birth_certificate' => 'PSA Birth Certificate', ...]
+    Document model fields : id, document_type, file_url, status, expiry_date, updated_at
+    Document model method : isExpiringSoon()
+--}}
 @extends('layouts.app')
+=======
+@extends('layouts.applicant')
+>>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0
 
-@section('title', 'Document Wallet — ScholarLink')
+@section('title', 'Document Wallet')
 
 @push('styles')
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
-    /* ── ScholarLink Design Tokens ── */
-    :root {
-        --sl-deep:        #0E3240;
-        --sl-teal:        #1A5269;
-        --sl-teal-mid:    #236B83;
-        --sl-teal-light:  #3D8FA8;
-        --sl-teal-pale:   #D6EBF2;
-        --sl-amber:       #E8A020;
-        --sl-amber-light: #FBE8BC;
-        --sl-bg:          #EBF4F8;
-        --sl-surface:     #FFFFFF;
-        --sl-border:      #C9DDE6;
-        --sl-text:        #1A2E38;
-        --sl-muted:       #5E7F8E;
-        --sl-success:     #2C8C5E;
-        --sl-success-bg:  #D7F0E4;
-        --sl-warning:     #B86A00;
-        --sl-warning-bg:  #FEF3D6;
-        --sl-danger:      #C0392B;
-        --sl-danger-bg:   #FDECEA;
-        --sl-radius-sm:   6px;
-        --sl-radius-md:   10px;
-        --sl-radius-lg:   14px;
-        --sl-shadow-sm:   0 1px 3px rgba(14,50,64,.07);
-        --sl-shadow-md:   0 4px 12px rgba(14,50,64,.10);
-    }
+/* ═══════════════════════════════════════════════════════
+   ScholarLink – Document Wallet
+   Design tokens: Brand Guide v1 (Deep Teal + Warm Amber)
+═══════════════════════════════════════════════════════ */
+:root {
+  /* Brand colours */
+  --teal:          #0F4C5C;
+  --teal-dark:     #0a3a47;
+  --amber:         #C9A84C;
+  /* Backgrounds */
+  --bg:            #FFFFFF;
+  --surface:       #F4F6FA;
+  --border:        #E2E8F0;
+  /* Typography */
+  --ink:           #1C1C2E;
+  --muted:         #8A95A3;
+  /* Status – ok / uploaded */
+  --ok-badge-bg:   #C3FBD7;
+  --ok-badge-text: #065F46;
+  --ok-dot:        #10B981;
+  --ok-icon-bg:    #D1FAE5;
+  /* Status – expiring */
+  --warn-badge-bg: #FEF3C7;
+  --warn-text:     #92400E;
+  --warn-dot:      #D97706;
+  --warn-border:   #D97706;
+  --warn-card-bg:  #FFFBEB;
+  --warn-icon-bg:  #FEF3C7;
+  /* Status – expired */
+  --err-badge-bg:  #FEE2E2;
+  --err-text:      #991B1B;
+  --err-dot:       #EF4444;
+  --err-border:    #EF4444;
+  --err-card-bg:   #FFF5F5;
+  --err-icon-bg:   #FEE2E2;
+  /* Status – none */
+  --none-bg:       #E2E8F0;
+  --none-text:     #64748B;
+  --none-icon-bg:  #EAF0F6;
+  /* Shadows */
+  --shadow:        0 1px 3px rgba(15,76,92,.07), 0 1px 2px rgba(15,76,92,.04);
+  --shadow-hover:  0 8px 24px rgba(15,76,92,.11), 0 2px 8px rgba(15,76,92,.06);
+  /* Radius */
+  --r-card:  14px;
+  --r-inner: 10px;
+  --r-btn:   8px;
+  --r-icon:  10px;
+  --r-badge: 100px;
+  --r-file:  8px;
+  /* Fonts */
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-ui:      'DM Sans', system-ui, sans-serif;
+}
 
-    body { background: var(--sl-bg); }
+/* ── Page wrapper ───────────────────────────────────── */
+.dw {
+  font-family: var(--font-ui);
+  padding: 44px 48px 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
 
-    /* ── Page Header ── */
-    .dw-header h1 {
-        font-family: 'DM Serif Display', Georgia, serif;
-        font-size: 2rem;
-        font-weight: 700;
-        color: var(--sl-deep);
-        line-height: 1.2;
-    }
-    .dw-header p { color: var(--sl-muted); font-size: .9375rem; }
+/* ── Page header ────────────────────────────────────── */
+.dw__title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.5px;
+  line-height: 1.15;
+  margin: 0 0 6px;
+}
+.dw__sub {
+  font-size: 14px;
+  color: var(--muted);
+  margin: 0 0 32px;
+}
 
-    /* ── Stats Row ── */
-    .dw-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-    .dw-stat-card {
-        background: var(--sl-surface);
-        border: 1px solid var(--sl-border);
-        border-radius: var(--sl-radius-lg);
-        padding: 1.25rem 1.5rem;
-        box-shadow: var(--sl-shadow-sm);
-    }
-    .dw-stat-card .stat-label {
-        font-size: .6875rem;
-        font-weight: 700;
-        letter-spacing: .07em;
-        text-transform: uppercase;
-        color: var(--sl-muted);
-        margin-bottom: .35rem;
-    }
-    .dw-stat-card .stat-value {
-        font-size: 2rem;
-        font-weight: 800;
-        color: var(--sl-deep);
-        line-height: 1;
-    }
-    .dw-stat-card .stat-sub {
-        font-size: .8125rem;
-        color: var(--sl-muted);
-        margin-top: .2rem;
-    }
-    .dw-stat-card.stat--warning .stat-value { color: var(--sl-warning); }
-    .dw-stat-card.stat--danger  .stat-value { color: var(--sl-danger); }
+/* ── Flash ──────────────────────────────────────────── */
+.dw__flash {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 16px;
+  border-radius: var(--r-inner);
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+.dw__flash--ok    { background:#ECFDF5; color:var(--ok-badge-text); border:1px solid #6EE7B7; }
+.dw__flash--error { background:#FFF1F2; color:var(--err-text);      border:1px solid #FCA5A5; }
 
-    /* ── Document Grid ── */
-    .dw-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1.125rem;
-    }
+/* ── Stats row ──────────────────────────────────────── */
+.dw__stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 40px;
+}
+.stat {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+}
+.stat__label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.stat__num {
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.stat__num--warn   { color: #D97706; }
+.stat__num--danger { color: #EF4444; }
+.stat__sub {
+  font-size: 13px;
+  color: var(--muted);
+}
 
-    /* ── Document Card (base) ── */
-    .doc-card {
-        background: var(--sl-surface);
-        border: 1px solid var(--sl-border);
-        border-radius: var(--sl-radius-lg);
-        padding: 1.25rem;
-        box-shadow: var(--sl-shadow-sm);
-        display: flex;
-        flex-direction: column;
-        gap: .875rem;
-        transition: box-shadow .15s;
-    }
-    .doc-card:hover { box-shadow: var(--sl-shadow-md); }
+/* ── Document grid ──────────────────────────────────── */
+.dw__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
 
-    /* State modifiers */
-    .doc-card.is-expiring { border-color: var(--sl-amber); }
-    .doc-card.is-expired  { border-color: var(--sl-danger); }
+/* ── Document card ──────────────────────────────────── */
+.doc-card {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s, transform .2s;
+}
+.doc-card:hover {
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+.doc-card--warn {
+  border-color: var(--warn-border);
+  background:   var(--warn-card-bg);
+}
+.doc-card--err {
+  border-color: var(--err-border);
+  background:   var(--err-card-bg);
+}
 
-    /* ── Card Header ── */
-    .doc-card-head { display: flex; align-items: flex-start; gap: .75rem; }
-    .doc-icon {
-        width: 38px; height: 38px;
-        border-radius: var(--sl-radius-sm);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-    }
-    .doc-icon.icon--teal    { background: var(--sl-teal-pale); color: var(--sl-teal); }
-    .doc-icon.icon--amber   { background: var(--sl-amber-light); color: var(--sl-warning); }
-    .doc-icon.icon--danger  { background: var(--sl-danger-bg); color: var(--sl-danger); }
-    .doc-icon.icon--neutral { background: #EEF2F4; color: #8AA3AD; }
-    .doc-icon svg { width: 18px; height: 18px; }
+/* card head: icon + name + badge */
+.doc-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.doc-card__icon {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: var(--r-icon);
+  background: var(--none-icon-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.doc-card__icon--ok   { background: var(--ok-icon-bg); }
+.doc-card__icon--warn { background: var(--warn-icon-bg); }
+.doc-card__icon--err  { background: var(--err-icon-bg); }
 
-    .doc-meta { flex: 1; min-width: 0; }
-    .doc-name {
-        font-size: .875rem;
-        font-weight: 700;
-        color: var(--sl-deep);
-        line-height: 1.3;
-    }
-    .doc-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: .3rem;
-        font-size: .6875rem;
-        font-weight: 700;
-        padding: .2rem .55rem;
-        border-radius: 99px;
-        margin-top: .3rem;
-        line-height: 1.4;
-    }
-    .badge--uploaded  { background: var(--sl-success-bg); color: var(--sl-success); }
-    .badge--expiring  { background: var(--sl-warning-bg); color: var(--sl-warning); }
-    .badge--expired   { background: var(--sl-danger-bg);  color: var(--sl-danger); }
-    .badge--empty     { background: #EEF2F4; color: var(--sl-muted); }
-    .badge-dot {
-        width: 6px; height: 6px;
-        border-radius: 50%;
-        background: currentColor;
-        display: inline-block;
-    }
+.doc-card__icon svg { width: 20px; height: 20px; color: var(--muted); }
+.doc-card__icon--ok   svg { color: var(--ok-badge-text); }
+.doc-card__icon--warn svg { color: var(--warn-text); }
+.doc-card__icon--err  svg { color: var(--err-text); }
 
-    /* ── File Row (when uploaded) ── */
-    .doc-file-row {
-        display: flex;
-        align-items: center;
-        gap: .625rem;
-        background: #F4F8FA;
-        border: 1px solid var(--sl-border);
-        border-radius: var(--sl-radius-sm);
-        padding: .625rem .75rem;
-    }
-    .doc-file-row .file-icon { color: var(--sl-muted); flex-shrink: 0; }
-    .doc-file-row .file-icon svg { width: 16px; height: 16px; }
-    .doc-file-info { flex: 1; min-width: 0; }
-    .doc-file-name {
-        font-size: .8125rem;
-        font-weight: 600;
-        color: var(--sl-teal);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .doc-file-meta { font-size: .725rem; color: var(--sl-muted); margin-top: .05rem; }
+.doc-card__meta { flex: 1; min-width: 0; }
+.doc-card__type {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.35;
+  margin-bottom: 7px;
+}
 
-    /* ── Dropzone ── */
-    .doc-dropzone {
-        border: 1.5px dashed var(--sl-border);
-        border-radius: var(--sl-radius-md);
-        background: #F8FBFD;
-        padding: 1.5rem 1rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: .5rem;
-        cursor: pointer;
-        transition: border-color .15s, background .15s;
-        text-align: center;
-        min-height: 100px;
-    }
-    .doc-dropzone:hover {
-        border-color: var(--sl-teal-light);
-        background: var(--sl-teal-pale);
-    }
-    .doc-dropzone .dz-icon { color: #B0C8D2; }
-    .doc-dropzone .dz-icon svg { width: 28px; height: 28px; }
-    .doc-dropzone .dz-label {
-        font-size: .8125rem;
-        font-weight: 600;
-        color: var(--sl-muted);
-    }
-    .doc-dropzone .dz-hint {
-        font-size: .725rem;
-        color: #9AB5BF;
-    }
-    .doc-dropzone .dz-browse {
-        color: var(--sl-teal-light);
-        font-weight: 700;
-        cursor: pointer;
-        text-decoration: underline;
-        text-underline-offset: 2px;
-    }
+/* ── Badges ──────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--r-badge);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.badge__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.badge--ok {
+  background: var(--ok-badge-bg);
+  color: var(--ok-badge-text);
+}
+.badge--ok .badge__dot    { background: var(--ok-dot); }
+.badge--warn {
+  background: var(--warn-badge-bg);
+  color: var(--warn-text);
+}
+.badge--warn .badge__dot  { background: var(--warn-dot); }
+.badge--err {
+  background: var(--err-badge-bg);
+  color: var(--err-text);
+}
+.badge--err .badge__dot   { background: var(--err-dot); }
+.badge--none {
+  background: var(--none-bg);
+  color: var(--none-text);
+}
 
-    /* ── Used-in link ── */
-    .doc-used-in {
-        font-size: .8rem;
-        color: var(--sl-teal-light);
-        font-weight: 600;
-        text-decoration: none;
-    }
-    .doc-used-in:hover { text-decoration: underline; }
+/* ── File row ────────────────────────────────────────── */
+.doc-file {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-file);
+  padding: 11px 14px;
+}
+.doc-card--warn .doc-file {
+  background: rgba(255,251,235,.9);
+  border-color: #FDE68A;
+}
+.doc-card--err .doc-file {
+  background: rgba(255,241,242,.9);
+  border-color: #FCA5A5;
+}
+.doc-file__thumb {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 6px;
+  background: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.doc-file__thumb svg { width: 14px; height: 14px; color: var(--muted); }
+.doc-file__info { flex: 1; min-width: 0; }
+.doc-file__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.doc-file__meta {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
 
-    /* ── Action Buttons ── */
-    .doc-actions { display: flex; gap: .625rem; margin-top: auto; }
-    .btn-doc {
-        flex: 1;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .375rem;
-        padding: .55rem 0;
-        border-radius: var(--sl-radius-sm);
-        font-size: .8125rem;
-        font-weight: 600;
-        border: 1.5px solid;
-        cursor: pointer;
-        transition: background .15s, color .15s;
-        text-decoration: none;
-    }
-    .btn-doc svg { width: 15px; height: 15px; }
-    .btn-doc--preview {
-        border-color: var(--sl-border);
-        color: var(--sl-text);
-        background: transparent;
-    }
-    .btn-doc--preview:hover { background: #F0F6F9; }
-    .btn-doc--replace {
-        border-color: var(--sl-border);
-        color: var(--sl-text);
-        background: transparent;
-    }
-    .btn-doc--replace:hover { background: #F0F6F9; }
+/* used-in */
+.doc-used     { font-size: 12.5px; color: var(--teal); font-weight: 500; }
+.doc-used--no { font-size: 12.5px; color: var(--muted); }
 
-    /* ── Responsive ── */
-    @media (max-width: 900px) {
-        .dw-stats { grid-template-columns: repeat(2, 1fr); }
-        .dw-grid  { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 600px) {
-        .dw-stats { grid-template-columns: 1fr 1fr; }
-        .dw-grid  { grid-template-columns: 1fr; }
-    }
+/* ── Dropzone ────────────────────────────────────────── */
+.doc-drop {
+  border: 1.5px dashed #CBD5E1;
+  border-radius: var(--r-inner);
+  padding: 28px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: border-color .18s, background .18s;
+  text-align: center;
+}
+.doc-drop:hover {
+  border-color: var(--teal);
+  background: rgba(15,76,92,.03);
+}
+.doc-drop input[type="file"] { display: none; }
+.doc-drop__icon svg { width: 32px; height: 32px; color: #94A3B8; }
+.doc-drop__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted);
+}
+.doc-drop__hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+.doc-drop__browse {
+  color: var(--teal);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ── Buttons ─────────────────────────────────────────── */
+.doc-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: auto;
+}
+.doc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: var(--r-btn);
+  border: 1.5px solid var(--border);
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: border-color .15s, color .15s, background .15s;
+  white-space: nowrap;
+  width: 100%;
+  text-align: center;
+}
+.doc-btn svg { width: 14px; height: 14px; }
+.doc-btn:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: rgba(15,76,92,.04);
+}
+.doc-btn--danger {
+  border-color: var(--err-border);
+  color: var(--err-text);
+}
+.doc-btn--danger:hover {
+  background: var(--err-badge-bg);
+  border-color: var(--err-border);
+  color: var(--err-text);
+}
+
+/* ── Responsive ──────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .dw { padding: 32px 32px 60px; }
+  .dw__stats { grid-template-columns: repeat(2, 1fr); }
+  .dw__grid  { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .dw { padding: 24px 20px 60px; }
+  .dw__stats { grid-template-columns: 1fr 1fr; }
+  .dw__grid  { grid-template-columns: 1fr; }
+  .dw__title { font-size: 28px; }
+}
 </style>
 @endpush
 
 @section('content')
-<div class="container-fluid py-4 px-4" style="max-width: 1200px; margin: 0 auto;">
 
-    {{-- ── Page Header ── --}}
-    <div class="dw-header mb-4">
-        <h1>Document Wallet</h1>
-        <p>Upload once, reuse across all your scholarship applications.</p>
+@php
+  /*
+   * Compute summary stats from $documents collection.
+   * No values are hardcoded — everything derives from DB-fetched data.
+   */
+  $allDocs           = $documents->values();
+  $uploadedCount     = $allDocs->filter(fn($d) => $d->file_url)->count();
+  $totalTypes        = count($documentTypes);
+  $expiringSoonCount = $allDocs->filter(fn($d) =>
+                           $d->file_url
+                           && $d->expiry_date
+                           && ! \Carbon\Carbon::parse($d->expiry_date)->isPast()
+                           && $d->isExpiringSoon()
+                       )->count();
+  $expiredCount      = $allDocs->filter(fn($d) =>
+                           $d->file_url
+                           && $d->expiry_date
+                           && \Carbon\Carbon::parse($d->expiry_date)->isPast()
+                       )->count();
+  $usedInCount       = auth()->user()
+                           ->applications()
+                           ->whereIn('status', ['pending', 'under_review', 'approved'])
+                           ->count();
+@endphp
+
+<div class="dw">
+
+  {{-- Flash messages --}}
+  @if (session('success'))
+    <div class="dw__flash dw__flash--ok">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      {{ session('success') }}
     </div>
-
-    {{-- ── Stats Row ── --}}
-    <div class="dw-stats mb-4">
-
-        <div class="dw-stat-card">
-            <div class="stat-label">Uploaded</div>
-            <div class="stat-value">{{ $stats['uploaded'] }}</div>
-            <div class="stat-sub">of {{ $totalDocumentTypes }} document types</div>
-        </div>
-
-        <div class="dw-stat-card stat--warning">
-            <div class="stat-label">Expiring Soon</div>
-            <div class="stat-value">{{ $stats['expiring_soon'] }}</div>
-            <div class="stat-sub">within 30 days</div>
-        </div>
-
-        <div class="dw-stat-card stat--danger">
-            <div class="stat-label">Expired</div>
-            <div class="stat-value">{{ $stats['expired'] }}</div>
-            <div class="stat-sub">needs replacement</div>
-        </div>
-
-        <div class="dw-stat-card">
-            <div class="stat-label">Used In</div>
-            <div class="stat-value">{{ $stats['used_in'] }}</div>
-            <div class="stat-sub">active applications</div>
-        </div>
-
+  @endif
+  @if (session('error'))
+    <div class="dw__flash dw__flash--error">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {{ session('error') }}
     </div>
+  @endif
 
-    {{-- ── Document Grid ── --}}
-    <div class="dw-grid">
+  {{-- Page header --}}
+  <h1 class="dw__title">Document Wallet</h1>
+  <p class="dw__sub">Upload once, reuse across all your scholarship applications.</p>
 
-        @foreach ($documentTypes as $type)
+  {{-- ── Summary stats ── --}}
+  <div class="dw__stats">
+    <div class="stat">
+      <div class="stat__label">Uploaded</div>
+      <div class="stat__num">{{ $uploadedCount }}</div>
+      <div class="stat__sub">of {{ $totalTypes }} document types</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">Expiring Soon</div>
+      <div class="stat__num stat__num--warn">{{ $expiringSoonCount }}</div>
+      <div class="stat__sub">within 30 days</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">Expired</div>
+      <div class="stat__num stat__num--danger">{{ $expiredCount }}</div>
+      <div class="stat__sub">needs replacement</div>
+    </div>
+    <div class="stat">
+      <div class="stat__label">Used In</div>
+      <div class="stat__num">{{ $usedInCount }}</div>
+      <div class="stat__sub">active applications</div>
+    </div>
+  </div>
 
-            {{-- Look up the uploaded document for this type (null if not yet uploaded) --}}
-            @php
-                $doc = $documents->firstWhere('document_type', $type['key']);
-                $isUploaded  = $doc && $doc->status === 'uploaded';
-                $isExpiring  = $doc && $doc->status === 'expiring_soon';
-                $isExpired   = $doc && $doc->status === 'expired';
-                $hasFile     = $doc && $doc->file_path;
-                $cardClass   = $isExpiring ? 'is-expiring' : ($isExpired ? 'is-expired' : '');
-                $iconClass   = $isExpiring ? 'icon--amber'  : ($isExpired ? 'icon--danger' : ($hasFile ? 'icon--teal' : 'icon--neutral'));
-            @endphp
+  {{-- ── Document cards ──
+       $documentTypes  => array<typeKey, typeLabel>
+       $documents      => Collection keyed by document_type
+  ── --}}
+  <div class="dw__grid">
+    @foreach ($documentTypes as $typeKey => $typeLabel)
+      @php
+        $doc        = $documents->get($typeKey);   {{-- Document|null --}}
+        $hasFile    = $doc && $doc->file_url;
 
-            <div class="doc-card {{ $cardClass }}">
+        $isExpired  = $hasFile
+                      && $doc->expiry_date
+                      && \Carbon\Carbon::parse($doc->expiry_date)->isPast();
 
-                {{-- Card Header --}}
-                <div class="doc-card-head">
-                    <div class="doc-icon {{ $iconClass }}">
-                        {{-- Document icon SVG --}}
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                            <polyline points="14 2 14 8 20 8"/>
-                            <line x1="16" y1="13" x2="8" y2="13"/>
-                            <line x1="16" y1="17" x2="8" y2="17"/>
-                            <polyline points="10 9 9 9 8 9"/>
-                        </svg>
-                    </div>
+        $isExpiring = $hasFile && ! $isExpired && $doc->isExpiringSoon();
 
-                    <div class="doc-meta">
-                        <div class="doc-name">{{ $type['label'] }}</div>
+        /* Visual state helpers */
+        $cardClass  = $isExpired  ? 'doc-card--err'
+                    : ($isExpiring ? 'doc-card--warn' : '');
 
-                        @if ($isUploaded)
-                            <span class="doc-badge badge--uploaded">
-                                <span class="badge-dot"></span> Uploaded
-                            </span>
+        $iconClass  = $isExpired  ? 'doc-card__icon--err'
+                    : ($isExpiring ? 'doc-card__icon--warn'
+                    : ($hasFile    ? 'doc-card__icon--ok' : ''));
 
-                        @elseif ($isExpiring)
-                            <span class="doc-badge badge--expiring">
-                                ⚠ Expires {{ \Carbon\Carbon::parse($doc->expiry_date)->format('M d, Y') }}
-                            </span>
+        $badgeClass = $isExpired  ? 'badge--err'
+                    : ($isExpiring ? 'badge--warn'
+                    : ($hasFile    ? 'badge--ok'   : 'badge--none'));
 
-                        @elseif ($isExpired)
-                            <span class="doc-badge badge--expired">
-                                Expired {{ \Carbon\Carbon::parse($doc->expiry_date)->format('M d, Y') }}
-                            </span>
+        $badgeText  = $isExpired  ? 'Expired ' . \Carbon\Carbon::parse($doc->expiry_date)->format('M d, Y')
+                    : ($isExpiring ? '⚠ Expires ' . \Carbon\Carbon::parse($doc->expiry_date)->format('M d, Y')
+                    : ($hasFile    ? 'Uploaded'   : 'Not Uploaded'));
+      @endphp
 
-                        @else
-                            <span class="doc-badge badge--empty">Not Uploaded</span>
-                            @if (!empty($type['required_by']))
-                                <span class="doc-badge badge--empty ms-1" style="background: #EBF4F8; color: var(--sl-teal);">
-                                    {{ $type['required_by'] }}
-                                </span>
-                            @endif
-                        @endif
-                    </div>
-                </div>
+      <div class="doc-card {{ $cardClass }}">
 
-                {{-- File Row or Dropzone --}}
-                @if ($hasFile)
-                    <div class="doc-file-row">
-                        <span class="file-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
-                                <polyline points="13 2 13 9 20 9"/>
-                            </svg>
-                        </span>
-                        <div class="doc-file-info">
-                            <div class="doc-file-name">{{ basename($doc->file_path) }}</div>
-                            <div class="doc-file-meta">
-                                {{ $doc->file_size_formatted }} &middot;
-                                Uploaded {{ $doc->created_at->diffForHumans() }}
-                            </div>
-                        </div>
-                    </div>
+        {{-- ── Head: icon + type label + status badge ── --}}
+        <div class="doc-card__head">
+          <div class="doc-card__icon {{ $iconClass }}">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor" stroke-width="1.75"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/>
+              <line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+          </div>
 
-                @else
-                    {{-- Dropzone --}}
-                    <label class="doc-dropzone" for="upload-{{ $type['key'] }}">
-                        <span class="dz-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
-                            </svg>
-                        </span>
-                        <span class="dz-label">Drop your document here</span>
-                        <span class="dz-hint">
-                            PDF, JPG, PNG up to 5MB &middot;
-                            <span class="dz-browse">Browse Files</span>
-                        </span>
-                        <input
-                            type="file"
-                            id="upload-{{ $type['key'] }}"
-                            name="document[{{ $type['key'] }}]"
-                            accept=".pdf,.jpg,.jpeg,.png"
-                            style="display: none;"
-                            onchange="handleFileUpload(event, '{{ $type['key'] }}')"
-                        >
-                    </label>
-                @endif
+          <div class="doc-card__meta">
+            <div class="doc-card__type">{{ $typeLabel }}</div>
+            <span class="badge {{ $badgeClass }}">
+              @if ($hasFile && ! $isExpired)
+                <span class="badge__dot"></span>
+              @endif
+              {{ $badgeText }}
+            </span>
+          </div>
+        </div>
 
+<<<<<<< HEAD
+        {{-- ── Uploaded: file info + actions ── --}}
+        @if ($hasFile)
+=======
                 {{-- Used In count --}}
                 @if ($hasFile && $doc->used_in_count > 0)
                     <a href="{{ url('/applicant/applications') }}" class="doc-used-in">
@@ -440,29 +573,72 @@
                         </label>
                     </div>
                 @endif
+>>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0
 
+          {{-- File row --}}
+          <div class="doc-file">
+            <div class="doc-file__thumb">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
             </div>
-        @endforeach
+            <div class="doc-file__info">
+              <div class="doc-file__name">{{ basename($doc->file_url) }}</div>
+              <div class="doc-file__meta">— · Uploaded {{ $doc->updated_at->diffForHumans() }}</div>
+            </div>
+          </div>
 
-    </div>
-</div>
-@endsection
+          {{-- Used-in count --}}
+          @php $usedIn = $doc->applicationDocuments()->count(); @endphp
+          @if ($usedIn > 0)
+            <p class="doc-used">Used in {{ $usedIn }} {{ Str::plural('application', $usedIn) }}</p>
+          @else
+            <p class="doc-used--no">Not used in any application yet</p>
+          @endif
 
-@push('scripts')
-<script>
-/**
- * Handle new file upload (dropzone).
- * Submits to the documents.store route via fetch.
- */
-function handleFileUpload(event, documentType) {
-    const file = event.target.files[0];
-    if (!file) return;
+          {{-- Preview + Replace --}}
+          <div class="doc-actions">
 
-    const formData = new FormData();
-    formData.append('document_type', documentType);
-    formData.append('file', file);
-    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+            {{-- Preview --}}
+            <a href="{{ route('documents.preview', $doc->id) }}"
+               target="_blank"
+               class="doc-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              Preview
+            </a>
 
+<<<<<<< HEAD
+            {{-- Replace (re-uses documents.store, controller detects existing doc) --}}
+            <form method="POST"
+                  action="{{ route('documents.store') }}"
+                  enctype="multipart/form-data"
+                  id="replace-{{ $typeKey }}">
+              @csrf
+              <input type="hidden" name="document_type" value="{{ $typeKey }}">
+              <input type="file"
+                     id="file-replace-{{ $typeKey }}"
+                     name="file"
+                     accept=".pdf,.jpg,.jpeg,.png"
+                     onchange="this.closest('form').submit()">
+              <button type="button"
+                      class="doc-btn {{ $isExpired ? 'doc-btn--danger' : '' }}"
+                      onclick="document.getElementById('file-replace-{{ $typeKey }}').click()">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                Replace
+              </button>
+            </form>
+=======
     fetch('{{ url('/applicant/documents') }}', {
         method: 'POST',
         body: formData,
@@ -478,21 +654,64 @@ function handleFileUpload(event, documentType) {
     })
     .catch(() => alert('Something went wrong. Please try again.'));
 }
+>>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0
 
-/**
- * Handle file replacement.
- * Submits to the documents.replace route via fetch.
- */
-function handleFileReplace(event, documentType, documentId) {
-    const file = event.target.files[0];
-    if (!file) return;
+          </div>
 
-    const formData = new FormData();
-    formData.append('document_type', documentType);
-    formData.append('file', file);
-    formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
-    formData.append('_method', 'PUT');
+        {{-- ── Empty: dropzone ── --}}
+        @else
 
+<<<<<<< HEAD
+          <form method="POST"
+                action="{{ route('documents.store') }}"
+                enctype="multipart/form-data"
+                id="upload-{{ $typeKey }}">
+            @csrf
+            <input type="hidden" name="document_type" value="{{ $typeKey }}">
+
+            <label class="doc-drop"
+                   for="file-upload-{{ $typeKey }}"
+                   ondragover="event.preventDefault(); this.style.borderColor='var(--teal)'"
+                   ondragleave="this.style.borderColor=''"
+                   ondrop="
+                     event.preventDefault();
+                     this.style.borderColor='';
+                     var dt = new DataTransfer();
+                     dt.items.add(event.dataTransfer.files[0]);
+                     document.getElementById('file-upload-{{ $typeKey }}').files = dt.files;
+                     document.getElementById('upload-{{ $typeKey }}').submit();
+                   ">
+              <input type="file"
+                     id="file-upload-{{ $typeKey }}"
+                     name="file"
+                     accept=".pdf,.jpg,.jpeg,.png"
+                     onchange="this.closest('form').submit()">
+
+              <div class="doc-drop__icon">
+                {{-- Paperclip --}}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="1.4"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+                </svg>
+              </div>
+              <span class="doc-drop__label">Drop your document here</span>
+              <span class="doc-drop__hint">
+                PDF, JPG, PNG up to 5MB · <span class="doc-drop__browse">Browse Files</span>
+              </span>
+            </label>
+          </form>
+
+        @endif
+
+      </div>{{-- /.doc-card --}}
+    @endforeach
+  </div>{{-- /.dw__grid --}}
+
+</div>{{-- /.dw --}}
+
+@endsection
+=======
     fetch(`/applicant/documents/${documentId}`, {
         method: 'POST',
         body: formData,
@@ -509,3 +728,4 @@ function handleFileReplace(event, documentType, documentId) {
 }
 </script>
 @endpush
+>>>>>>> 9e61f3937bf092d1c59a061e20b475a945d4d9a0

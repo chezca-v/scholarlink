@@ -1,7 +1,7 @@
 @extends('layouts.evaluator')
 
 @section('page_title', 'Review Queue')
-@section('page_subtitle', '/evaluator/queue')
+
 
 @section('content')
 <div class="breadcrumb">

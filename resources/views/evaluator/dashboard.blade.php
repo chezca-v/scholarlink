@@ -1,7 +1,6 @@
 @extends('layouts.evaluator')
 
 @section('page_title', 'Evaluator Dashboard')
-@section('page_subtitle', '/evaluator/dashboard')
 
 @section('content')
 <div class="breadcrumb">
