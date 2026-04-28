@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us — ScholarLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --teal:           #0F4C5C;
+      --teal-light:     #1A6B7A;
+      --teal-lighter:   #2A8FA0;
+      --amber:          #E8A838;
+      --gold-light:     #F9D679;
+      --white:          #FFFFFF;
+      --cloud:          #F4F6FA;
+      --mist:           #E2E8F0;
+      --slate:          #8A95A3;
+      --ink:            #1C1C2E;
+
+      --grad-primary:   linear-gradient(135deg, #0F4C5C, #1A6B7A);
+      --grad-amber:     linear-gradient(135deg, #E8A838, #F9D679);
+      --grad-match-bar: linear-gradient(90deg, #0F4C5C, #E8A838);
+      --grad-hero:      linear-gradient(160deg, #0F4C5C, #2A8FA0);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--white);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 68px;
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      z-index: 100;
+      /* transparent at top — blends with hero */
+      background: transparent;
+      transition: background .4s ease, box-shadow .4s ease, backdrop-filter .4s ease;
+    }
+    /* once user scrolls, nav solidifies with primary gradient */
+    nav.scrolled {
+      background: linear-gradient(135deg, rgba(15,76,92,.97), rgba(26,107,122,.97));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 2px 24px rgba(0,0,0,.22);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo-icon {
+      width: 34px;
+      height: 34px;
+      background: var(--grad-amber);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-logo-icon svg {
+      width: 20px; height: 20px;
+      fill: none; stroke: var(--teal);
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .nav-logo-text {
+      font-family: 'Fraunces', serif;
+      font-size: 21px;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -.3px;
+    }
+
+    .nav-links {
+      margin-left: auto;
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      align-items: center;
+    }
+    .nav-links a {
+      color: rgba(255,255,255,.82);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: color .2s;
+      position: relative;
+      padding-bottom: 2px;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px; left: 0; right: 0;
+      height: 2px;
+      background: var(--grad-amber);
+      border-radius: 2px;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .25s cubic-bezier(.22,1,.36,1);
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after,
+    .nav-links a.active::after { transform: scaleX(1); }
+    .nav-links a.active { color: var(--gold-light); }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--grad-hero);
+      padding: 148px 40px 110px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 60% 60% at 20% 50%, rgba(201,168,76,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 70% at 80% 40%, rgba(249,214,121,.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .hero > * { position: relative; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(201,168,76,.15);
+      border: 1px solid rgba(201,168,76,.35);
+      color: var(--gold-light);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.3px;
+      text-transform: uppercase;
+      padding: 6px 18px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+    .hero-title {
+      font-family: 'Fraunces', serif;
+      font-size: clamp(40px, 6vw, 62px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+      max-width: 740px;
+      margin: 0 auto 24px;
+    }
+    .hero-title em { font-style: italic; color: var(--gold-light); }
+    .hero-sub {
+      font-size: 18px;
+      color: rgba(255,255,255,.72);
+      max-width: 560px;
+      margin: 0 auto;
+      font-weight: 400;
+    }
+
+    /* hero fade-up */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(26px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-eyebrow { animation: fadeUp .6s ease both .05s; }
+    .hero-title   { animation: fadeUp .6s ease both .18s; }
+    .hero-sub     { animation: fadeUp .6s ease both .30s; }
+
+    /* ── SECTIONS ── */
+    section { padding: 88px 40px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.6px;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 12px;
+    }
+    .section-label::before {
+      content: '';
+      display: inline-block;
+      width: 20px; height: 2px;
+      background: var(--grad-match-bar);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 20px;
+      line-height: 1.25;
+    }
+    .section-body {
+      font-size: 16px;
+      color: #4A5568;
+      line-height: 1.75;
+      max-width: 680px;
+    }
+
+    /* ── MISSION ── */
+    .mission { background: var(--white); }
+    .mission-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 72px;
+      align-items: center;
+    }
+    .mission-visual {
+      background: var(--cloud);
+      border: 1px solid var(--mist);
+      border-radius: 24px;
+      padding: 40px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--mist);
+      border-radius: 16px;
+      padding: 22px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .stat-card:hover { box-shadow: 0 6px 20px rgba(15,76,92,.1); transform: translateY(-2px); }
+    .stat-icon {
+      width: 46px; height: 46px;
+      background: var(--grad-primary);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .stat-icon svg { width: 22px; height: 22px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .stat-value {
+      font-family: 'Fraunces', serif;
+      font-size: 28px; font-weight: 700; line-height: 1;
+      background: var(--grad-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label { font-size: 13px; color: var(--slate); font-weight: 500; margin-top: 3px; }
+
+    /* ── VALUES ── */
+    .values { background: var(--cloud); }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .value-card {
+      background: var(--white);
+      border: 1px solid var(--mist);
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      transition: box-shadow .25s, transform .25s;
+    }
+    .value-card:hover { box-shadow: 0 8px 28px rgba(15,76,92,.12); transform: translateY(-4px); }
+    .value-icon-wrap {
+      width: 50px; height: 50px;
+      background: var(--grad-primary);
+      border-radius: 13px;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 16px;
+    }
+    .value-icon-wrap svg { width: 24px; height: 24px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .amber-bar {
+      width: 32px; height: 3px;
+      background: var(--grad-match-bar);
+      border-radius: 2px;
+      margin-bottom: 16px;
+    }
+    .value-title { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+    .value-desc { font-size: 14px; color: #5A6475; line-height: 1.7; }
+
+    /* ── STORY ── */
+    .story { background: var(--white); }
+    .story-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .story-text p { font-size: 16px; color: #4A5568; line-height: 1.8; margin-bottom: 18px; }
+    .story-timeline { display: flex; flex-direction: column; }
+    .timeline-item { display: flex; gap: 20px; }
+    .timeline-line-wrap { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+    .timeline-dot {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--grad-primary);
+      border: 3px solid var(--white);
+      box-shadow: 0 0 0 2px var(--amber);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    .timeline-connector {
+      width: 2px; flex: 1;
+      background: var(--grad-match-bar);
+      opacity: .18;
+      min-height: 32px;
+    }
+    .timeline-content { padding-bottom: 32px; }
+    .timeline-year { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; color: var(--amber); text-transform: uppercase; margin-bottom: 3px; }
+    .timeline-event { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .timeline-desc { font-size: 13px; color: var(--slate); line-height: 1.6; }
+
+    /* ── TEAM ── */
+    .team { background: var(--cloud); }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 48px;
+    }
+    .team-card {
+      background: var(--white);
+      border: 1px solid var(--mist);
+      border-radius: 20px;
+      padding: 28px 20px;
+      text-align: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,.04);
+      transition: box-shadow .25s, transform .25s;
+    }
+    .team-card:hover { box-shadow: 0 8px 28px rgba(15,76,92,.12); transform: translateY(-4px); }
+    .avatar {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Fraunces', serif;
+      font-size: 24px; font-weight: 700;
+      color: var(--white);
+      background: var(--grad-primary);
+      border: 3px solid var(--mist);
+    }
+    .avatar.amber { background: var(--grad-amber); color: var(--teal); }
+    .team-name { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+    .team-role { font-size: 12px; color: var(--slate); font-weight: 500; margin-bottom: 12px; }
+    .team-badge {
+      display: inline-flex; align-items: center;
+      background: rgba(15,76,92,.07);
+      color: var(--teal);
+      font-size: 11px; font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      background: var(--grad-primary);
+      padding: 88px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 100% at 50% 0%, rgba(249,214,121,.13) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .cta-banner h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 40px; font-weight: 700;
+      color: var(--white);
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .cta-banner p {
+      font-size: 17px; color: rgba(255,255,255,.72);
+      margin-bottom: 36px; max-width: 520px;
+      margin-left: auto; margin-right: auto;
+      position: relative;
+    }
+    .btn-primary {
+      background: var(--grad-amber);
+      color: var(--teal);
+      font-size: 15px; font-weight: 600;
+      padding: 14px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+      transition: opacity .2s, transform .15s;
+      margin: 0 8px;
+      position: relative;
+    }
+    .btn-primary:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-secondary {
+      border: 2px solid rgba(255,255,255,.3);
+      color: var(--white);
+      font-size: 15px; font-weight: 600;
+      padding: 12px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+      transition: border-color .2s, background .2s;
+      margin: 0 8px;
+      position: relative;
+    }
+    .btn-secondary:hover { border-color: var(--gold-light); background: rgba(255,255,255,.07); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--ink);
+      color: rgba(255,255,255,.5);
+      padding: 36px 40px;
+      text-align: center;
+      font-size: 13px;
+    }
+    footer span { color: var(--amber); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition:
+        opacity .7s cubic-bezier(.22,1,.36,1),
+        transform .7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .mission-grid, .story-inner { grid-template-columns: 1fr; gap: 40px; }
+      .values-grid { grid-template-columns: 1fr 1fr; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      section { padding: 60px 20px; }
+      .hero { padding: 130px 24px 80px; }
+      .values-grid, .team-grid { grid-template-columns: 1fr; }
+      .cta-banner { padding: 60px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV: starts transparent, solidifies on scroll -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </div>
+    <span class="nav-logo-text">ScholarLink</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li>
+    <li><a href="#" class="active">About Us</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">About ScholarLink</div>
+  <h1 class="hero-title">Bridging Filipino Students to <em>Scholarship Opportunities</em></h1>
+  <p class="hero-sub">A platform built for every aspiring scholar — from Luzon to Mindanao — making access to education funding simple, transparent, and equitable.</p>
+</section>
+
+<!-- MISSION -->
+<section class="mission">
+  <div class="container">
+    <div class="mission-grid">
+      <div class="reveal">
+        <p class="section-label">Our Mission</p>
+        <h2 class="section-title">Empowering the Next Generation of Filipino Leaders</h2>
+        <p class="section-body">ScholarLink was built to solve a persistent problem: deserving Filipino students miss out on scholarships simply because they didn't know about them or couldn't navigate complex application processes.</p>
+        <br/>
+        <p class="section-body">We consolidate government, private, and institutional scholarships into one trusted platform — with clear eligibility guides, real-time status tracking, and a support system that speaks your language.</p>
+      </div>
+      <div class="mission-visual reveal" style="transition-delay:.13s">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">12,000+</div>
+            <div class="stat-label">Registered scholars nationwide</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">340+</div>
+            <div class="stat-label">Scholarship programs listed</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">
+            <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div>
+            <div class="stat-value">₱280M+</div>
+            <div class="stat-label">Total scholarships facilitated</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VALUES -->
+<section class="values">
+  <div class="container">
+    <p class="section-label reveal">What We Stand For</p>
+    <h2 class="section-title reveal" style="transition-delay:.07s">Our Core Values</h2>
+    <div class="values-grid">
+      <div class="value-card reveal" style="transition-delay:.07s">
+        <div class="value-icon-wrap"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="amber-bar"></div>
+        <div class="value-title">Transparency</div>
+        <p class="value-desc">Every scholarship listing includes complete requirements, timelines, and decision criteria — no hidden steps, no surprises.</p>
+      </div>
+      <div class="value-card reveal" style="transition-delay:.13s">
+        <div class="value-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+        <div class="amber-bar"></div>
+        <div class="value-title">Accessibility</div>
+        <p class="value-desc">Designed for students across all regions and backgrounds, with multilingual support and mobile-first experience.</p>
+      </div>
+      <div class="value-card reveal" style="transition-delay:.19s">
+        <div class="value-icon-wrap"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div class="amber-bar"></div>
+        <div class="value-title">Integrity</div>
+        <p class="value-desc">We verify every scholarship and partner institution. We do not charge students any fees — ever.</p>
+      </div>
+      <div class="value-card reveal" style="transition-delay:.09s">
+        <div class="value-icon-wrap"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="amber-bar"></div>
+        <div class="value-title">Community</div>
+        <p class="value-desc">We connect scholars with mentors, alumni, and peers — building networks that last beyond the scholarship period.</p>
+      </div>
+      <div class="value-card reveal" style="transition-delay:.15s">
+        <div class="value-icon-wrap"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="amber-bar"></div>
+        <div class="value-title">Innovation</div>
+        <p class="value-desc">We continuously improve our platform with smart matching, AI-assisted guidance, and real-time tracking tools.</p>
+      </div>
+      <div class="value-card reveal" style="transition-delay:.21s">
+        <div class="value-icon-wrap"><svg viewBox="0 0 24 24"><path d="M4.5 9.5V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v4.5M12 12v9M8 16l4 4 4-4"/></svg></div>
+        <div class="amber-bar"></div>
+        <div class="value-title">Equity</div>
+        <p class="value-desc">We actively surface scholarships for underserved groups — PWDs, indigenous peoples, students from BARMM and conflict-affected areas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STORY -->
+<section class="story">
+  <div class="container">
+    <div class="story-inner">
+      <div class="story-text reveal">
+        <p class="section-label">Our Story</p>
+        <h2 class="section-title">From a Capstone to a Movement</h2>
+        <p>ScholarLink started as a university capstone project after our founders noticed how many of their classmates were unaware of scholarships they were fully eligible for.</p>
+        <p>What began as a simple aggregator grew into a full platform when CHED and DOST partners recognized the need for a centralized, student-friendly scholarship portal — one that could serve SHS graduates, college freshmen, and working scholars alike.</p>
+        <p>Today, ScholarLink serves students across all 17 regions of the Philippines, partnering with government agencies, state universities, and private foundations to keep educational opportunity within reach.</p>
+      </div>
+      <div class="reveal" style="transition-delay:.13s">
+        <p class="section-label" style="margin-bottom:28px">Timeline</p>
+        <div class="story-timeline">
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot"></div>
+              <div class="timeline-connector"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-year">2023</div>
+              <div class="timeline-event">Project Founded</div>
+              <p class="timeline-desc">ScholarLink launched as a university capstone project with 3 partner scholarships.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot"></div>
+              <div class="timeline-connector"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-year">Early 2024</div>
+              <div class="timeline-event">CHED Partnership</div>
+              <p class="timeline-desc">Formal partnership with CHED to list government-funded undergraduate scholarships.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot"></div>
+              <div class="timeline-connector"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-year">Mid 2024</div>
+              <div class="timeline-event">Platform v2 Launch</div>
+              <p class="timeline-desc">Full application tracking, document submission, and status dashboard released.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot"></div>
+              <div class="timeline-connector"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-year">Dec 2025</div>
+              <div class="timeline-event">340+ Programs Listed</div>
+              <p class="timeline-desc">Scholarships open for applications across government, private, and institutional partners.</p>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-line-wrap">
+              <div class="timeline-dot"></div>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-year">2026</div>
+              <div class="timeline-event">SHS Expansion</div>
+              <p class="timeline-desc">New SHS-targeted scholarships and mentorship programs being rolled out nationwide.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="team">
+  <div class="container">
+    <p class="section-label reveal">The People Behind ScholarLink</p>
+    <h2 class="section-title reveal" style="transition-delay:.07s">Our Team</h2>
+    <div class="team-grid">
+      <div class="team-card reveal" style="transition-delay:.07s">
+        <div class="avatar">M</div>
+        <div class="team-name">Maria Santos</div>
+        <div class="team-role">Co-Founder & CEO</div>
+        <span class="team-badge">Leadership</span>
+      </div>
+      <div class="team-card reveal" style="transition-delay:.13s">
+        <div class="avatar amber">J</div>
+        <div class="team-name">Jose Reyes</div>
+        <div class="team-role">Co-Founder & CTO</div>
+        <span class="team-badge">Engineering</span>
+      </div>
+      <div class="team-card reveal" style="transition-delay:.19s">
+        <div class="avatar">A</div>
+        <div class="team-name">Ana Lanuza</div>
+        <div class="team-role">Head of Design</div>
+        <span class="team-badge">Design</span>
+      </div>
+      <div class="team-card reveal" style="transition-delay:.25s">
+        <div class="avatar amber">R</div>
+        <div class="team-name">Ramon Cruz</div>
+        <div class="team-role">Partnerships Lead</div>
+        <span class="team-badge">Partnerships</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner reveal">
+  <h2>Your scholarship is waiting.</h2>
+  <p>Join thousands of Filipino students who found their funding through ScholarLink.</p>
+  <a href="#" class="btn-primary">Browse Scholarships</a>
+  <a href="#" class="btn-secondary">Contact Us</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 <span>ScholarLink</span> — Empowering Filipino scholars, one application at a time.</p>
+</footer>
+
+<script>
+  // ── Nav: transparent at top, solidifies on scroll ──
+  const navbar = document.getElementById('navbar');
+  let ticking = false;
+
+  function handleScroll() {
+    navbar.classList.toggle('scrolled', window.scrollY > 40);
+    ticking = false;
+  }
+
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(handleScroll);
+      ticking = true;
+    }
+  }, { passive: true });
+
+  // ── Scroll reveal using IntersectionObserver ──
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -48px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+</script>
+
+</body>
+</html>
