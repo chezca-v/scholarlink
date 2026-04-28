@@ -433,5 +433,7 @@ function typeWriter() {
 }
 typeWriter();
 </script>
+<x-chatbot-widget />
+@stack('scripts')
 </body>
 </html>
