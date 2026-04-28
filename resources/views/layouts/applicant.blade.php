@@ -161,25 +161,14 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
       <div class="sb-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
       <div style="flex:1; min-width:0;">
         <div class="sb-name" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</div>
-        <div class="sb-sub" style="display:flex; align-items:center; gap:4px;">
-          Applicant
+        <div class="sb-sub" style="display:flex; align-items:center; justify-content: space-between; gap:4px;">
+          <span>Applicant</span>
           <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; display:inline-block;">
             @csrf
-            <button type="submit" style="background:none; border:none; color:#DC2626; cursor:pointer; font-size:11px; font-family:inherit; padding:0; text-decoration:none;" title="Log Out" onclick="return confirm('Are you sure you want to log out?');">
+            <button type="submit" style="background:none; border:none; color:#DC2626; cursor:pointer; font-weight:700; font-size:11px; font-family:inherit; padding:0; text-decoration:none;" title="Log Out" onclick="return confirm('Are you sure you want to log out?');">
               Log Out
             </button>
           </form>
-
-    <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0;">
-      @csrf
-      <button type="submit" class="sb-user-btn" onclick="return confirm('Are you sure you want to log out?');">
-        <div class="sb-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
-        <div style="flex:1;">
-          <div class="sb-name">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</div>
-          <div class="sb-sub" style="display:flex; justify-content:space-between;">
-             <span>Applicant</span>
-             <span style="color:#DC2626;font-weight:700;">Log Out</span>
-          </div>
         </div>
       </div>
     </div>
