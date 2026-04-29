@@ -39,6 +39,14 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
+        
+        // Profile Setup Routes
+        Route::get('/applicant/setup', 'setup')->name('profile.setup');
+        Route::post('/applicant/setup/step1', 'setupStep1')->name('profile.setup.step1');
+        Route::post('/applicant/setup/step2', 'setupStep2')->name('profile.setup.step2');
+        Route::post('/applicant/setup/step3', 'setupStep3')->name('profile.setup.step3');
+        Route::post('/applicant/setup/submit', 'setupSubmit')->name('profile.setup.submit');
+
         Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');

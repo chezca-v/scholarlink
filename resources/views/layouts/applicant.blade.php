@@ -252,26 +252,33 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="logo-box">
     <span class="logo-text">ScholarLink</span>
   </a>
+  @if(!request()->routeIs('profile.setup*'))
   <form action="{{ route('scholarships.index') }}" method="GET" class="nav-search">
     <span class="si"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
     <input type="text" name="q" placeholder="Search scholarships, requirements…">
   </form>
+  @endif
   <div class="nav-right">
-    <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-      </svg>
-      @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
-      @if($navUnread > 0)
-        <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--accent);border-radius:99px;border:2px solid var(--primary);"></span>
-      @endif
-    </a>
-    <a href="{{ route('profile.show') }}" class="nav-av" title="My Profile">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</a>
+    @if(request()->routeIs('profile.setup*'))
+      <button onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'confirm-logout' }))" class="nav-logout">Log Out</button>
+    @else
+      <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+        @if($navUnread > 0)
+          <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--accent);border-radius:99px;border:2px solid var(--primary);"></span>
+        @endif
+      </a>
+      <a href="{{ route('profile.show') }}" class="nav-av" title="My Profile">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</a>
+    @endif
   </div>
 </nav>
 
 <div class="app">
+@if(!request()->routeIs('profile.setup*'))
   <aside class="sidebar">
     <div class="sb-section-label">Main</div>
     <a class="sb-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
@@ -332,8 +339,9 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         <span style="vertical-align: middle;">Log Out</span>
     </button>
   </aside>
+  @endif
 
-  <main class="main">
+  <main class="main" @if(request()->routeIs('profile.setup*')) style="display:flex; justify-content:center; align-items:center;" @endif>
     @yield('content')
   </main>
 </div>
