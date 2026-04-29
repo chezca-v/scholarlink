@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('admin.layouts.admin')
 
 @section('page_title', $pageTitle)
 @section('topnav_title', $topnavTitle)

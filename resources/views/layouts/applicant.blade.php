@@ -594,5 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 @stack('scripts')
 <x-chatbot-widget />
+    @include('components.toast-notification')
+    @include('components.modals.session-timeout')
 </body>
 </html>

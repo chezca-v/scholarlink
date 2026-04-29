@@ -1,83 +1,105 @@
-<!-- Session Timeout Warning Modal -->
-<div id="session-timeout-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; display: flex; align-items: center; justify-content: center;">
-    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15); animation: slideUp 0.3s ease-out;">
-        <!-- Icon -->
-        <div style="text-align: center; margin-bottom: 20px; font-size: 48px;">
-            ⏱️
+<div x-data="sessionTracker" 
+     x-show="isWarningShown" 
+     style="display: none;"
+     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+     x-transition.opacity>
+    
+    <div class="bg-white rounded-[20px] w-full max-w-[400px] p-8 shadow-2xl relative text-center"
+         @click.away="stayLoggedIn()"
+         x-show="isWarningShown"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+
+        <div class="mx-auto w-12 h-12 bg-[#FFFBEB] rounded-full flex items-center justify-center mb-5 border border-[#FDE68A]">
+            <svg class="w-6 h-6 text-[#B07B10]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
 
-        <!-- Title -->
-        <h2 style="font-size: 20px; font-weight: 700; color: #1a2e2c; margin-bottom: 12px; text-align: center;">
-            Session Expiring Soon
-        </h2>
+        <h2 class="font-display font-bold text-[22px] text-[#0F4C5C] mb-2">Session Expiring</h2>
+        <p class="text-[13px] text-slate-500 mb-6">You'll be automatically logged out in</p>
 
-        <!-- Message -->
-        <p style="font-size: 14px; color: #4a6460; line-height: 1.6; margin-bottom: 24px; text-align: center;">
-            You've been inactive for 13 minutes. Your session will expire in 2 minutes for your security. Please click "Stay Logged In" to continue.
-        </p>
+        <div class="flex items-end justify-center gap-2 mb-6">
+            <div class="text-[48px] font-display font-bold text-[#0F4C5C] leading-none" x-text="countdownText">00:00</div>
+            <div class="text-[12px] text-slate-400 font-bold uppercase tracking-wide mb-1 flex gap-4">
+                <span>min</span>
+                <span>sec</span>
+            </div>
+        </div>
 
-        <!-- Button Group -->
-        <div style="display: flex; gap: 12px;">
-            <button 
-                onclick="document.querySelector('[x-data]')?.__x.$data?.stayLoggedIn()" 
-                style="flex: 1; padding: 12px 16px; background: linear-gradient(135deg, #1a6b63, #2a8a80); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background 0.2s ease;">
-                Stay Logged In
+        <p class="text-[12px] text-slate-400 mb-8">Any unsaved changes will be lost</p>
+
+        <div class="flex items-center justify-center gap-3">
+            <button type="button" @click="logout()" 
+                    class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-colors border border-slate-200 bg-white min-w-[120px]">
+                Log out now
             </button>
-            <button 
-                onclick="document.querySelector('[x-data]')?.__x.$data?.logout()" 
-                style="flex: 1; padding: 12px 16px; background: #f5f5f5; color: #1a2e2c; border: 1px solid #e2e8e6; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; transition: background 0.2s ease;">
-                Log Out
+            <button type="button" @click="stayLoggedIn()" 
+                    class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-[#0F4C5C] hover:bg-[#1a6878] shadow-md transition-colors border border-[#0F4C5C] min-w-[120px]">
+                Stay logged in
             </button>
         </div>
-
-        <!-- Timer -->
-        <div style="text-align: center; margin-top: 16px; font-size: 12px; color: #8aaba6;">
-            Automatically logging out in <span id="session-timeout-countdown">2:00</span>
-        </div>
+        
+        <form id="global-logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
+            @csrf
+        </form>
     </div>
 </div>
 
-<style>
-    @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    #session-timeout-modal button:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-    }
-
-    #session-timeout-modal {
-        display: none !important;
-    }
-
-    #session-timeout-modal[style*="display: block"] {
-        display: flex !important;
-    }
-</style>
-
 <script>
-    // Update countdown timer every second
-    setInterval(() => {
-        const modal = document.getElementById('session-timeout-modal');
-        if (modal && modal.style.display !== 'none') {
-            const countdownEl = document.getElementById('session-timeout-countdown');
-            const text = countdownEl.textContent;
-            const [minutes, seconds] = text.split(':').map(Number);
-            let totalSeconds = minutes * 60 + seconds - 1;
-            
-            if (totalSeconds < 0) totalSeconds = 0;
-            
-            const newMinutes = Math.floor(totalSeconds / 60);
-            const newSeconds = totalSeconds % 60;
-            countdownEl.textContent = `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+document.addEventListener('alpine:init', () => {
+    Alpine.data('sessionTracker', () => ({
+        idleSeconds: 0,
+        warningLimit: 13 * 60, // Show warning after 13 minutes
+        timeoutLimit: 15 * 60, // Logout after 15 minutes
+        interval: null,
+        isWarningShown: false,
+        countdownText: '02:00',
+
+        init() {
+            this.resetIdleTime();
+            const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+            events.forEach(event => {
+                window.addEventListener(event, () => this.resetIdleTime(), true);
+            });
+
+            this.interval = setInterval(() => {
+                this.idleSeconds++;
+                
+                if (this.idleSeconds >= this.warningLimit) {
+                    if (!this.isWarningShown) this.isWarningShown = true;
+                    this.updateCountdown();
+                }
+                
+                if (this.idleSeconds >= this.timeoutLimit) {
+                    this.logout();
+                }
+            }, 1000);
+        },
+
+        updateCountdown() {
+            let remaining = this.timeoutLimit - this.idleSeconds;
+            if (remaining < 0) remaining = 0;
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            this.countdownText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        },
+
+        resetIdleTime() {
+            this.idleSeconds = 0;
+            this.isWarningShown = false;
+        },
+
+        logout() {
+            clearInterval(this.interval);
+            document.getElementById('global-logout-form').submit();
+        },
+
+        stayLoggedIn() {
+            this.resetIdleTime();
         }
-    }, 1000);
+    }));
+});
 </script>
