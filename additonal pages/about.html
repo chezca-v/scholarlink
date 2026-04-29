@@ -537,7 +537,7 @@
     document.querySelectorAll('#stackDots .stack-dot').forEach((d,i) => d.classList.toggle('active', i === stackCurrent));
   }
 
-  function stack`Advance() {
+  function stackAdvance() {
     const top = document.querySelector(`#stack .s-card[data-i="${stackCurrent}"]`);
     top.style.transition = 'transform .28s cubic-bezier(.22,1,.36,1), opacity .22s ease';
     top.style.transform = 'translate(-70px,30px) rotate(-18deg) scale(0.88)';
