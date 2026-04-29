@@ -1,24 +1,24 @@
 @extends('layouts.superadmin')
 
-@section('page_title', 'Organization Management')
-@section('topnav_title', 'Organization Management')
+@section('page_title', 'Scholarship Management')
+@section('topnav_title', 'Scholarship Management')
 @section('topnav_subtitle', '/superadmin/organizations')
 
 @section('content')
   <!-- BREADCRUMB -->
   <div class="breadcrumb">
-    <span>Home</span><span class="sep">/</span><span class="current">Organizations</span>
+    <span>Home</span><span class="sep">/</span><span class="current">Scholarships</span>
   </div>
 
   <!-- STATS -->
   <div class="stat-grid" style="grid-template-columns: repeat(3,1fr); margin-bottom: 20px;">
     <div class="stat-card">
-      <div class="label">Total Orgs</div>
+      <div class="label">Total Scholarships</div>
       <div class="value">{{ $totalOrgs }}</div>
       <div class="delta up">▲ {{ $newOrgsThisMonth }} this month</div>
     </div>
     <div class="stat-card">
-      <div class="label">Active Orgs</div>
+      <div class="label">Active Applicants</div>
       <div class="value">{{ $activeOrgs }}</div>
       <div class="delta neutral">{{ $inactiveOrgs }} inactive</div>
     </div>
@@ -35,7 +35,7 @@
       <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
         <div class="search-wrap" style="flex: 1; min-width: 200px;">
           <span class="search-icon">🔍</span>
-          <input class="form-input" name="search" placeholder="Search organizations…"
+          <input class="form-input" name="search" placeholder="Search scholarships…"
                  value="{{ request('search') }}" style="padding-left: 36px;">
         </div>
         <select class="form-select" name="status" style="width: auto;">
@@ -52,7 +52,7 @@
         </select>
         <button type="button" class="btn btn-primary"
                 onclick="document.getElementById('createOrgModal').classList.add('open')">
-          + Add Org
+          + Add Scholarship
         </button>
       </div>
     </form>
@@ -64,7 +64,7 @@
       <table>
         <thead>
           <tr>
-            <th>Organization</th>
+            <th>Scholarship Provider</th>
             <th>Type</th>
             <th>Assigned Admin</th>
             <th>Scholarships</th>
@@ -74,89 +74,55 @@
           </tr>
         </thead>
         <tbody>
-          @forelse($organizations as $org)
-          <tr>
-            <td>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="org-avatar" style="background: {{ $org->avatar_bg ?? '#E8F8F0' }}; font-size: 16px;">
-                  {{ $org->emoji ?? '🏛️' }}
-                </div>
-                <div>
-                  <div style="font-weight: 600;">{{ $org->name }}</div>
-                  <div style="font-size: 11px; color: var(--slate);">{{ $org->description }}</div>
-                </div>
-              </div>
-            </td>
-            <td>
-              @if($org->type === 'Government')
-                <span class="badge teal">Government</span>
-              @elseif($org->type === 'Private')
-                <span class="badge amber">Private</span>
-              @else
-                <span class="badge gray">{{ $org->type }}</span>
-              @endif
-            </td>
-            <td>
-              @if($org->admin)
-                <div style="display: flex; align-items: center; gap: 6px;">
-                  <div class="org-avatar" style="background: rgba(15,76,92,.1); width: 26px; height: 26px; font-size: 11px; border-radius: 50%;">
-                    {{ strtoupper(substr($org->admin->first_name, 0, 1) . substr($org->admin->last_name, 0, 1)) }}
-                  </div>
-                  <span style="font-size: 12px;">{{ $org->admin->full_name }}</span>
-                </div>
-              @else
-                <span style="color: var(--muted); font-size: 12px; font-style: italic;">Unassigned</span>
-              @endif
-            </td>
-            <td>
-              <span style="font-weight: 600;">{{ $org->active_scholarships_count ?? 0 }}</span>
-              <span style="color: var(--slate); font-size: 12px;"> active</span>
-            </td>
-            <td>{{ number_format($org->applicants_count ?? 0) }}</td>
-            <td>
-              @if($org->status === 'active')
-                <span class="badge green">Active</span>
-              @elseif($org->status === 'pending')
-                <span class="badge yellow">Pending</span>
-              @else
-                <span class="badge red">Inactive</span>
-              @endif
-            </td>
-            <td>
-              <div style="display: flex; gap: 6px;">
-                <a href="#"
-                   class="btn btn-ghost btn-sm">✏️ Edit</a>
-                @if(!$org->admin)
-                  <button class="btn btn-amber btn-sm"
-                          onclick="openAssignModal({{ $org->id }}, '{{ $org->name }}')">
-                    👤 Assign
-                  </button>
-                @elseif($org->status === 'inactive')
-                  <button class="btn btn-outline btn-sm"
-                          onclick="reactivateOrg({{ $org->id }})">
-                    ↩ Reactivate
-                  </button>
-                @else
-                  <button class="btn btn-outline btn-sm"
-                          onclick="openAssignModal({{ $org->id }}, '{{ $org->name }}')">
-                    👤 Assign
-                  </button>
-                @endif
-              </div>
-            </td>
-          </tr>
-          @empty
-          <tr>
-            <td colspan="7" style="text-align: center; padding: 40px; color: var(--muted);">
-              No organizations found.
-            </td>
-          </tr>
-          @endforelse
+            @forelse ($organizations as $org)
+            <tr>
+                <td>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="org-avatar" style="background: #E8F8F0; font-size: 16px;">🎓</div>
+                        <div>
+                            <div style="font-weight: 600;">{{ $org->name }}</div>
+                            <div style="font-size: 11px; color: var(--slate);">{{ $org->provider_name }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge gray">Scholarship</span>
+                </td>
+                <td>
+                    <span style="color: var(--muted); font-size: 12px; font-style: italic;">System Admin</span>
+                </td>
+                <td>
+                    <span style="font-weight: 600;">{{ $org->slots ?? 0 }}</span>
+                    <span style="color: var(--slate); font-size: 12px;"> slots</span>
+                </td>
+                <td>{{ number_format($org->applications_count ?? 0) }}</td>
+                <td>
+                    @if ($org->status === 'open')
+                        <span class="badge green">Open</span>
+                    @elseif ($org->status === 'draft')
+                        <span class="badge yellow">Draft</span>
+                    @else
+                        <span class="badge red">{{ ucfirst($org->status) }}</span>
+                    @endif
+                </td>
+                <td>
+                    <div style="display: flex; gap: 6px;">
+                        <a href="#" class="btn btn-ghost btn-sm">View Details</a>
+                    </div>
+                </td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="7" style="text-align: center; padding: 40px; color: var(--muted);">
+                    No scholarships found.
+                </td>
+            </tr>
+            @endforelse
         </tbody>
       </table>
     </div>
     <div class="pagination">
-      <span class="info">Showing {{ $organizations->firstItem() }}–{{ $organizations->lastItem() }} of {{ $organizations->total() }} organizations</span>
+      <span class="info">Showing {{ $organizations->firstItem() }}–{{ $organizations->lastItem() }} of {{ $organizations->total() }} scholarships</span>
       <div class="page-btns">
         @for($i = 1; $i <= $organizations->lastPage(); $i++)
           <button class="page-btn {{ $organizations->currentPage() === $i ? 'active' : '' }}"
@@ -173,40 +139,43 @@
 
   <!-- PER-ORG STATS OVERVIEW -->
   <div style="margin-top: 20px;">
-    <div class="section-title" style="margin-bottom: 12px;">Per-Org Stats Overview</div>
+    <div class="section-title" style="margin-bottom: 12px;">Top Performing Scholarships</div>
     <div class="grid-3">
-      @foreach($orgStats as $stat)
-      <div class="org-card">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div class="org-avatar" style="background: {{ $stat->avatar_bg ?? '#E8F8F0' }};">
-            {{ $stat->emoji ?? '🏛️' }}
-          </div>
-          <div>
-            <div style="font-weight: 600; font-size: 13px;">{{ $stat->name }}</div>
-            <div class="org-meta">{{ $stat->type }} · {{ $stat->scholarships_count }} scholarships</div>
-          </div>
+        @foreach($orgStats as $stat)
+        <div class="org-card">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="org-avatar" style="background: {{ $stat->avatar_bg ?? '#E8F8F0' }}; font-size: 16px;">
+                    {{ $stat->emoji ?? '🎓' }}
+                </div>
+                <div>
+                    <div style="font-weight: 600; font-size: 13px;">{{ $stat->name }}</div>
+                    <div class="org-meta">{{ $stat->provider }}</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 8px;">
+                <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
+                    <span style="color: var(--slate);">Approval rate</span>
+                    <span style="font-weight: 600;">{{ $stat->approval_rate }}%</span>
+                </div>
+                <div class="prog-bar-wrap">
+                    <div class="prog-bar" style="width: {{ $stat->approval_rate }}%;"></div>
+                </div>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+                <div style="display: flex; gap: 8px;">
+                    <span class="badge green">{{ number_format($stat->applicants_count) }} applicants</span>
+                    <span class="badge teal">{{ ucfirst($stat->status) }}</span>
+                </div>
+                <div style="font-size: 11px; color: var(--slate); font-weight: 600;">
+                    {{ $stat->slots_available }} slots
+                </div>
+            </div>
         </div>
-        <div>
-          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px;">
-            <span style="color: var(--slate);">Approval rate</span>
-            <span style="font-weight: 600;">{{ $stat->approval_rate }}%</span>
-          </div>
-          <div class="prog-bar-wrap">
-            <div class="prog-bar" style="width: {{ $stat->approval_rate }}%;"></div>
-          </div>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <span class="badge green">{{ number_format($stat->applicants_count) }} applicants</span>
-          @if($stat->type === 'Private')
-            <span class="badge amber">Private</span>
-          @else
-            <span class="badge teal">{{ $stat->status === 'active' ? 'Active' : ucfirst($stat->status) }}</span>
-          @endif
-        </div>
-      </div>
-      @endforeach
+        @endforeach
     </div>
-  </div>
+</div>
 @endsection
 
 @section('modals')
@@ -215,14 +184,14 @@
        onclick="if(event.target===this) this.classList.remove('open')">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">Add New Organization</div>
+        <div class="modal-title">Add New Scholarship</div>
         <button class="modal-close"
                 onclick="document.getElementById('createOrgModal').classList.remove('open')">✕</button>
       </div>
       <form method="POST" action="{{ route('superadmin.organizations.store') }}">
         @csrf
         <div class="form-group">
-          <label class="form-label">Organization Name <span class="req">*</span></label>
+          <label class="form-label">Scholarship Provider Name <span class="req">*</span></label>
           <input class="form-input" name="name" placeholder="e.g. Petron Foundation" required>
         </div>
         <div class="form-group">
@@ -236,7 +205,7 @@
         <div class="form-group">
           <label class="form-label">Description</label>
           <textarea class="form-textarea" name="description"
-                    placeholder="Brief description of the organization…"></textarea>
+                    placeholder="Brief description of the scholarship…"></textarea>
         </div>
         <div class="form-group">
           <label class="form-label">Initial Status</label>
@@ -250,7 +219,7 @@
                   onclick="document.getElementById('createOrgModal').classList.remove('open')">
             Cancel
           </button>
-          <button type="submit" class="btn btn-primary">Create Organization</button>
+          <button type="submit" class="btn btn-primary">Create Scholarship</button>
         </div>
       </form>
     </div>
@@ -261,7 +230,7 @@
        onclick="if(event.target===this) this.classList.remove('open')">
     <div class="modal">
       <div class="modal-header">
-        <div class="modal-title">Assign Admin to Organization</div>
+        <div class="modal-title">Assign Admin to </div>
         <button class="modal-close"
                 onclick="document.getElementById('assignAdminModal').classList.remove('open')">✕</button>
       </div>

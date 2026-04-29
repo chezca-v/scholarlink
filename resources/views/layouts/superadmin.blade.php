@@ -511,7 +511,7 @@
             <div class="sa-nav-group__label">Management</div>
             <a href="{{ route('superadmin.organizations') }}"
                class="sa-nav-item {{ request()->routeIs('superadmin.organizations*') ? 'active' : '' }}">
-                <span class="sa-nav-item__icon">🏛️</span> Organizations
+                <span class="sa-nav-item__icon">🏛️</span> Scholarships
             </a>
             <a href="{{ route('superadmin.admins') }}"
                class="sa-nav-item {{ request()->routeIs('superadmin.admins*') ? 'active' : '' }}">
