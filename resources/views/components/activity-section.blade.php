@@ -3,7 +3,7 @@
 <div class="activity-section">
     <div class="section-header">
         <h3>Recent Activity</h3>
-        <a href="{{ route('admin.activity.index') ?? '#' }}" class="subtitle" style="text-decoration: none; color: inherit;">View all →</a>
+        <a href="#" class="subtitle" style="text-decoration: none; color: inherit;">View all →</a>
     </div>
 
     <div class="activity-list">

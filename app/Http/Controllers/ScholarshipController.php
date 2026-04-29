@@ -146,10 +146,9 @@ class ScholarshipController extends Controller
             $user = Auth::user();
             $applicationCount = \App\Models\Application::where('applicant_id', $user->id)->count();
             $savedCount = \App\Models\SavedScholarship::where('user_id', $user->id)->count();
-            $unreadCount = \App\Models\Notification::where('user_id', $user->id)->whereNull('read_at')->count();
-        }
+            $unreadCount = \App\Models\Notification::where('user_id', $user->id)->where('is_read', false)->count();        }
 
-        return view('applicant.dashboard', compact('scholarships', 'filters', 'statusCounts', 'incomeBrackets', 'applicationCount', 'savedCount', 'unreadCount'));
+        return view('scholarships.index', compact('scholarships', 'filters', 'statusCounts', 'incomeBrackets', 'applicationCount', 'savedCount', 'unreadCount'));
     }
 
     public function create()

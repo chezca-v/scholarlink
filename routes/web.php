@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     PublicController,
     ScholarshipController,
+    AiController,
     ProfileController,
     DocumentController,
     ApplicationController,
@@ -26,8 +27,7 @@ Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships', 'index')->name('scholarships.index');
     Route::get('/scholarships/{id}', 'show')->name('scholarships.show');
 });
-
-/*
+Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');/*
 Applicant Routes (Role: applicant)
 */
 Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
@@ -35,9 +35,11 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     // Dashboard & Profile Management
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
+        Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
         Route::get('/profile/setup', 'setup')->name('profile.setup');
         Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
+        Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 
     //Document Wallet
@@ -57,6 +59,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
         Route::get('/applicant/applications', 'index')->name('applications.index');
         Route::get('/apply/{id}', 'create')->name('applications.create');
         Route::post('/apply/{id}', 'store')->name('applications.store');
+        Route::get('/applicant/applications/{id}', 'show')->name('applications.show');
         Route::get('/applicant/applications/{id}/track', 'track')->name('applications.track');
     });
 
@@ -73,6 +76,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
 Admin Routes (Role: admin)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () { return redirect()->route('admin.dashboard'); });
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Scholarship CRUD & Extensions
@@ -95,6 +99,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 6.4 Evaluator Routes (Role: evaluator)
 */
 Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evaluator.')->group(function () {
+    Route::get('/', function () { return redirect()->route('evaluator.dashboard'); });
     Route::get('/dashboard', [EvaluatorController::class, 'dashboard'])->name('dashboard');
     Route::get('/queue', [EvaluatorController::class, 'queue'])->name('queue');
 
@@ -103,7 +108,7 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
         Route::get('/notifications', 'notifications')->name('notifications');
         Route::post('/notifications/mark-all-read', 'markAllRead')->name('notifications.markAllRead');
         Route::post('/notifications/{id}/mark-read', 'markRead')->name('notifications.markRead');
-        
+
         Route::get('/profile', 'profile')->name('profile');
         Route::patch('/profile', 'profileUpdate')->name('profile.update');
     });
@@ -122,6 +127,7 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
 Superadmin Routes (Role: superadmin)
 */
 Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('/', function () { return redirect()->route('superadmin.dashboard'); });
     Route::controller(SuperadminController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
 
@@ -142,6 +148,11 @@ Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('supe
         Route::get('/logs', 'logs')->name('logs');
         Route::get('/settings', 'settings')->name('settings');
         Route::patch('/settings', 'updateSettings')->name('settings.update');
+
+        // Notifications
+        Route::get('/notifications', 'notifications')->name('notifications');
+        Route::post('/notifications/mark-all-read', 'markAllReadNotifications')->name('notifications.markAllRead');
+        Route::post('/notifications/{id}/mark-read', 'markReadNotification')->name('notifications.markRead');
     });
 });
 

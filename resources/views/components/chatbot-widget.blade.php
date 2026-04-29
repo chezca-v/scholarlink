@@ -52,7 +52,9 @@
 ═══════════════════════════════════════════════════════════════════════════ --}}
 <div id="chat-widget-root"
      data-unread="{{ $unreadCount }}"
-     data-amber="{{ $isAmber ? 'true' : 'false' }}">
+     data-amber="{{ $isAmber ? 'true' : 'false' }}"
+     data-bot-initial="{{ strtoupper(substr($botName, 0, 1)) }}"
+     data-chat-url="{{ route('ai.chat') }}">
 
     {{-- FAB Button --}}
     <button
@@ -267,7 +269,6 @@
 {{-- ═══════════════════════════════════════════════════════════════════════════
      STYLES — scoped with .chat-* namespace to avoid collisions
 ═══════════════════════════════════════════════════════════════════════════ --}}
-@push('styles')
 <style>
 /* ── CSS Custom Properties ────────────────────────────────────────────── */
 :root {
@@ -682,7 +683,6 @@
     }
 }
 </style>
-@endpush
 
 
 {{-- ═══════════════════════════════════════════════════════════════════════════
@@ -697,6 +697,7 @@
     const state = {
         isOpen:      false,
         isMinimized: false,
+        isSending:   false,
         unread:      parseInt(document.getElementById('chat-widget-root')
                         ?.dataset.unread || '0', 10),
     };
@@ -710,7 +711,15 @@
     const chips     = () => document.getElementById('chat-chips');
     const input     = () => document.getElementById('chat-input');
     const badge     = () => document.getElementById('chat-fab-badge');
+    const root      = () => document.getElementById('chat-widget-root');
 
+        function botInitial() {
+            return root()?.dataset.botInitial || 'S';
+        }
+
+        function chatUrl() {
+            return root()?.dataset.chatUrl || '/ai/chat';
+        }
     // ── Helpers ──────────────────────────────────────────────────────────
     function scrollToBottom() {
         const el = messages();
@@ -733,8 +742,7 @@
         if (role === 'bot') {
             msg.innerHTML = `
                 <div class="chat-msg__avatar">
-                    <span class="chat-pill__avatar-initials">S</span>
-                </div>
+                    <span class="chat-pill__avatar-initials">${escapeHtml(botInitial())}</span>                </div>
                 <div class="chat-msg__bubble">${escapeHtml(text)}</div>`;
         } else {
             msg.innerHTML = `<div class="chat-msg__bubble">${escapeHtml(text)}</div>`;
@@ -764,6 +772,19 @@
         const b = badge();
         if (b) b.remove();
         fab()?.classList.remove('chat-fab--pulse');
+    }
+    function setSending(isSending) {
+        state.isSending = isSending;
+
+        const inp = input();
+        const sendButton = document.querySelector('.chat-window__send-btn');
+
+        if (inp) inp.disabled = isSending;
+        if (sendButton) {
+            sendButton.disabled = isSending;
+            sendButton.style.opacity = isSending ? '.6' : '1';
+            sendButton.style.cursor = isSending ? 'wait' : 'pointer';
+        }
     }
 
     // ── Public API ───────────────────────────────────────────────────────
@@ -833,6 +854,8 @@
          * @param {string} label
          */
         sendChip(label) {
+            if (state.isSending) return;
+
             // Hide chips after first interaction (Spec: shown after welcome + certain responses)
             chips()?.classList.add('is-hidden');
 
@@ -840,13 +863,14 @@
             appendMessage(label, 'user');
 
             // Simulate bot response
-            this._simulateBotResponse();
+            this._fetchBotResponse(label);
         },
 
         /**
          * sendMessage — reads input and sends
          */
         sendMessage() {
+            if (state.isSending) return;
             const inp  = input();
             const text = inp?.value.trim();
             if (!text) return;
@@ -855,7 +879,7 @@
             appendMessage(text, 'user');
             inp.value = '';
 
-            this._simulateBotResponse();
+            this._fetchBotResponse(text);
         },
 
         /**
@@ -886,15 +910,40 @@
          *     .then(r => r.json())
          *     .then(d => { ChatWidget.hideTyping(); appendMessage(d.reply, 'bot'); });
          */
-        _simulateBotResponse() {
+        * _fetchBotResponse — sends message to Gemini via Laravel backend
+        * @param {string} text — the user's message
+        */
+        _fetchBotResponse(text) {
+            setSending(true);
             this.showTyping();
-            setTimeout(() => {
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+            fetch('/ai/chat', {
+                method:  'POST',
+                headers: {
+                    'Content-Type':  'application/json',
+                    'Accept':        'application/json',
+                    'X-CSRF-TOKEN':  csrfToken,
+                },
+                body: JSON.stringify({ message: text }),
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Network error ' + res.status);
+                return res.json();
+            })
+            .then(data => {
                 this.hideTyping();
-                appendMessage('I\'m looking into that for you…', 'bot');
-                // Optionally re-show chips after bot responds
-                // chips()?.classList.remove('is-hidden');
-            }, 1800);
-        },
+                appendMessage(data.reply || 'Sorry, I couldn\'t get a response.', 'bot');
+            })
+            .catch(() => {
+                this.hideTyping();
+                appendMessage('Something went wrong while contacting Gemini. Please try again.', 'bot');
+            })
+            .finally(() => {
+                setSending(false);
+                input()?.focus();
+            });
     };
 
     // ── Init — show pulse on first load if no unread ─────────────────────

@@ -250,13 +250,25 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   </form>
 
   <div class="nav-right">
-    <button class="nav-ibtn" type="button" title="Notifications">
+    @auth
+    <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      @if ($unreadCount > 0)
+        <span class="nbadge"></span>
+      @endif
+    </a>
+    @else
+    <button class="nav-ibtn" type="button" title="Notifications" onclick="window.location.href='{{ route('login') }}'">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
         <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
       </svg>
       <span class="nbadge"></span>
     </button>
+    @endauth
     <button class="nav-ibtn" type="button" title="Settings">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="3"/>
@@ -626,7 +638,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           @endauth
 
           {{-- Actions --}}
-          </div> 
+          </div>
           <div class="cact">
             <a href="{{ route('scholarships.show', $scholarship->id) }}"
                class="btn-apply">

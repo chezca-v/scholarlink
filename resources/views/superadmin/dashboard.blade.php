@@ -5,8 +5,6 @@
 | Purpose: Nationwide stats + fraud alert feed
 |--------------------------------------------------------------------------
 | Controller should pass:
-|   $admin           array  ['name','initials']
-|   $pendingAdmins   int
 |   $stats           array  of stat cards
 |   $orgPerformance  array  bar chart rows
 |   $fraudAlerts     array  alert feed items
@@ -14,15 +12,11 @@
 |   $systemHealth    array  health indicator cards
 |   $chartMonths     array  monthly bar data [{month,pct,accent}]
 --}}
-@extends('superadmin._layout')
+@extends('layouts.superadmin')
 
-@section('title', 'Dashboard')
-@section('page-title', 'Dashboard')
-@section('page-subtitle', 'Nationwide overview · ScholarLink')
-
-@php
-    $activePage = 'dashboard';
-@endphp
+@section('page_title', 'Dashboard')
+@section('topnav_title', 'Dashboard')
+@section('topnav_subtitle', '/superadmin/dashboard')
 
 @section('content')
     <div class="breadcrumb">
