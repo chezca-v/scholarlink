@@ -48,6 +48,12 @@ class Application extends Model
         return $this->hasMany(Evaluation::class);
     }
 
+    // Virtual attribute to get the assigned evaluator
+    public function getEvaluatorAttribute()
+    {
+        return $this->evaluations()->first()?->evaluator;
+    }
+
     // One application has many application_documents
     public function applicationDocuments(): HasMany
     {

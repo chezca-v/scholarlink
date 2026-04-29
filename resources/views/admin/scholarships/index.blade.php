@@ -49,6 +49,11 @@
                             <div class="flex items-center justify-end gap-2">
                                 <a href="{{ route('admin.scholarships.show', $scholarship->id) }}" class="btn-ghost !px-3 !py-1.5 text-xs">View</a>
                                 <a href="{{ route('admin.scholarships.edit', $scholarship->id) }}" class="btn-ghost !px-3 !py-1.5 text-xs">Edit</a>
+                                <form action="{{ route('admin.scholarships.destroy', $scholarship->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this scholarship?');" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-danger !px-3 !py-1.5 text-xs">Delete</button>
+                                </form>
                             </div>
                         </td>
                     </tr>

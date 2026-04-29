@@ -246,7 +246,7 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::latest()->get();
+        $users = User::where('role', '!=', 'applicant')->latest()->get();
         return view('admin.user', compact('users'));
     }
 
@@ -481,11 +481,53 @@ class AdminController extends Controller
 
     public function bulkAssign(\Illuminate\Http\Request $request)
     {
+        $request->validate([
+            'application_ids' => 'required|string',
+            'evaluator_id' => 'required|exists:users,id',
+        ]);
+
+        $ids = explode(',', $request->application_ids);
+        
+        foreach ($ids as $id) {
+            $application = Application::find($id);
+            if ($application) {
+                \App\Models\Evaluation::firstOrCreate([
+                    'application_id' => $application->id,
+                    'evaluator_id' => $request->evaluator_id,
+                ], [
+                    'gpa_score' => 0,
+                    'income_score' => 0,
+                ]);
+                
+                if ($application->status === 'pending') {
+                    $application->update(['status' => 'under_review']);
+                }
+            }
+        }
+
         return back()->with('success', 'Evaluator assigned to selected applications.');
     }
 
     public function assign(\Illuminate\Http\Request $request, $id)
     {
+        $request->validate([
+            'evaluator_id' => 'required|exists:users,id',
+        ]);
+
+        $application = Application::findOrFail($id);
+        
+        \App\Models\Evaluation::firstOrCreate([
+            'application_id' => $application->id,
+            'evaluator_id' => $request->evaluator_id,
+        ], [
+            'gpa_score' => 0,
+            'income_score' => 0,
+        ]);
+        
+        if ($application->status === 'pending') {
+            $application->update(['status' => 'under_review']);
+        }
+
         return back()->with('success', 'Evaluator assigned to application.');
     }
 

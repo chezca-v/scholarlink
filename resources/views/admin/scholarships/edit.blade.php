@@ -34,6 +34,17 @@
         @csrf
         @method('PUT')
 
+        @if($errors->any())
+        <div class="alert alert-danger mb-6 p-4 rounded-xl" style="background:#FEE2E2; color:#DC2626; border:1px solid #FECACA;">
+            <p class="font-bold text-sm mb-1">Please fix the following errors:</p>
+            <ul class="list-disc pl-5 text-sm">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         {{-- Hidden fields to store dynamic arrays as strings --}}
         <input type="hidden" name="eligibility" :value="eligibility.join('\n')">
         <input type="hidden" name="benefits" :value="benefits.join('\n')">
@@ -101,68 +112,62 @@
                         
                         {{-- Eligibility --}}
                         <div>
-                            <label class="input-label flex items-center justify-between">
-                                <span>Eligibility Criteria <span style="color:#DC2626;">*</span></span>
-                            </label>
-                            <div class="space-y-2">
-                                <template x-for="(item, index) in eligibility" :key="'elig'+index">
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <input type="text" class="input-field" x-model="eligibility[index]" placeholder="e.g. Must be a graduating SHS student" required>
-                                        </div>
-                                        <button type="button" @click="eligibility.splice(index, 1)" x-show="eligibility.length > 1" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                        </button>
-                                    </div>
-                                </template>
+                            <label class="input-label">Eligibility Criteria <span style="color:#DC2626;">*</span></label>
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" class="input-field" x-model="newEligibility" placeholder="e.g. Must be a graduating SHS student" @keydown.enter.prevent="if(newEligibility) { eligibility.push(newEligibility); newEligibility=''; }">
+                                <button type="button" @click="if(newEligibility) { eligibility.push(newEligibility); newEligibility=''; }" class="btn-secondary !py-2 px-4 shrink-0">Add</button>
                             </div>
-                            <button type="button" @click="eligibility.push('')" class="mt-2 text-sm font-semibold text-[var(--primary)] hover:underline flex items-center gap-1">
-                                + Add another criteria
-                            </button>
+                            <ul class="space-y-2">
+                                <template x-for="(item, index) in eligibility" :key="'elig'+index">
+                                    <li class="flex items-start gap-2 bg-white border border-[var(--border)] p-2.5 rounded-lg shadow-sm">
+                                        <svg class="w-4 h-4 text-[var(--primary)] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span class="flex-1 text-sm text-[var(--ink)]" x-text="item"></span>
+                                        <button type="button" @click="eligibility.splice(index, 1)" class="text-red-500 hover:bg-red-50 p-1 rounded transition-colors" title="Remove">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
 
                         {{-- Benefits --}}
                         <div>
-                            <label class="input-label flex items-center justify-between">
-                                <span>Benefits Overview <span style="color:#DC2626;">*</span></span>
-                            </label>
-                            <div class="space-y-2">
-                                <template x-for="(item, index) in benefits" :key="'ben'+index">
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <input type="text" class="input-field" x-model="benefits[index]" placeholder="e.g. Full Tuition Coverage" required>
-                                        </div>
-                                        <button type="button" @click="benefits.splice(index, 1)" x-show="benefits.length > 1" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                        </button>
-                                    </div>
-                                </template>
+                            <label class="input-label">Benefits Overview <span style="color:#DC2626;">*</span></label>
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" class="input-field" x-model="newBenefit" placeholder="e.g. Full Tuition Coverage" @keydown.enter.prevent="if(newBenefit) { benefits.push(newBenefit); newBenefit=''; }">
+                                <button type="button" @click="if(newBenefit) { benefits.push(newBenefit); newBenefit=''; }" class="btn-secondary !py-2 px-4 shrink-0">Add</button>
                             </div>
-                            <button type="button" @click="benefits.push('')" class="mt-2 text-sm font-semibold text-[var(--primary)] hover:underline flex items-center gap-1">
-                                + Add another benefit
-                            </button>
+                            <ul class="space-y-2">
+                                <template x-for="(item, index) in benefits" :key="'ben'+index">
+                                    <li class="flex items-start gap-2 bg-white border border-[var(--border)] p-2.5 rounded-lg shadow-sm">
+                                        <svg class="w-4 h-4 text-[var(--primary)] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span class="flex-1 text-sm text-[var(--ink)]" x-text="item"></span>
+                                        <button type="button" @click="benefits.splice(index, 1)" class="text-red-500 hover:bg-red-50 p-1 rounded transition-colors" title="Remove">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
 
                         {{-- Requirements --}}
                         <div>
-                            <label class="input-label flex items-center justify-between">
-                                <span>Document Requirements <span style="color:#DC2626;">*</span></span>
-                            </label>
-                            <div class="space-y-2">
-                                <template x-for="(item, index) in requirements" :key="'req'+index">
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <input type="text" class="input-field" x-model="requirements[index]" placeholder="e.g. Certificate of Good Moral" required>
-                                        </div>
-                                        <button type="button" @click="requirements.splice(index, 1)" x-show="requirements.length > 1" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                        </button>
-                                    </div>
-                                </template>
+                            <label class="input-label">Document Requirements <span style="color:#DC2626;">*</span></label>
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" class="input-field" x-model="newRequirement" placeholder="e.g. Certificate of Good Moral" @keydown.enter.prevent="if(newRequirement) { requirements.push(newRequirement); newRequirement=''; }">
+                                <button type="button" @click="if(newRequirement) { requirements.push(newRequirement); newRequirement=''; }" class="btn-secondary !py-2 px-4 shrink-0">Add</button>
                             </div>
-                            <button type="button" @click="requirements.push('')" class="mt-2 text-sm font-semibold text-[var(--primary)] hover:underline flex items-center gap-1">
-                                + Add another document
-                            </button>
+                            <ul class="space-y-2">
+                                <template x-for="(item, index) in requirements" :key="'req'+index">
+                                    <li class="flex items-start gap-2 bg-white border border-[var(--border)] p-2.5 rounded-lg shadow-sm">
+                                        <svg class="w-4 h-4 text-[var(--primary)] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                                        <span class="flex-1 text-sm text-[var(--ink)]" x-text="item"></span>
+                                        <button type="button" @click="requirements.splice(index, 1)" class="text-red-500 hover:bg-red-50 p-1 rounded transition-colors" title="Remove">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -423,9 +428,12 @@
 function scholarshipForm() {
     return {
         // Dynamic Fields setup
-        eligibility: {!! json_encode(old('eligibility', $scholarship->eligibility) ? explode("\n", old('eligibility', $scholarship->eligibility)) : ['']) !!},
-        benefits: {!! json_encode(old('benefits', $scholarship->benefits) ? explode("\n", old('benefits', $scholarship->benefits)) : ['']) !!},
-        requirements: {!! json_encode(old('requirements', $scholarship->requirements) ? explode("\n", old('requirements', $scholarship->requirements)) : ['']) !!},
+        eligibility: {!! json_encode(array_values(array_filter(old('eligibility', $scholarship->eligibility) ? explode("\n", old('eligibility', $scholarship->eligibility)) : []))) !!},
+        newEligibility: '',
+        benefits: {!! json_encode(array_values(array_filter(old('benefits', $scholarship->benefits) ? explode("\n", old('benefits', $scholarship->benefits)) : []))) !!},
+        newBenefit: '',
+        requirements: {!! json_encode(array_values(array_filter(old('requirements', $scholarship->requirements) ? explode("\n", old('requirements', $scholarship->requirements)) : []))) !!},
+        newRequirement: '',
         
         // GPA Scale
         gpaScale: {{ (old('gpa_requirement', $scholarship->gpa_requirement) > 5) ? "'shs'" : "'college'" }},
@@ -449,11 +457,14 @@ function scholarshipForm() {
             health: ['BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health'],
             arts: ['BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math']
         },
-        selectedTags: {!! json_encode(array_values(array_filter(old('tags', $scholarship->tags ?? []), function($tag) {
+        @php
+            $currentTags = is_array(old('tags', $scholarship->tags)) ? old('tags', $scholarship->tags) : (is_string(old('tags', $scholarship->tags)) ? json_decode(old('tags', $scholarship->tags), true) ?? [] : []);
+        @endphp
+        selectedTags: {!! json_encode(array_values(array_filter($currentTags, function($tag) {
             $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return in_array($tag, $standards);
         }))) !!},
-        customTags: {!! json_encode(array_values(array_filter(old('tags', $scholarship->tags ?? []), function($tag) {
+        customTags: {!! json_encode(array_values(array_filter($currentTags, function($tag) {
             $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return !in_array($tag, $standards);
         }))) !!},
