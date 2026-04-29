@@ -6,18 +6,68 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
-class AiController extends Controller
+class AIController extends Controller
 {
-    private string $apiKey;
-    private string $model;
-    private string $baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models';
-
-    public function __construct()
+    /**
+     * Chat endpoint used by the floating chatbot widget.
+     */
+    public function chat(Request $request)
     {
-        $this->apiKey = config('services.gemini.key');
-        $this->model  = config('services.gemini.model');
-    }
+        $validated = $request->validate([
+            'message' => ['required', 'string', 'max:2000'],
+        ]);
 
+        $apiKey = config('services.gemini.api_key');
+        $model = config('services.gemini.model', 'gemini-1.5-flash');
+
+        if (blank($apiKey)) {
+            return response()->json([
+                'reply' => 'Chat service is not configured yet. Please set GEMINI_API_KEY.',
+            ], 503);
+        }
+
+        $systemInstruction = 'You are Scholar, a helpful scholarship assistant for students. '
+            .'Keep answers concise, actionable, and friendly.';
+
+        $endpoint = sprintf(
+            'https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent',
+            $model
+        );
+
+        $response = Http::timeout(20)
+            ->acceptJson()
+            ->withQueryParameters(['key' => $apiKey])
+            ->post($endpoint, [
+                'contents' => [[
+                    'role' => 'user',
+                    'parts' => [[
+                        'text' => $validated['message'],
+                    ]],
+                ]],
+                'systemInstruction' => [
+                    'parts' => [[
+                        'text' => $systemInstruction,
+                    ]],
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.6,
+                    'maxOutputTokens' => 512,
+                ],
+            ]);
+
+        if (! $response->ok()) {
+            return response()->json([
+                'reply' => 'I could not reach Gemini right now. Please try again in a moment.',
+            ], 502);
+        }
+
+        $reply = data_get($response->json(), 'candidates.0.content.parts.0.text');
+        $fallback = 'I am here to help with scholarships. Could you rephrase your question?';
+
+        return response()->json([
+            'reply' => Str::of((string) ($reply ?: $fallback))->trim()->toString(),
+        ]);
+    }
     /**
      * Match a student profile against available scholarships.
      */
