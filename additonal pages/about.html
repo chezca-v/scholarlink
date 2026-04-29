@@ -45,7 +45,7 @@
     .nav-links { margin-left: auto; display: flex; gap: 32px; list-style: none; align-items: center; }
     .nav-links a { color: rgba(255,255,255,.82); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s; position: relative; padding-bottom: 2px; }
     .nav-links a::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: var(--grad-amber); border-radius: 2px; transform: scaleX(0); transform-origin: left; transition: transform .25s cubic-bezier(.22,1,.36,1); }
-    .nav-links a:hover { color: var(--white); letter-spacing: 0.5px; }
+    .nav-links a:hover { color: var(--white); }
     .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
     .nav-links a.active { color: var(--gold-light); }
 
@@ -127,9 +127,9 @@
     .icon-coral  { background: #FAECE7; } .icon-coral svg  { stroke: #993C1D; }
     .stack-title {
         font-family: 'Fraunces', serif;
-        font-size: 18px;         
-        font-weight: 600;      
-        color: #4A5568;          
+        font-size: 18px;
+        font-weight: 600;
+        color: #4A5568;
         margin-bottom: 18px;
     }
     /* ── VALUES — horizontal scroll ── */
@@ -245,9 +245,9 @@
     <span class="nav-logo-text">ScholarLink</span>
   </a>
   <ul class="nav-links">
-    <li><a href="#">How It Works</a></li>
-    <li><a href="#">Organizations</a></li>
-    <li><a href="#" class="active">About Us</a></li>
+    <li><a href="how-it-works.html">How It Works</a></li>
+    <li><a href="organizations.html">Organizations</a></li>
+    <li><a href="about.html" class="active">About Us</a></li>
   </ul>
 </nav>
 

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works — ScholarLink</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,700;1,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --teal:           #0F4C5C;
+      --teal-light:     #1A6B7A;
+      --teal-lighter:   #2A8FA0;
+      --amber:          #E8A838;
+      --gold-light:     #F9D679;
+      --white:          #FFFFFF;
+      --cloud:          #F4F6FA;
+      --mist:           #E2E8F0;
+      --slate:          #8A95A3;
+      --ink:            #1C1C2E;
+      --grad-primary:   linear-gradient(135deg, #0F4C5C, #1A6B7A);
+      --grad-amber:     linear-gradient(135deg, #E8A838, #F9D679);
+      --grad-match-bar: linear-gradient(90deg, #0F4C5C, #E8A838);
+      --grad-hero:      linear-gradient(160deg, #0F4C5C, #2A8FA0);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--ink); line-height: 1.6; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 16px; left: 20px; right: 20px; height: 60px;
+      display: flex; align-items: center; padding: 0 40px; border-radius: 10px;
+      background: linear-gradient(135deg, #0F4C5C, #1A6B7A);
+      backdrop-filter: blur(14px); box-shadow: 0 8px 28px rgba(0,0,0,0.15); z-index: 100;
+    }
+    nav.scrolled { background: rgba(15,76,92,0.9); }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo-icon { width: 34px; height: 34px; }
+    .nav-logo-icon img { width: 10rem; height: auto; max-width: 100%; }
+    .nav-logo-text { font-family: 'Fraunces', serif; font-size: 21px; font-weight: 700; color: var(--white); letter-spacing: -.3px; }
+    .nav-links { margin-left: auto; display: flex; gap: 32px; list-style: none; align-items: center; }
+    .nav-links a { color: rgba(255,255,255,.82); text-decoration: none; font-size: 14px; font-weight: 500; transition: color .2s; position: relative; padding-bottom: 2px; }
+    .nav-links a::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 2px; background: var(--grad-amber); border-radius: 2px; transform: scaleX(0); transform-origin: left; transition: transform .25s cubic-bezier(.22,1,.36,1); }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after, .nav-links a.active::after { transform: scaleX(1); }
+    .nav-links a.active { color: var(--gold-light); }
+
+    /* HERO */
+    .hero { background: var(--grad-hero); padding: 148px 40px 110px; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 60% at 20% 50%, rgba(201,168,76,.12) 0%, transparent 70%), radial-gradient(ellipse 50% 70% at 80% 40%, rgba(249,214,121,.08) 0%, transparent 60%); pointer-events: none; }
+    .hero > * { position: relative; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,168,76,.15); border: 1px solid rgba(201,168,76,.35); color: var(--gold-light); font-size: 12px; font-weight: 600; letter-spacing: 1.3px; text-transform: uppercase; padding: 6px 18px; border-radius: 100px; margin-bottom: 28px; }
+    .hero-title { font-family: 'DM Sans', sans-serif; font-size: clamp(38px, 5.5vw, 58px); font-weight: 700; color: var(--white); line-height: 1.1; max-width: 700px; margin: 0 auto 24px; }
+    .hero-title em { font-family: 'Fraunces', serif; font-style: italic; color: var(--gold-light); }
+    .hero-sub { font-size: 18px; color: rgba(255,255,255,.72); max-width: 540px; margin: 0 auto; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); filter: blur(6px); } to { opacity: 1; transform: translateY(0); filter: blur(0); } }
+    .hero-eyebrow { animation: fadeUp .6s ease both .05s; }
+    .hero-title   { animation: fadeUp .6s ease both .18s; }
+    .hero-sub     { animation: fadeUp .6s ease both .30s; }
+
+    /* SHARED */
+    section { padding: 88px 40px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: var(--amber); margin-bottom: 12px; }
+    .section-label::before { content: ''; display: inline-block; width: 20px; height: 2px; background: var(--grad-match-bar); border-radius: 2px; flex-shrink: 0; }
+    .section-title { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 700; color: var(--ink); margin-bottom: 20px; line-height: 1.25; }
+    .section-body { font-size: 16px; color: #4A5568; line-height: 1.75; max-width: 680px; }
+
+    /* STEPS */
+    .steps-section { background: var(--white); }
+    .steps-intro { text-align: center; margin-bottom: 72px; }
+    .steps-intro .section-label { justify-content: center; }
+    .steps-intro .section-title { margin: 0 auto 16px; max-width: 600px; }
+    .steps-intro .section-body { margin: 0 auto; text-align: center; }
+
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .step-card {
+      background: var(--white); border: 1px solid var(--mist);
+      border-radius: 24px; padding: 40px 32px; position: relative;
+      box-shadow: 0 2px 12px rgba(15,76,92,.06);
+      transition: box-shadow .25s, transform .25s;
+    }
+    .step-card:hover { box-shadow: 0 12px 36px rgba(15,76,92,.14); transform: translateY(-5px); }
+    .step-number {
+      position: absolute; top: -18px; left: 32px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--grad-primary); color: #fff;
+      font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 12px rgba(15,76,92,.3);
+    }
+    .step-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+    .step-icon svg { width: 26px; height: 26px; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+    .step-name { font-size: 18px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+    .step-desc { font-size: 14px; color: #5A6475; line-height: 1.75; }
+
+    .icon-teal   { background: #E1F5EE; } .icon-teal svg   { stroke: #0F6E56; }
+    .icon-amber  { background: #FAEEDA; } .icon-amber svg  { stroke: #854F0B; }
+    .icon-blue   { background: #E6F1FB; } .icon-blue svg   { stroke: #185FA5; }
+    .icon-purple { background: #EEEDFE; } .icon-purple svg { stroke: #534AB7; }
+    .icon-coral  { background: #FAECE7; } .icon-coral svg  { stroke: #993C1D; }
+    .icon-green  { background: #E3FAF0; } .icon-green svg  { stroke: #076B47; }
+
+    /* CONNECTOR ARROW */
+    .steps-connector { display: flex; justify-content: center; align-items: center; gap: 24px; margin: 48px 0; flex-wrap: wrap; }
+    .conn-step { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .conn-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--teal); }
+    .conn-label { font-size: 12px; font-weight: 600; color: var(--teal); }
+    .conn-arrow { color: var(--amber); font-size: 20px; margin-top: -12px; }
+
+    /* FEATURES BENTO */
+    .features { background: #F0FAFA; }
+    .features-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: auto auto; gap: 20px; margin-top: 48px; }
+    .feat-card { background: var(--white); border: 1px solid var(--mist); border-radius: 20px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,.04); transition: box-shadow .25s, transform .25s; }
+    .feat-card:hover { box-shadow: 0 8px 28px rgba(15,76,92,.12); transform: translateY(-3px); }
+    .feat-card.wide { grid-column: span 2; }
+    .feat-card.tall { grid-row: span 2; }
+    .feat-icon { width: 46px; height: 46px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    .feat-icon svg { width: 22px; height: 22px; stroke-width: 1.8; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .feat-title { font-size: 17px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .feat-desc { font-size: 14px; color: #5A6475; line-height: 1.7; }
+
+    /* ROLES */
+    .roles { background: var(--white); }
+    .roles-tabs { display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap; }
+    .role-tab { padding: 10px 24px; border-radius: 100px; font-size: 14px; font-weight: 600; cursor: pointer; border: 2px solid var(--mist); background: var(--white); color: var(--slate); transition: all .2s; }
+    .role-tab.active, .role-tab:hover { background: var(--grad-primary); color: #fff; border-color: transparent; }
+    .role-panel { display: none; }
+    .role-panel.active { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    .role-steps { display: flex; flex-direction: column; gap: 20px; }
+    .role-step { display: flex; gap: 16px; align-items: flex-start; }
+    .role-step-num { width: 32px; height: 32px; min-width: 32px; border-radius: 50%; background: var(--grad-primary); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .role-step-body h4 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+    .role-step-body p { font-size: 14px; color: #5A6475; line-height: 1.65; }
+    .role-visual { background: var(--cloud); border-radius: 20px; padding: 32px; border: 1px solid var(--mist); }
+    .role-visual-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: var(--teal); margin-bottom: 16px; }
+    .feature-pill { display: inline-flex; align-items: center; gap: 6px; background: rgba(15,76,92,.08); color: var(--teal); font-size: 12px; font-weight: 600; padding: 6px 14px; border-radius: 100px; margin: 4px; }
+    .feature-pill svg { width: 14px; height: 14px; stroke: var(--teal); fill: none; stroke-width: 2; }
+
+    /* CTA */
+    .cta-banner { background: var(--grad-primary); padding: 88px 40px; text-align: center; position: relative; overflow: hidden; }
+    .cta-banner::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 100% at 50% 0%, rgba(249,214,121,.13) 0%, transparent 70%); pointer-events: none; }
+    .cta-banner h2 { font-family: 'Fraunces', serif; font-size: 38px; font-weight: 700; color: var(--white); margin-bottom: 16px; position: relative; }
+    .cta-banner p { font-size: 17px; color: rgba(255,255,255,.72); margin-bottom: 36px; max-width: 500px; margin-left: auto; margin-right: auto; position: relative; }
+    .btn-primary { background: var(--grad-amber); color: var(--teal); font-size: 15px; font-weight: 600; padding: 14px 32px; border-radius: 10px; text-decoration: none; display: inline-block; transition: opacity .2s, transform .15s; margin: 0 8px; position: relative; }
+    .btn-primary:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 10px 25px rgba(232,168,56,.35); }
+    .btn-secondary { border: 2px solid rgba(255,255,255,.3); color: var(--white); font-size: 15px; font-weight: 600; padding: 12px 32px; border-radius: 10px; text-decoration: none; display: inline-block; transition: border-color .2s, background .2s; margin: 0 8px; position: relative; }
+    .btn-secondary:hover { transform: translateY(-2px); background: rgba(255,255,255,.08); }
+
+    /* FOOTER */
+    footer { background: #0d1f26; padding: 64px 64px 36px; font-size: 14px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 64px; margin-bottom: 64px; }
+    .footer-brand-name { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--amber); letter-spacing: -.2px; margin-bottom: 16px; display: block; }
+    .footer-brand-desc { font-size: 14px; color: rgba(255,255,255,.45); line-height: 1.7; max-width: 280px; }
+    .footer-col-title { font-size: 11px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: rgba(255,255,255,.35); margin-bottom: 22px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .footer-col ul li a { color: rgba(255,255,255,.75); text-decoration: none; font-size: 14px; font-weight: 400; transition: color .18s; }
+    .footer-col ul li a:hover { color: var(--white); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; padding-top: 32px; border-top: 1px solid rgba(255,255,255,.07); }
+    .footer-copy { font-size: 13px; color: rgba(255,255,255,.4); }
+    .footer-sdp-badge { font-size: 11px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase; color: var(--amber); border: 1px solid var(--amber); padding: 7px 18px; border-radius: 100px; opacity: .8; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(40px) scale(.98); filter: blur(6px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1), filter .8s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+
+    @media (max-width: 900px) {
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .features-grid { grid-template-columns: 1fr 1fr; }
+      .feat-card.wide { grid-column: span 1; }
+      .role-panel.active { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      section { padding: 60px 20px; }
+      .hero { padding: 130px 24px 80px; }
+      .steps-grid { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feat-card.wide, .feat-card.tall { grid-column: span 1; grid-row: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="about.html" class="nav-logo">
+    <div class="nav-logo-icon"><img src="/public/white-logo.png" alt="logo"></div>
+    <span class="nav-logo-text">ScholarLink</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="how-it-works.html" class="active">How It Works</a></li>
+    <li><a href="organizations.html">Organizations</a></li>
+    <li><a href="about.html">About Us</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">How It Works</div>
+  <h1 class="hero-title">Your Scholarship Journey, <em>Step by Step</em></h1>
+  <p class="hero-sub">From profile setup to receiving your scholarship — ScholarLink makes the entire process simple, transparent, and guided.</p>
+</section>
+
+<!-- STEPS OVERVIEW -->
+<section class="steps-section">
+  <div class="container">
+    <div class="steps-intro reveal">
+      <p class="section-label">The Process</p>
+      <h2 class="section-title">Three Paths, One Platform</h2>
+      <p class="section-body">ScholarLink supports students, scholarship organizations, and evaluators — each with a tailored experience designed to reduce friction and increase transparency at every stage.</p>
+    </div>
+
+    <div class="steps-grid">
+      <div class="step-card reveal" style="transition-delay:.05s">
+        <div class="step-number">1</div>
+        <div class="step-icon icon-teal"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="step-name">Create Your Profile</div>
+        <p class="step-desc">Sign up and complete the 4-step setup wizard. Input your academic background, financial status, region, and upload key documents to your secure Document Wallet.</p>
+      </div>
+      <div class="step-card reveal" style="transition-delay:.12s">
+        <div class="step-number">2</div>
+        <div class="step-icon icon-amber"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <div class="step-name">Discover Matched Scholarships</div>
+        <p class="step-desc">Our AI matching engine analyzes your profile and surfaces the most relevant opportunities from government, private, institutional, and international scholarship providers.</p>
+      </div>
+      <div class="step-card reveal" style="transition-delay:.19s">
+        <div class="step-number">3</div>
+        <div class="step-icon icon-blue"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+        <div class="step-name">Apply with One Click</div>
+        <p class="step-desc">Use the 3-step Apply Wizard to submit your application. ScholarLink auto-fills information from your profile, and documents from your wallet are attached automatically.</p>
+      </div>
+      <div class="step-card reveal" style="transition-delay:.26s">
+        <div class="step-number">4</div>
+        <div class="step-icon icon-purple"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="step-name">Track Your Application</div>
+        <p class="step-desc">Follow your application through a real-time visual timeline. Receive SMS and email notifications at every stage — submission, review, evaluation, and decision.</p>
+      </div>
+      <div class="step-card reveal" style="transition-delay:.33s">
+        <div class="step-number">5</div>
+        <div class="step-icon icon-green"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <div class="step-name">Receive Your Decision</div>
+        <p class="step-desc">Get notified instantly when a decision is made. If approved, next steps are outlined clearly. If rejected, detailed feedback and suggested alternatives are provided.</p>
+      </div>
+      <div class="step-card reveal" style="transition-delay:.40s">
+        <div class="step-number">6</div>
+        <div class="step-icon icon-coral"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="step-name">Join the Scholar Community</div>
+        <p class="step-desc">Connect with other scholars, access mentorship networks, and stay updated on new opportunities. Your ScholarLink profile grows with your academic journey.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="container">
+    <p class="section-label reveal">Platform Features</p>
+    <h2 class="section-title reveal" style="transition-delay:.07s">Everything You Need, Built In</h2>
+    <div class="features-grid">
+      <div class="feat-card wide reveal" style="transition-delay:.05s">
+        <div class="feat-icon icon-amber"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
+        <div class="feat-title">AI-Powered Matching Engine</div>
+        <p class="feat-desc">ScholarLink uses Gemini AI to analyze your full profile — GWA, course, region, financial need, extracurriculars — and ranks scholarship opportunities by compatibility score. No more manual searching through dozens of listings.</p>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.10s">
+        <div class="feat-icon icon-teal"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="feat-title">Document Wallet</div>
+        <p class="feat-desc">Upload documents once. Attach to any application instantly. ScholarLink securely stores your transcripts, certificates, and IDs.</p>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.14s">
+        <div class="feat-icon icon-blue"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+        <div class="feat-title">Real-Time Notifications</div>
+        <p class="feat-desc">SMS via hardware (ESP32 + SIM800L) and email notifications ensure you never miss a deadline or status update.</p>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.18s">
+        <div class="feat-icon icon-purple"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="feat-title">Deadline Calendar Export</div>
+        <p class="feat-desc">Export scholarship deadlines directly to Google Calendar so important dates are always visible in your schedule.</p>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.22s">
+        <div class="feat-icon icon-coral"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+        <div class="feat-title">AI Chatbot Assistant</div>
+        <p class="feat-desc">An always-available chatbot guides students through eligibility questions, application requirements, and platform navigation.</p>
+      </div>
+      <div class="feat-card reveal" style="transition-delay:.26s">
+        <div class="feat-icon icon-green"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <div class="feat-title">Blind Screening</div>
+        <p class="feat-desc">Evaluators review anonymized applications to reduce bias and ensure merit-based, equitable selection across all applicants.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ROLE TABS -->
+<section class="roles">
+  <div class="container">
+    <p class="section-label reveal">For Every User</p>
+    <h2 class="section-title reveal" style="transition-delay:.07s">Tailored for Your Role</h2>
+    <div class="roles-tabs reveal" style="transition-delay:.13s">
+      <div class="role-tab active" onclick="switchRole('student')">Student / Applicant</div>
+      <div class="role-tab" onclick="switchRole('org')">Organization / Admin</div>
+      <div class="role-tab" onclick="switchRole('eval')">Evaluator</div>
+    </div>
+
+    <div class="role-panel active" id="panel-student">
+      <div class="role-steps">
+        <div class="role-step">
+          <div class="role-step-num">1</div>
+          <div class="role-step-body"><h4>Sign up & complete your profile</h4><p>Register as a student applicant, fill out the 4-step profile wizard covering academics, finances, and location.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">2</div>
+          <div class="role-step-body"><h4>Upload documents to your Wallet</h4><p>Store your TOR, birth certificate, income proof, and other requirements once — reuse across all applications.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">3</div>
+          <div class="role-step-body"><h4>Browse or let AI match for you</h4><p>Explore the full scholarship directory or review your personalized AI matches sorted by eligibility score.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">4</div>
+          <div class="role-step-body"><h4>Apply, track, and receive updates</h4><p>Submit applications in minutes, then follow each one through a live status timeline with SMS/email alerts.</p></div>
+        </div>
+      </div>
+      <div class="role-visual">
+        <div class="role-visual-title">Student Features</div>
+        <div>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI Matching</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Document Wallet</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Application Tracker</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Saved Scholarships</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> SMS Notifications</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Calendar Export</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> AI Chatbot</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Rejection Feedback</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="role-panel" id="panel-org">
+      <div class="role-steps">
+        <div class="role-step">
+          <div class="role-step-num">1</div>
+          <div class="role-step-body"><h4>Register your organization</h4><p>Create an organization account verified by ScholarLink's superadmin team. Set up your profile and scholarship programs.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">2</div>
+          <div class="role-step-body"><h4>Build scholarship listings</h4><p>Use the Scholarship Builder to define eligibility criteria, required documents, award amounts, slots, and deadlines with custom weight sliders for scoring.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">3</div>
+          <div class="role-step-body"><h4>Manage the application queue</h4><p>Review incoming applications, assign evaluators, extend deadlines, and send bulk notifications to applicants from the admin dashboard.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">4</div>
+          <div class="role-step-body"><h4>Analyze outcomes</h4><p>Access funnel analytics, demographic breakdowns, and evaluation summaries to improve scholarship programs over time.</p></div>
+        </div>
+      </div>
+      <div class="role-visual">
+        <div class="role-visual-title">Admin Features</div>
+        <div>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Scholarship Builder</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Application Queue</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Evaluator Assignment</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Deadline Calendar</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Analytics Dashboard</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Bulk Notifications</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Blind Screening Toggle</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> User Management</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="role-panel" id="panel-eval">
+      <div class="role-steps">
+        <div class="role-step">
+          <div class="role-step-num">1</div>
+          <div class="role-step-body"><h4>Access your assigned queue</h4><p>Log in to your evaluator dashboard and view your assigned applications with workload overview and priority flags.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">2</div>
+          <div class="role-step-body"><h4>Review anonymized applicant profiles</h4><p>View blind profiles — academic records, documents, and answers — without identifying information to ensure fair, bias-free evaluation.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">3</div>
+          <div class="role-step-body"><h4>Score and submit your assessment</h4><p>Grade each application using the organization's defined criteria and weight settings, add comments, and submit your evaluation.</p></div>
+        </div>
+        <div class="role-step">
+          <div class="role-step-num">4</div>
+          <div class="role-step-body"><h4>Provide rejection feedback</h4><p>When applicable, select rejection reasons and suggest alternative scholarships from the platform to help applicants find other opportunities.</p></div>
+        </div>
+      </div>
+      <div class="role-visual">
+        <div class="role-visual-title">Evaluator Features</div>
+        <div>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Review Queue</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Blind Profile View</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> PDF Viewer</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Grading Form</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Rejection Reason Tool</span>
+          <span class="feature-pill"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Evaluation History</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-banner">
+  <h2>Ready to find your scholarship?</h2>
+  <p>Create your free profile in minutes and let ScholarLink match you with the right opportunity.</p>
+  <a href="#" class="btn-primary">Get Started Free</a>
+  <a href="organizations.html" class="btn-secondary">For Organizations</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="footer-brand-name">ScholarLink</span>
+        <p class="footer-brand-desc">Bridging Filipino students to scholarship opportunities — one profile, every scholarship.</p>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Platform</div>
+        <ul>
+          <li><a href="#">Browse</a></li>
+          <li><a href="how-it-works.html">How It Works</a></li>
+          <li><a href="organizations.html">For Organizations</a></li>
+          <li><a href="#">AI Matching</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Account</div>
+        <ul>
+          <li><a href="#">Sign Up</a></li>
+          <li><a href="#">Log In</a></li>
+          <li><a href="#">My Applications</a></li>
+          <li><a href="#">Document Wallet</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Legal</div>
+        <ul>
+          <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          <li><a href="terms-of-service.html">Terms of Service</a></li>
+          <li><a href="data-privacy-act.html">Data Privacy Act</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2026 ScholarLink. Philippines 🇵🇭</p>
+      <span class="footer-sdp-badge">Software Design Project</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => navbar.classList.toggle('scrolled', window.scrollY > 40), { passive: true });
+
+  function switchRole(role) {
+    document.querySelectorAll('.role-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.role-panel').forEach(p => p.classList.remove('active'));
+    const idx = ['student','org','eval'].indexOf(role);
+    document.querySelectorAll('.role-tab')[idx].classList.add('active');
+    document.getElementById('panel-' + role).classList.add('active');
+  }
+
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+  }, { threshold: 0.1, rootMargin: '0px 0px -48px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>
