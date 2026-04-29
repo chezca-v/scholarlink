@@ -901,18 +901,9 @@
         },
 
         /**
-         * _simulateBotResponse — internal demo helper.
-         * Replace this with a real fetch() / Axios call to your API endpoint.
-         *
-         * Example real usage:
-         *   ChatWidget.showTyping();
-         *   fetch('/api/chat', { method:'POST', body: JSON.stringify({message: text}) })
-         *     .then(r => r.json())
-         *     .then(d => { ChatWidget.hideTyping(); appendMessage(d.reply, 'bot'); });
+         * _fetchBotResponse — sends message to Gemini via Laravel backend
+         * @param {string} text — the user's message
          */
-        * _fetchBotResponse — sends message to Gemini via Laravel backend
-        * @param {string} text — the user's message
-        */
         _fetchBotResponse(text) {
             setSending(true);
             this.showTyping();
@@ -944,17 +935,5 @@
                 setSending(false);
                 input()?.focus();
             });
+        },
     };
-
-    // ── Init — show pulse on first load if no unread ─────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
-        if (state.unread === 0) {
-            // Brief pulse on first load per spec
-            fab()?.classList.add('chat-fab--pulse');
-            setTimeout(() => fab()?.classList.remove('chat-fab--pulse'), 6000);
-        }
-    });
-
-})();
-</script>
-@endpush

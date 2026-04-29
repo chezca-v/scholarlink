@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'ScholarLink — Applicant Portal')</title>
+    <meta name="auth-check" content="authenticated">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -295,15 +296,9 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <button class="nav-ibtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     </button>
-    <a class="nav-ibtn" href="{{ route('notifications.index') }}">      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        @if(\App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->exists())
-            <span class="nbadge"></span>
-        @endif
+    <a class="nav-ibtn" href="{{ route('dashboard') }}" title="Back to Dashboard">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     </a>
-    <form method="POST" action="{{ route('logout') }}" style="margin:0;">
-      @csrf
-      <button type="submit" class="nav-logout" title="Log Out">Log Out</button>
-    </form>
     <a href="{{ route('profile.show') }}" class="nav-av" title="My Profile">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</a>
   </div>
 </nav>
@@ -360,18 +355,14 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     </a>
 
     <div class="sb-spacer"></div>
-    <a href="#" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();" class="sb-nav-item text-red-600" style="color:#e53e3e;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button onclick="document.querySelector('[x-data]')?.__x?.$dispatch('openModal', 'confirm-logout');" class="sb-nav-item text-red-600" style="color:#e53e3e; width: 100%; text-align: left; background: none; border: none; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 10px; vertical-align: middle;">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
         </svg>
-        Log Out
-    </a>
-
-    <form method="POST" action="{{ route('logout') }}" id="sidebar-logout-form" style="display:none;">
-        @csrf
-    </form>
+        <span style="vertical-align: middle;">Log Out</span>
+    </button>
   </aside>
 
   <main class="main">
@@ -485,6 +476,41 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     }, 1000);
 </script>
 
+
+<!-- Logout Confirmation Modal -->
+<x-logout-modal />
+
+<!-- Browser History Management -->
+<script>
+// Handle browser back button - maintain auth state
+window.addEventListener('popstate', function() {
+    const isAuthenticated = !!document.querySelector('meta[name="auth-check"]');
+    const currentUrl = window.location.pathname;
+
+    // If trying to go back to landing/login pages while authenticated, redirect to dashboard
+    if (isAuthenticated && (currentUrl === '/' || currentUrl === '/login' || currentUrl === '/register')) {
+        window.location.href = '{{ route("dashboard") }}';
+    }
+});
+
+// Prevent browser back to unauthorized pages
+window.addEventListener('beforeunload', function() {
+    const isAuthenticated = !!document.querySelector('meta[name="auth-check"]');
+    sessionStorage.setItem('lastAuthState', isAuthenticated ? 'authenticated' : 'guest');
+});
+
+// Check auth state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUrl = window.location.pathname;
+    const lastAuthState = sessionStorage.getItem('lastAuthState');
+    const isCurrentlyAuthenticated = !!document.querySelector('meta[name="auth-check"]');
+
+    // If user was authenticated but is now on login page, redirect to dashboard
+    if (lastAuthState === 'authenticated' && isCurrentlyAuthenticated && (currentUrl === '/' || currentUrl === '/login')) {
+        window.location.href = '{{ route("dashboard") }}';
+    }
+});
+</script>
 
 @stack('scripts')
 </body>

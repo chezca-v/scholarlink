@@ -297,6 +297,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <a href="{{ route('scholarships.index') }}" class="btn-clr">Clear all</a>
     </div>
 
+    {{-- Quick Navigation --}}
+    @auth
+    <div class="fg" style="border-bottom: 1px solid var(--mist); padding-bottom: 12px; margin-bottom: 12px;">
+      <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--teal); font-size: 13px; font-weight: 600; transition: all 0.15s;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Back to Dashboard
+      </a>
+    </div>
+    @endauth
+
     {{-- Status --}}
     <div class="fg">
       <div class="fgl">Status</div>
