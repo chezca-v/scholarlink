@@ -285,9 +285,14 @@ class AdminController extends Controller
         return view('admin.analytics', compact('stats', 'funnel'));
     }
 
-    public function calendar()
+    public function calendar(\Illuminate\Http\Request $request)
     {
-        $currentMonth = \Carbon\Carbon::now();
+        $monthQuery = $request->get('month');
+        if ($monthQuery) {
+            $currentMonth = \Carbon\Carbon::parse($monthQuery . '-01');
+        } else {
+            $currentMonth = \Carbon\Carbon::now();
+        }
         $prevMonth = $currentMonth->copy()->subMonth();
         $nextMonth = $currentMonth->copy()->addMonth();
 
@@ -434,11 +439,11 @@ class AdminController extends Controller
                 'save_weights' => 'Save Weights'
             ],
             'routes' => [
-                'update_profile' => 'admin.settings', // placeholder
-                'blind_screening' => 'admin.settings', // placeholder
-                'templates' => 'admin.settings', // placeholder
-                'weights' => 'admin.settings', // placeholder
-                'toggle_blind' => 'admin.settings', // placeholder
+                'update_profile' => 'admin.settings.update',
+                'blind_screening' => 'admin.settings.update',
+                'templates' => 'admin.settings.update',
+                'weights' => 'admin.settings.update',
+                'toggle_blind' => 'admin.settings.update',
             ],
             'orgFields' => [
                 ['name' => 'name', 'label' => 'Organization Name'],
@@ -462,5 +467,45 @@ class AdminController extends Controller
                 'essay' => 30,
             ],
         ]);
+    }
+
+    public function updateSettings(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Settings updated successfully.');
+    }
+
+    public function showApplication($id)
+    {
+        return back()->with('success', 'Application ' . $id . ' viewed.');
+    }
+
+    public function bulkAssign(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Evaluator assigned to selected applications.');
+    }
+
+    public function assign(\Illuminate\Http\Request $request, $id)
+    {
+        return back()->with('success', 'Evaluator assigned to application.');
+    }
+
+    public function bulkApprove(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Selected applications approved.');
+    }
+
+    public function bulkReject(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Selected applications rejected.');
+    }
+
+    public function approveApplication($id)
+    {
+        return back()->with('success', 'Application approved.');
+    }
+
+    public function rejectForm($id)
+    {
+        return back()->with('success', 'Application rejected.');
     }
 }

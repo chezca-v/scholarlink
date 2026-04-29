@@ -58,11 +58,10 @@ nav {
   display: flex; align-items: center; gap: 10px; text-decoration: none;
 }
 .logo-mark {
-  width: 32px; height: 32px;
-  background: linear-gradient(135deg, var(--teal-mid), var(--teal-light));
-  border-radius: 9px; display: flex; align-items: center; justify-content: center;
-  color: var(--gold-light); font-size: 15px;
-  box-shadow: 0 4px 12px rgba(15,76,92,0.25);
+  width: 34px; height: 34px;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 10px rgba(15,76,92,0.18));
 }
 .nav-links { display: flex; gap: 36px; list-style: none; }
 .nav-links a {
@@ -475,7 +474,8 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
   padding-bottom: 52px; border-bottom: 1px solid rgba(255,255,255,0.06);
   margin-bottom: 32px;
 }
-.footer-logo { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--gold-light); letter-spacing: -0.5px; margin-bottom: 12px; }
+.footer-logo { display: flex; align-items: center; gap: 10px; font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: var(--gold-light); letter-spacing: -0.5px; margin-bottom: 12px; }
+.footer-logo-mark { width: 36px; height: 36px; object-fit: contain; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.2)); }
 .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.3); line-height: 1.8; max-width: 280px; }
 .footer-col-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 16px; }
 .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
@@ -545,7 +545,10 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
 <!-- NAV -->
 <nav id="main-nav">
   <div class="nav-inner">
-    <a href="{{ route('landing') }}" class="logo"><div class="logo-mark">🎓</div>ScholarLink</a>
+    <a href="{{ route('landing') }}" class="logo">
+      <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="logo-mark">
+      <span>ScholarLink</span>
+    </a>
     <ul class="nav-links">
       <li><a href="{{ route('scholarships.index') }}">Browse</a></li>
       <li><a href="#how">How It Works</a></li>
@@ -770,7 +773,10 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
   <div class="footer-inner">
     <div class="footer-grid">
       <div>
-        <div class="footer-logo">ScholarLink</div>
+        <div class="footer-logo">
+          <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="footer-logo-mark">
+          <span>ScholarLink</span>
+        </div>
         <div class="footer-tagline">Bridging Filipino students to scholarship opportunities — one profile, every scholarship.</div>
       </div>
       <div>

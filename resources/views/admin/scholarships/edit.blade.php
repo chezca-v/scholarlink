@@ -359,9 +359,31 @@
                             </div>
                         </div>
                         <div>
-                            <p class="font-bold text-[var(--ink)] text-sm mb-3 pb-2 border-b">Business & Sciences</p>
+                            <p class="font-bold text-[var(--ink)] text-sm mb-3 pb-2 border-b">Business & Administration</p>
                             <div class="space-y-2">
                                 <template x-for="course in standardCourses.biz" :key="course">
+                                    <label class="flex items-center gap-3 cursor-pointer text-sm text-[var(--slate)] hover:text-[var(--primary)] transition-colors">
+                                        <input type="checkbox" :value="course" x-model="selectedTags" class="w-4 h-4 rounded text-[var(--primary)] border-gray-300 focus:ring-[var(--primary)]">
+                                        <span x-text="course"></span>
+                                    </label>
+                                </template>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-bold text-[var(--ink)] text-sm mb-3 pb-2 border-b">Healthcare & Sciences</p>
+                            <div class="space-y-2">
+                                <template x-for="course in standardCourses.health" :key="course">
+                                    <label class="flex items-center gap-3 cursor-pointer text-sm text-[var(--slate)] hover:text-[var(--primary)] transition-colors">
+                                        <input type="checkbox" :value="course" x-model="selectedTags" class="w-4 h-4 rounded text-[var(--primary)] border-gray-300 focus:ring-[var(--primary)]">
+                                        <span x-text="course"></span>
+                                    </label>
+                                </template>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-bold text-[var(--ink)] text-sm mb-3 pb-2 border-b">Arts & Education</p>
+                            <div class="space-y-2">
+                                <template x-for="course in standardCourses.arts" :key="course">
                                     <label class="flex items-center gap-3 cursor-pointer text-sm text-[var(--slate)] hover:text-[var(--primary)] transition-colors">
                                         <input type="checkbox" :value="course" x-model="selectedTags" class="w-4 h-4 rounded text-[var(--primary)] border-gray-300 focus:ring-[var(--primary)]">
                                         <span x-text="course"></span>
@@ -422,15 +444,17 @@ function scholarshipForm() {
         // Courses Modal setup
         courseModalOpen: false,
         standardCourses: {
-            eng: ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science'],
-            biz: ['BS Accountancy', 'BS Business Administration', 'BS Nursing', 'BS Biology', 'BA Psychology']
+            eng: ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering'],
+            biz: ['BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance'],
+            health: ['BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health'],
+            arts: ['BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math']
         },
         selectedTags: {!! json_encode(array_values(array_filter(old('tags', $scholarship->tags ?? []), function($tag) {
-            $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Accountancy', 'BS Business Administration', 'BS Nursing', 'BS Biology', 'BA Psychology'];
+            $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return in_array($tag, $standards);
         }))) !!},
         customTags: {!! json_encode(array_values(array_filter(old('tags', $scholarship->tags ?? []), function($tag) {
-            $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Accountancy', 'BS Business Administration', 'BS Nursing', 'BS Biology', 'BA Psychology'];
+            $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return !in_array($tag, $standards);
         }))) !!},
         

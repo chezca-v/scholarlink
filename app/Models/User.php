@@ -92,6 +92,12 @@ class User extends Authenticatable
         return $this->hasMany(EvaluatorAssignment::class, 'evaluator_id');
     }
 
+    // Helper: Accessor for full name
+    public function getNameAttribute(): string
+    {
+        return trim("{$this->first_name} {$this->last_name}");
+    }
+
     // Helper: check role
     public function isApplicant(): bool
     {

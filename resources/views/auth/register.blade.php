@@ -139,9 +139,9 @@
             margin-bottom: 12px;
         }
         .login-eyebrow-dot {
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: var(--teal-700);
+            width: 20px; height: 20px;
+            object-fit: contain;
+            filter: drop-shadow(0 3px 8px rgba(15,76,92,0.16));
         }
         .login-eyebrow-text {
             font-size: 0.72rem;
@@ -630,7 +630,7 @@
         <div class="panel-login" id="panelLogin" aria-label="Login form">
 
             <div class="login-eyebrow">
-                <span class="login-eyebrow-dot"></span>
+                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="login-eyebrow-dot">
                 <span class="login-eyebrow-text">ScholarLink</span>
             </div>
 
@@ -782,9 +782,9 @@
                     <label for="role" class="field-label-rp">Role <span class="req">*</span></label>
                     <select id="role" name="role" class="form-select-rp" required>
                         <option value="" disabled {{ old('role') ? '' : 'selected' }}>Select your role</option>
-                        @foreach ($roles ?? ['Applicant', 'Evaluator', 'Admin'] as $role)
-                            <option value="{{ $role }}" {{ old('role') === $role ? 'selected' : '' }}>
-                                {{ $role }}
+                        @foreach ($roles ?? ['applicant' => 'Applicant', 'evaluator' => 'Evaluator', 'admin' => 'Admin'] as $val => $label)
+                            <option value="{{ $val }}" {{ old('role') === $val ? 'selected' : '' }}>
+                                {{ $label }}
                             </option>
                         @endforeach
                     </select>

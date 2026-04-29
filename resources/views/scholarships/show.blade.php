@@ -20,10 +20,7 @@
 
             {{-- Logo (always visible) --}}
             <a href="{{ route('landing') }}" class="flex items-center gap-3 flex-shrink-0">
-                <div class="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0"
-                     style="background: linear-gradient(135deg, #0F4C5C 0%, #1A6B7A 100%);">
-                    <span style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: #F9D679;">🎓</span>
-                </div>
+                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="w-9 h-9 object-contain flex-shrink-0" style="filter: drop-shadow(0 4px 10px rgba(15,76,92,0.18));">
                 <span style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 21px; color: #0F4C5C; letter-spacing: -0.5px;">ScholarLink</span>
             </a>
 
@@ -523,7 +520,10 @@
 
                 {{-- Brand --}}
                 <div class="flex-1">
-                    <p class="mb-3" style="font-family: 'Fraunces', serif; font-weight: 400; font-size: 20px; color: #F9D679; letter-spacing: -0.5px;">ScholarLink</p>
+                    <p class="mb-3 flex items-center gap-2" style="font-family: 'Fraunces', serif; font-weight: 400; font-size: 20px; color: #F9D679; letter-spacing: -0.5px;">
+                        <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="w-9 h-9 object-contain">
+                        <span>ScholarLink</span>
+                    </p>
                     <p class="text-[13px] leading-[22px]" style="color: rgba(255,255,255,0.35); max-width: 280px;">
                         Bridging Filipino students to scholarship opportunities — one profile, every scholarship.
                     </p>

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     PublicController,
     ScholarshipController,
-    AiController,
+    AIController,
     ProfileController,
     DocumentController,
     ApplicationController,
@@ -28,7 +28,9 @@ Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships', 'index')->name('scholarships.index');
     Route::get('/scholarships/{id}', 'show')->name('scholarships.show');
 });
-Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');/*
+Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');
+
+/*
 Applicant Routes (Role: applicant)
 */
 Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
@@ -37,7 +39,6 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
-        Route::get('/profile/setup', 'setup')->name('profile.setup');
         Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');
@@ -86,6 +87,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/scholarships/{id}/close', 'close')->name('scholarships.close');
         Route::post('/scholarships/{id}/extend', 'extendDeadline')->name('scholarships.extend');
         Route::patch('/scholarships/{id}/toggle', 'toggle')->name('scholarships.toggle');
+        Route::get('/scholarships/{id}/applications/export', 'exportApplications')->name('scholarships.applications.export');
     });
 
     // User Management & Analytics
@@ -96,8 +98,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/analytics/export', 'exportAnalytics')->name('analytics.export');
         Route::get('/calendar', 'calendar')->name('calendar');
         Route::get('/applications', 'applications')->name('applications');
+        Route::get('/applications/{id}', 'showApplication')->name('applications.show');
+        Route::patch('/applications/bulk-assign', 'bulkAssign')->name('applications.bulk-assign');
+        Route::patch('/applications/{id}/assign', 'assign')->name('applications.assign');
+        Route::patch('/applications/bulk-approve', 'bulkApprove')->name('applications.bulk-approve');
+        Route::patch('/applications/bulk-reject', 'bulkReject')->name('applications.bulk-reject');
+        Route::patch('/applications/{id}/approve', 'approveApplication')->name('applications.approve');
+        Route::get('/applications/{id}/reject', 'rejectForm')->name('applications.reject-form');
         Route::get('/reviews', 'reviews')->name('reviews');
         Route::get('/settings', 'settings')->name('settings');
+        Route::patch('/settings', 'updateSettings')->name('settings.update');
     });
 });
 

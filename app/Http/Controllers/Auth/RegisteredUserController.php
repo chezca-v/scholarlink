@@ -11,16 +11,19 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Support\RedirectsUsersByRole;
 
 class RegisteredUserController extends Controller
 {
+    use RedirectsUsersByRole;
     /**
      * Display the registration view.
      */
     public function create(): View
     {
         return view('auth.login', [
-            'roles' => ['applicant', 'evaluator', 'admin', 'superadmin'],        ]);
+            'roles' => ['applicant' => 'Applicant', 'evaluator' => 'Evaluator', 'admin' => 'Admin'],
+        ]);
     }
 
     /**
@@ -35,7 +38,7 @@ class RegisteredUserController extends Controller
             'last_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:applicant,evaluator,admin,superadmin'],
+            'role' => ['required', 'string', 'in:applicant,evaluator,admin'],
             'terms' => ['accepted'],
         ]);
 
@@ -51,7 +54,9 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect($this->dashboardRouteFor($user));
+        return $user->role === 'applicant'
+            ? redirect()->route('profile.setup')
+            : redirect($this->dashboardRouteFor($user));
     }
 
     private function dashboardRouteFor(User $user): string
