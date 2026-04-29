@@ -712,7 +712,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     @endif
 
   </main>
-</div>{{-- /layout --}}
+  @include('scholarships.partials.scholarship-drawer')
+</div>
 
 <div class="toast" id="toast"></div>
 
