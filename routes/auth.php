@@ -38,9 +38,15 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 
     Route::get('/auth/{provider}/redirect', function (string $provider) {
-        return Socialite::driver($provider)->redirect();
+        try {
+            if (empty(config("services.{$provider}.client_id"))) {
+                return redirect('/login')->with('error', ucfirst($provider) . ' login is not currently configured.');
+            }
+            return Socialite::driver($provider)->redirect();
+        } catch (\Exception $e) {
+            return redirect('/login')->with('error', 'Unable to connect to ' . ucfirst($provider) . '.');
+        }
     })->whereIn('provider', ['google', 'facebook', 'microsoft'])->name('socialite.redirect');
-
 
     Route::get('/auth/{provider}/callback', function (string $provider) {        try {
             $socialUser = Socialite::driver($provider)->user();
