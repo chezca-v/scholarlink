@@ -11,7 +11,7 @@
         body{font-family:'DM Sans',sans-serif;background:#F0FAFA;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;}
         .page-frame{background:#FFFFFF;border:1px solid #DFF0EE;border-radius:20px;padding:40px;width:100%;max-width:450px;box-shadow:0 8px 24px rgba(15,76,92,0.1);}
         .logo-box{display:flex;align-items:center;gap:9px;margin-bottom:20px;}
-        .logo-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,#0F4C5C,#1A6B7A);display:flex;align-items:center;justify-content:center;color:#fff;}
+        .logo-icon{width:36px;height:36px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(15,76,92,0.18));}
         .auth-title{font-family:'Fraunces',serif;font-size:26px;font-weight:800;color:#0A3040;margin-bottom:4px;}
         .auth-sub{font-size:13px;color:#4A7A80;margin-bottom:24px;}
         .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
@@ -24,7 +24,7 @@
 
 <div class="page-frame" x-data="{ password: '', confirm: '' }">
     <div class="logo-box">
-        <div class="logo-icon">🔑</div>
+        <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="logo-icon">
         <span style="font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:#0F4C5C;">ScholarLink</span>
     </div>
 

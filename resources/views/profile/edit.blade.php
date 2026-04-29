@@ -85,6 +85,7 @@ h2.text-lg { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; 
 @endpush
 
 <div class="main-inner" x-data="{ activeTab: 'overview' }">
+    @php $profile = auth()->user()->applicantProfile; @endphp
     <div class="header-row" style="margin-bottom: 24px;">
         <div class="page-title-area">
             <span class="page-eyebrow">ACCOUNT</span>
@@ -149,19 +150,19 @@ h2.text-lg { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; 
             <div class="info-grid">
                 <div class="info-item">
                     <span class="info-label">University/School</span>
-                    <span class="info-value">Pamantasan ng Lungsod ng Maynila</span>
+                    <span class="info-value">{{ optional($profile)->university_name ?? 'Not set' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Degree/Program</span>
-                    <span class="info-value">BS Computer Science</span>
+                    <span class="info-value">{{ optional($profile)->course_program ?? 'Not set' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Year Level</span>
-                    <span class="info-value">3rd Year</span>
+                    <span class="info-value">{{ optional($profile)->year_level ?? 'Not set' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Latest GPA/GWA</span>
-                    <span class="info-value">1.25</span>
+                    <span class="info-value">{{ optional($profile)->gwa ? number_format(optional($profile)->gwa, 2) : 'Not set' }}</span>
                 </div>
             </div>
         </div>

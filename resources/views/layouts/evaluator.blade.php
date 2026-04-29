@@ -43,6 +43,8 @@
     overflow-y: auto; display: flex; flex-direction: column; z-index: 100;
   }
   .sidebar-logo { padding: 20px 16px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-logo .brand-row { display:flex; align-items:center; gap:10px; }
+  .sidebar-logo .brand-logo { width:34px; height:34px; object-fit:contain; filter:drop-shadow(0 4px 10px rgba(15,76,92,.18)); }
   .sidebar-logo .wordmark { font-family: 'Fraunces', serif; font-weight: 900; font-size: 18px; color: var(--primary); letter-spacing: -.3px; }
   .sidebar-logo .wordmark span { color: var(--accent); }
   .sidebar-logo .role-badge { display: inline-block; margin-top: 6px; padding: 2px 8px; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 20px; font-size: 10px; font-weight: 600; color: #1D4ED8; text-transform: uppercase; letter-spacing: .5px; }
@@ -289,7 +291,10 @@
 <div class="layout">
   <aside class="sidebar">
     <div class="sidebar-logo">
-      <div class="wordmark">Scholar<span>Link</span></div>
+      <div class="brand-row">
+        <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="brand-logo">
+        <div class="wordmark">Scholar<span>Link</span></div>
+      </div>
       <div class="role-badge">📋 Evaluator</div>
     </div>
     <div class="sidebar-section">Workspace</div>

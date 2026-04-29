@@ -165,12 +165,8 @@
 .mp-topbar__logo {
     width:           36px;
     height:          36px;
-    border-radius:   var(--mp-radius-md);
-    background:      var(--mp-teal);
-    display:         flex;
-    align-items:     center;
-    justify-content: center;
-    font-size:       18px;
+    object-fit:      contain;
+    filter:          drop-shadow(0 4px 10px rgba(15,76,92,0.18));
 }
 .mp-topbar__search {
     flex:       1;
@@ -656,8 +652,8 @@
         {{-- Top nav --}}
         <div class="mp-topbar">
             <div class="mp-topbar__brand">
-                <div class="mp-topbar__logo">🎓</div>
-                ScholarLink
+                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="mp-topbar__logo">
+                <span>ScholarLink</span>
             </div>
 
             <div class="mp-topbar__search">

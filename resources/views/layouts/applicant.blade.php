@@ -42,7 +42,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
   box-shadow:0 1px 4px rgba(0,0,0,0.18);
 }
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
-.logo-box{width:32px;height:32px;background:#0F4C5C;color:#fff;font-size:18px;box-shadow:0 4px 12px rgba(0,0,0,0.12);border:1.5px solid rgba(255,255,255,0.25);border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.logo-box{width:32px;height:32px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(15,76,92,0.18));}
 .logo-text{font-family:'Fraunces',serif;font-size:16px;font-weight:700;color:#0F4C5C;letter-spacing:-0.2px;}
 .nav-search{flex:1;max-width:440px;margin:0 auto;position:relative;}
 .nav-search input{width:100%;height:34px;background:var(--light-green);border:1px solid rgba(15,76,92,0.10);border-radius:30px;padding:0 54px 0 34px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--teal);outline:none;}
@@ -249,7 +249,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 
 <nav class="navbar">
   <a class="nav-logo" href="{{ route('scholarships.index') }}" style="text-decoration:none">
-    <div class="logo-box">🎓</div>
+    <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="logo-box">
     <span class="logo-text">ScholarLink</span>
   </a>
   <form action="{{ route('scholarships.index') }}" method="GET" class="nav-search">
@@ -337,9 +337,6 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     @yield('content')
   </main>
 </div>
-
-<!-- Chatbot Widget -->
-<x-chatbot-widget />
 
 <!-- Session Timeout Modal -->
 <div id="session-timeout-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">

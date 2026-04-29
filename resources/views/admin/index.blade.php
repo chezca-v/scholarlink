@@ -110,9 +110,7 @@
     {{-- Logo --}}
     <div class="px-5 py-5 border-b border-white/10">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2.5">
-            <div style="width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F4C5C" stroke-width="2.5"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-            </div>
+            <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" style="width:32px;height:32px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(0,0,0,.18));">
             <span class="font-display font-bold text-white text-lg leading-tight">Scholar<span style="color:var(--accent-light)">Link</span></span>
         </a>
     </div>

@@ -84,12 +84,8 @@
         .sa-sidebar__logo {
             width:           36px;
             height:          36px;
-            border-radius:   10px;
-            background:      rgba(255,255,255,.15);
-            display:         flex;
-            align-items:     center;
-            justify-content: center;
-            font-size:       18px;
+            object-fit:      contain;
+            filter:          drop-shadow(0 4px 10px rgba(0,0,0,.2));
             flex-shrink:     0;
         }
         .sa-sidebar__wordmark {
@@ -493,7 +489,7 @@
 
         {{-- Brand --}}
         <a href="{{ route('superadmin.dashboard') }}" class="sa-sidebar__brand">
-            <div class="sa-sidebar__logo">🎓</div>
+            <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="sa-sidebar__logo">
             <span class="sa-sidebar__wordmark">ScholarLink</span>
         </a>
         <div class="sa-sidebar__role">Superadmin Panel</div>

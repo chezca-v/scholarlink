@@ -11,9 +11,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Support\RedirectsUsersByRole;
 
 class RegisteredUserController extends Controller
 {
+    use RedirectsUsersByRole;
     /**
      * Display the registration view.
      */
@@ -52,7 +54,9 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect($this->dashboardRouteFor($user));
+        return $user->role === 'applicant'
+            ? redirect()->route('profile.setup')
+            : redirect($this->dashboardRouteFor($user));
     }
 
     private function dashboardRouteFor(User $user): string

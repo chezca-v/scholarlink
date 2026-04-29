@@ -2,7 +2,7 @@
 
 <aside class="sidebar">
     <div class="side-brand">
-        <div class="logo-icon">🎓</div>
+        <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="logo-icon" style="object-fit:contain;">
         <div>
             <h3 style="font-family:'Fraunces'; font-size: 16px;">Scholar<span style="color:var(--warm-amber)">Link</span></h3>
             <p style="font-size:9px; color:rgba(255,255,255,0.3); text-transform:uppercase;">{{ $organization?->name ?? 'Admin Panel' }}</p>
