@@ -136,7 +136,7 @@ class AdminController extends Controller
                 'icon' => '🚨',
                 'title' => $unassignedApplications . ' Applications Unassigned for 4+ Days',
                 'description' => 'Applications with no evaluations assigned yet. Risk of missing SLA.',
-                'link' => route('admin.applications.unassigned') ?? '#',
+                'link' => '#',
                 'link_text' => 'Assign Evaluators',
             ],
             [
@@ -144,7 +144,7 @@ class AdminController extends Controller
                 'icon' => '⏳',
                 'title' => 'Upcoming Deadlines — ' . $incompleteDocsApplications . ' Applicants with Incomplete Docs',
                 'description' => 'Applicants still missing at least one required document.',
-                'link' => route('admin.applications.incomplete_docs') ?? '#',
+                'link' => '#',
                 'link_text' => 'View Applicants',
             ],
             [
@@ -152,7 +152,7 @@ class AdminController extends Controller
                 'icon' => '📢',
                 'title' => $awaitingApprovalScholarships . ' Scholarships Awaiting Approval',
                 'description' => 'Draft scholarships are ready for review and publication.',
-                'link' => route('admin.scholarships.drafts') ?? '#',
+                'link' => '#',
                 'link_text' => 'Review Drafts',
             ],
         ];
@@ -167,17 +167,17 @@ class AdminController extends Controller
             [
                 'icon' => '👥',
                 'label' => 'Assign',
-                'link' => route('admin.applications.pending') ?? '#',
+                'link' => '#',
             ],
             [
                 'icon' => '⚙️',
                 'label' => 'Weight Config',
-                'link' => route('admin.settings') ?? '#',
+                'link' => '#',
             ],
             [
                 'icon' => '📊',
                 'label' => 'Analytics',
-                'link' => route('admin.reports.index') ?? '#',
+                'link' => route('admin.analytics') ?? '#',
             ],
         ];
 

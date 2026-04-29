@@ -76,6 +76,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
 Admin Routes (Role: admin)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', function () { return redirect()->route('admin.dashboard'); });
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Scholarship CRUD & Extensions
@@ -98,6 +99,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 6.4 Evaluator Routes (Role: evaluator)
 */
 Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evaluator.')->group(function () {
+    Route::get('/', function () { return redirect()->route('evaluator.dashboard'); });
     Route::get('/dashboard', [EvaluatorController::class, 'dashboard'])->name('dashboard');
     Route::get('/queue', [EvaluatorController::class, 'queue'])->name('queue');
 
@@ -125,6 +127,7 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
 Superadmin Routes (Role: superadmin)
 */
 Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::get('/', function () { return redirect()->route('superadmin.dashboard'); });
     Route::controller(SuperadminController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
 

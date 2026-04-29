@@ -326,12 +326,9 @@
         </div>
         <div class="sub" style="font-size: 10px; color: var(--muted); display:flex; align-items:center; gap:4px;">
           Evaluator
-          <form method="POST" action="{{ route('logout') }}" style="margin: 0; padding: 0; display:inline-block;">
-            @csrf
-            <button type="submit" style="background:none; border:none; color:var(--red); font-size:10px; cursor:pointer; font-family:inherit; padding:0; text-decoration:none;" title="Log Out" onclick="return confirm('Are you sure you want to log out?');">
-              Log Out
-            </button>
-          </form>
+          <button type="button" style="background:none; border:none; color:var(--red); font-size:10px; cursor:pointer; font-family:inherit; padding:0; text-decoration:none; margin-left:4px;" title="Log Out" onclick="document.getElementById('logoutModal').classList.add('open')">
+            Log Out
+          </button>
         </div>
       </div>
     </div>
@@ -365,6 +362,23 @@
 </div>
 
 @stack('modals')
+
+<div class="modal-overlay" id="logoutModal">
+  <div class="modal" style="width: 400px; text-align: center; padding: 32px 28px 24px;">
+    <div style="font-size:42px; margin-bottom:14px;">👋</div>
+    <h2 class="modal-title" style="margin-bottom:8px; font-size:22px; color:var(--primary);">Log out of ScholarLink?</h2>
+    <p style="font-size:13px; color:var(--slate); margin-bottom:24px;">
+        You'll need to sign in again to access your evaluator dashboard.
+    </p>
+    <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-outline" style="flex:1; justify-content:center; background:#F4F6FA; border:1.5px solid #E2E8F0; color:#1C1C2E;" onclick="document.getElementById('logoutModal').classList.remove('open')">Cancel</button>
+        <form method="POST" action="{{ route('logout') }}" style="flex:1; display:flex; margin:0;">
+            @csrf
+            <button type="submit" class="btn btn-danger" style="flex:1; justify-content:center; background:linear-gradient(135deg,#e53e3e,#c53030); color:white; border:none;">Yes, Log Out</button>
+        </form>
+    </div>
+  </div>
+</div>
 
 <x-chatbot-widget />
 @stack('scripts')
