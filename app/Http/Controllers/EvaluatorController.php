@@ -20,8 +20,13 @@ class EvaluatorController extends Controller
         $now = Carbon::now();
         $unreadNotifications = Notification::where('user_id', $user->id)->where('is_read', false)->count();
 
-        $totalApplications = Application::count();
-        $pendingReviews    = Application::where('status', 'pending')->count();
+        // Get IDs of scholarships assigned to this evaluator
+        $assignedScholarshipIds = $user->evaluatorAssignments()->pluck('scholarship_id');
+
+        $totalApplications = Application::whereIn('scholarship_id', $assignedScholarshipIds)->count();
+        $pendingReviews    = Application::whereIn('scholarship_id', $assignedScholarshipIds)
+            ->where('status', 'under_review')
+            ->count();
 
         $stats = [
             [
@@ -30,15 +35,15 @@ class EvaluatorController extends Controller
                 'value'       => $pendingReviews,
                 'badge_text'  => 'Queue',
                 'badge_color' => '#C9A84C',
-                'footer'      => 'Applications awaiting review',
+                'footer'      => 'Awaiting your evaluation',
             ],
             [
                 'icon'        => '✅',
-                'label'       => 'Total Applications',
+                'label'       => 'Total Assigned',
                 'value'       => $totalApplications,
                 'badge_text'  => 'All',
                 'badge_color' => '#22889a',
-                'footer'      => 'Across all scholarships',
+                'footer'      => 'Applications in your assigned pool',
             ],
         ];
 
@@ -52,8 +57,11 @@ class EvaluatorController extends Controller
     public function queue()
     {
         $evaluator = auth()->user();
+        $assignedScholarshipIds = $evaluator->evaluatorAssignments()->pluck('scholarship_id');
+
         $applications = Application::with('scholarship')
-            ->where('status', 'review')
+            ->whereIn('scholarship_id', $assignedScholarshipIds)
+            ->where('status', 'under_review')
             ->paginate(15);
             
         return view('evaluator.queue', compact('applications'));

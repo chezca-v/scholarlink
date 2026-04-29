@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Application;
 use App\Models\ApplicantProfile;
+use App\Models\Scholarship;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -281,11 +282,12 @@ class ApplicationController extends Controller
         );
 
         // Create the application
+        $scholarship = Scholarship::findOrFail($request->scholarship_id);
         $application = Application::create([
-            'reference_code' => 'APP-' . Str::upper(Str::random(8)), // Generate unique code
+            'reference_code' => Application::generateReferenceCode($scholarship, now()->year),
             'applicant_id' => auth()->id(),
             'scholarship_id' => $request->scholarship_id,
-            'status' => 'submitted', // Changed from 'pending' to 'submitted'
+            'status' => 'pending', 
             'stage' => 'submitted',
             'submitted_at' => now(),
         ]);
@@ -352,7 +354,10 @@ class ApplicationController extends Controller
 
     public function track($id)
     {
-        // Alias: redirect to show view
-        return $this->show($id);
+        $application = Application::with(['scholarship', 'applicationDocuments.document'])
+            ->where('applicant_id', auth()->id())
+            ->findOrFail($id);
+
+        return view('applicant.track', compact('application'));
     }
 }

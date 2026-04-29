@@ -25,10 +25,10 @@ class AIController extends Controller
         $user = $request->user();
         $profile = $user?->applicantProfile;
         $profileFingerprint = md5(json_encode([
-            $profile?->course,
+            $profile?->course_program,
             $profile?->university_name,
             $profile?->gpa,
-            $profile?->income_bracket,
+            $profile?->monthly_household_income,
         ]));
         $cacheKey = 'ai-chat-response:' . md5(($user?->id ?? $request->ip()) . '|' . $profileFingerprint . '|' . Str::lower($message));
 
@@ -52,10 +52,10 @@ class AIController extends Controller
         RateLimiter::hit($rateKey, 60);
 
         $name = $user?->first_name ?? $user?->name ?? 'Guest';
-        $course = $profile?->course ?? 'not set';
+        $course = $profile?->course_program ?? 'not set';
         $university = $profile?->university_name ?? 'not set';
         $gpa = $profile?->gpa ?? 'not set';
-        $income = $profile?->income_bracket ?? 'not set';
+        $income = $profile?->monthly_household_income ?? 'not set';
 
         $prompt = <<<PROMPT
 You are Isko, ScholarLink's scholarship assistant.
@@ -90,10 +90,10 @@ PROMPT;
         $profile = $user->applicantProfile;
         $profileFingerprint = md5(json_encode([
             $profile?->gpa,
-            $profile?->course,
+            $profile?->course_program,
             $profile?->university_name,
-            $profile?->income_bracket,
-            $profile?->region,
+            $profile?->monthly_household_income,
+            $profile?->province,
         ]));
         $formattedScholarships = $this->formatScholarships();
         $scholarshipSnapshot = md5($formattedScholarships);
@@ -125,10 +125,10 @@ PROMPT;
             Student Profile:
             - Name: {$user->first_name}
             - GPA: {$profile->gpa}
-            - Course: {$profile->course}
+            - Course: {$profile->course_program}
             - University: {$profile->university_name}
-            - Income Bracket: {$profile->income_bracket}
-            - Location: {$profile->region}
+            - Income Bracket: {$profile->monthly_household_income}
+            - Location: {$profile->province}
 
             Based on this profile, give a match score from 0-100 and a short reason for each scholarship.
             Respond in JSON only, no markdown, like:
@@ -167,7 +167,7 @@ PROMPT;
         $prompt = "
             You are a friendly scholarship advisor for ScholarLink.
             Give a short 2-sentence encouragement and tip for a student named {$request->user()->first_name}
-            who is taking {$profile->course} with a GPA of {$profile->gpa}.
+            who is taking {$profile->course_program} with a GPA of {$profile->gpa}.
             Keep it warm and motivating. No markdown.
         ";
 
@@ -258,12 +258,12 @@ PROMPT;
      */
     private function formatScholarships(): string
     {
-        $scholarships = Scholarship::where('is_active', true)
-            ->select('id', 'name', 'provider_name', 'min_gpa', 'course_requirements', 'income_requirement')
+        $scholarships = Scholarship::where('status', 'open')
+            ->select('id', 'name', 'provider_name', 'gpa_requirement', 'courses', 'income_bracket')
             ->get();
 
         return $scholarships->map(fn ($scholarship) =>
-            "ID:{$scholarship->id} | {$scholarship->name} by {$scholarship->provider_name} | Min GPA: {$scholarship->min_gpa} | Courses: {$scholarship->course_requirements} | Income: {$scholarship->income_requirement}"
+            "ID:{$scholarship->id} | {$scholarship->name} by {$scholarship->provider_name} | Min GPA: {$scholarship->gpa_requirement} | Courses: " . (is_array($scholarship->courses) ? implode(', ', $scholarship->courses) : $scholarship->courses) . " | Income: {$scholarship->monthly_household_income}"
         )->implode("\n");
     }
 }

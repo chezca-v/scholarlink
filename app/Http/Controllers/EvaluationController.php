@@ -38,6 +38,9 @@ class EvaluationController extends Controller
 
         // Blind screening — mask applicant info if enabled
         $blindScreening = $application->scholarship->blind_screening;
+        if ($blindScreening) {
+            $application->applicant = $this->maskApplicantForBlindReview($application->applicant, $application->applicant->applicantProfile);
+        }
 
         // Alternative scholarships for suggestion
         $alternatives = Scholarship::query()
