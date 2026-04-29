@@ -349,7 +349,7 @@ tr:last-child td {
                                 <span class="st-badge {{ $currentStatus['class'] }}">{{ $currentStatus['label'] }}</span>
                             </td>
                             <td class="td-actions">
-                                <a href="{{ route('applications.track', $app->id) }}" class="btn-action">View</a>
+                                <a href="{{ route('applications.show', $app->id) }}" class="btn-action">View</a>
                                 @if(in_array($app->status, ['pending', 'submitted', 'under_review']))
                                     <button class="btn-action btn-withdraw" onclick="alert('Withdraw feature coming soon')">Withdraw</button>
                                 @endif

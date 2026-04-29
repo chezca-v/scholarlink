@@ -105,8 +105,13 @@ h2.text-lg { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; 
                 {{ auth()->user()->email ?? 'user@example.com' }}
             </div>
             <div class="profile-tags">
-                <span class="profile-tag">Undergraduate</span>
-                <span class="profile-tag">BS Computer Science</span>
+                <span class="profile-tag">{{ $profile->year_level ? 'Year '.$profile->year_level : 'Applicant' }}</span>
+                @if($profile?->course_program)
+                <span class="profile-tag">{{ $profile->course_program }}</span>
+                @endif
+                @if($profile?->university_name)
+                <span class="profile-tag" style="font-size:10px;">{{ $profile->university_name }}</span>
+                @endif
             </div>
         </div>
         <div style="margin-left: auto;">
@@ -132,15 +137,27 @@ h2.text-lg { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; 
                 </div>
                 <div class="info-item">
                     <span class="info-label">Email Address</span>
-                    <span class="info-value">{{ auth()->user()->email ?? 'user@example.com' }}</span>
+                    <span class="info-value">{{ auth()->user()->email ?? '—' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Phone Number</span>
-                    <span class="info-value">{{ auth()->user()->phone ?? '+639123456789' }}<span style="font-size: 10px; color: #1a9653; background: #e8f8ed; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">Verified</span></span>
+                    <span class="info-value">
+                        {{ optional($profile)->mobile_number ?? 'Not provided' }}
+                    </span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">Location</span>
-                    <span class="info-value">{{ auth()->user()->location ?? 'City, Country' }}</span>
+                    <span class="info-label">Home Address</span>
+                    <span class="info-value">
+                        {{ collect([optional($profile)->home_address, optional($profile)->city, optional($profile)->province])->filter()->implode(', ') ?: 'Not provided' }}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Date of Birth</span>
+                    <span class="info-value">{{ optional($profile)->date_of_birth ? \Carbon\Carbon::parse($profile->date_of_birth)->format('M d, Y') : 'Not provided' }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Sex</span>
+                    <span class="info-value">{{ optional($profile)->sex ?? 'Not provided' }}</span>
                 </div>
             </div>
         </div>

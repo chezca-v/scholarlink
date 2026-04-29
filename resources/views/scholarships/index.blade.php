@@ -231,8 +231,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <span class="logo-text">ScholarLink</span>
   </a>
 
+  <div style="display:flex;align-items:center;gap:12px;margin-left:20px;">
+    <a href="{{ route('dashboard') }}" class="pbtn" style="text-decoration:none;padding:0 14px;background:var(--cloud);border-color:var(--mist);color:var(--ink);display:flex;align-items:center;gap:6px;font-weight:600;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to Dashboard
+    </a>
+  </div>
+
   {{--Search form — submits GET to same page --}}
   <form class="nav-search" method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
+    <input type="hidden" name="filter_submitted" value="1">
     <span class="si">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -240,7 +248,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     </span>
     <input type="text" name="q" id="nav-search"
            value="{{ $filters['q'] ?? '' }}"
-           placeholder="Search scholarships, organizations…"
+           placeholder="Search scholarships, requirements…"
            autocomplete="off">
   </form>
 
@@ -310,22 +318,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     <div class="fg">
       <div class="fgl">Status</div>
       @php
-        $activeStatuses = (array) ($filters['status'] ?? ['open', 'closing_soon', 'coming_soon']);
+        // Only pre-check boxes if the user explicitly submitted the status filter.
+        // If no 'status' in the request, show no boxes as checked (controller uses defaults internally).
+        $activeStatuses = request()->has('status') ? (array) ($filters['status'] ?? []) : [];
       @endphp
       <label class="cbr">
-        <input type="checkbox" name="status[]" value="open"
+        <input type="checkbox" name="status[]" value="open" form="filter-form"
                {{ in_array('open', $activeStatuses) ? 'checked' : '' }}
                onchange="submitFilters()">
         <span class="cbl">Open</span>
       </label>
       <label class="cbr">
-        <input type="checkbox" name="status[]" value="closing_soon"
+        <input type="checkbox" name="status[]" value="closing_soon" form="filter-form"
                {{ in_array('closing_soon', $activeStatuses) ? 'checked' : '' }}
                onchange="submitFilters()">
         <span class="cbl">Closing Soon</span>
       </label>
       <label class="cbr">
-        <input type="checkbox" name="status[]" value="coming_soon"
+        <input type="checkbox" name="status[]" value="coming_soon" form="filter-form"
                {{ in_array('coming_soon', $activeStatuses) ? 'checked' : '' }}
                onchange="submitFilters()">
         <span class="cbl">Coming Soon</span>
@@ -347,7 +357,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       @endphp
       @foreach($categoryOptions as $value => $label)
         <label class="cbr">
-          <input type="checkbox" name="category[]" value="{{ $value }}"
+          <input type="checkbox" name="category[]" value="{{ $value }}" form="filter-form"
                  {{ in_array($value, $activeCategories) ? 'checked' : '' }}
                  onchange="submitFilters()">
           <span class="cbl">{{ $label }}</span>
@@ -365,7 +375,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <span class="swc" id="gpa-d">≥ {{ number_format($gpaVal, 2) }}</span>
           <span>5.00</span>
         </div>
-        <input type="range" id="gpa-s" name="gpa" min="1" max="5" step="0.25"
+        <input type="range" id="gpa-s" name="gpa" form="filter-form" min="1" max="5" step="0.25"
                value="{{ $gpaVal }}"
                oninput="document.getElementById('gpa-d').textContent='≥ '+parseFloat(this.value).toFixed(2);"
                onchange="submitFilters()">
@@ -377,12 +387,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <div class="fgl">Income Bracket</div>
       @php
 
-        $activeIncomes = (array) ($filters['income'] ?? ['Below ₱100K/yr', '₱100K–₱250K']);
+        $activeIncomes = request()->has('income') ? (array) ($filters['income'] ?? []) : [];
         $incomeOptions = ['Below ₱100K/yr', '₱100K–₱250K', '₱250K–₱500K', 'Open / Any'];
       @endphp
       @foreach($incomeOptions as $incVal)
         <label class="cbr">
-          <input type="checkbox" name="income[]" value="{{ $incVal }}"
+          <input type="checkbox" name="income[]" value="{{ $incVal }}" form="filter-form"
                  {{ in_array($incVal, $activeIncomes) ? 'checked' : '' }}
                  onchange="submitFilters()">
           <span class="cbl">{{ $incVal }}</span>
@@ -406,7 +416,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           </button>
         @endforeach
         {{-- Hidden input carries the selected value --}}
-        <input type="hidden" name="deadline" id="deadline-val" value="{{ $activeDl }}">
+        <input type="hidden" name="deadline" id="deadline-val" form="filter-form" value="{{ request()->has('deadline') ? $activeDl : '' }}">
       </div>
     </div>
 
@@ -421,7 +431,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <span class="swc" id="match-d">≥ {{ $matchVal }}%</span>
           <span>100%</span>
         </div>
-        <input type="range" id="match-s" name="match" min="0" max="100" step="5"
+        <input type="range" id="match-s" name="match" form="filter-form" min="0" max="100" step="5"
                value="{{ $matchVal }}"
                oninput="document.getElementById('match-d').textContent='≥ '+this.value+'%';"
                onchange="submitFilters()">
@@ -430,7 +440,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     @endauth
 
     {{-- Sort (hidden on sidebar, controlled by top bar) --}}
-    <input type="hidden" name="sort" id="sort-val" value="{{ $filters['sort'] ?? 'match' }}">
+    <input type="hidden" name="sort" id="sort-val" form="filter-form" value="{{ $filters['sort'] ?? 'match' }}">
 
     {{-- User profile card (bottom of sidebar) --}}
     @auth
@@ -582,8 +592,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
             </div>
           </div>
 
-          {{-- Scholarship name --}}
-          <div class="ctitle">{{ $scholarship->name }}</div>
+          {{-- Scholarship Logo & Name --}}
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #0F4C5C, #1A6B7A); color:#F9D679; display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:16px; flex-shrink:0; box-shadow:0 3px 8px rgba(15,76,92,0.15);">
+                {{ strtoupper(substr($scholarship->provider_name, 0, 1)) }}
+            </div>
+            <div class="ctitle" style="margin-bottom:0;">{{ $scholarship->name }}</div>
+          </div>
 
           {{-- Deadline + location meta --}}
           <div class="cmeta">
@@ -635,16 +650,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           @auth
             @if($matchScore !== null)
               <div class="mlbl">Your Match Score</div>
-              <div class="mrow">
+              <div class="mrow" style="margin-bottom:8px;">
                 <div class="btrack">
                   <div class="bfill" style="width:{{ $matchScore }}%"></div>
                 </div>
                 <span class="mpct">{{ number_format($matchScore, 0) }}%</span>
               </div>
-            @else
-              <div class="mlbl" style="margin-bottom:13px;opacity:.6;">Match score not yet computed</div>
             @endif
           @endauth
+
+          <div class="mlbl">Slots Available</div>
+          <div style="font-size:13px; font-weight:700; color:var(--primary); margin-bottom:13px; display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--slate)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            {{ $scholarship->remainingSlots() }} slots left
+            <span style="font-weight:400; color:var(--slate); font-size:11px;">(of {{ $scholarship->slots }})</span>
+          </div>
 
           {{-- Actions --}}
           </div>

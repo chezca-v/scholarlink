@@ -342,12 +342,17 @@ class ApplicationController extends Controller
 
     public function show($id)
     {
-        return view('applicant.applications.show', compact('id'));
+        $application = Application::with(['scholarship', 'applicationDocuments.document'])
+            ->where('applicant_id', auth()->id())
+            ->findOrFail($id);
+
+        return view('applicant.applications.show', compact('application', 'id'));
     }
 
 
     public function track($id)
     {
-        return view('applicant.applications.track', compact('id'));
+        // Alias: redirect to show view
+        return $this->show($id);
     }
 }

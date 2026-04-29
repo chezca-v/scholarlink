@@ -348,7 +348,14 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
             <button type="button" class="filter-pill" data-filter="matches">Matches ({{ $counts['matches'] }})</button>
         </div>
 
-        <div class="notif-list">
+        <div class="notif-list" x-data="{ 
+            open: false, 
+            activeNotif: {title: '', body: '', time: ''},
+            showNotif(title, body, time) {
+                this.activeNotif = {title, body, time};
+                this.open = true;
+            }
+        }">
             @forelse($notifications as $notif)
                 @php
                     $isUnread = !$notif->is_read;
@@ -399,7 +406,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                         </div>
                     </div>
                     <div class="n-action">
-                        <a href="#" class="btn-action {{ $btnClass }}">{{ $actionText }}</a>
+                        <button @click="showNotif('{{ addslashes($notif->title) }}', '{{ addslashes($notif->body) }}', '{{ $notif->created_at->diffForHumans() }}')" class="btn-action {{ $btnClass }}">{{ $actionText }}</button>
                     </div>
                 </div>
             @empty
@@ -407,9 +414,40 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                     No notifications available.
                 </div>
             @endforelse
+
+            {{-- Notification Modal --}}
+            <div x-show="open" 
+                 class="modal-backdrop" 
+                 style="display: none; position: fixed; inset: 0; background: rgba(15, 76, 92, 0.4); backdrop-filter: blur(4px); z-index: 1000; align-items: center; justify-content: center;"
+                 x-transition.opacity>
+                <div @click.away="open = false" 
+                     class="modal-content" 
+                     style="background: #fff; border-radius: 20px; width: 90%; max-width: 480px; padding: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--mist);"
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 transform scale-95"
+                     x-transition:enter-end="opacity-100 transform scale-100">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                        <h2 x-text="activeNotif.title" style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; color: var(--teal); line-height: 1.2;"></h2>
+                        <button @click="open = false" style="background: var(--cloud); border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--slate);">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        </button>
+                    </div>
+                    <p x-text="activeNotif.body" style="font-size: 15px; color: var(--ink); line-height: 1.6; margin-bottom: 24px;"></p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span x-text="activeNotif.time" style="font-size: 12px; color: var(--slate); font-weight: 500;"></span>
+                        <button @click="open = false" class="btn-action primary" style="width: auto; padding: 10px 24px;">Dismiss</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
   </div>
+
+  <style>
+      .modal-backdrop {
+          display: flex !important;
+      }
+  </style>
 
   <script>
       document.addEventListener('DOMContentLoaded', function() {

@@ -108,33 +108,38 @@ class ScholarshipController extends Controller
         $scholarship = Scholarship::findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'provider_name' => 'required|string|max:255',
-            'tagline' => 'nullable|string|max:255',
-            'description' => 'required|string',
-            'gpa_requirement' => 'nullable|numeric|min:0|max:100',
-            'income_bracket' => 'nullable|string|max:100',
-            'slots' => 'required|integer|min:1',
-            'eligibility' => 'required|string',
-            'benefits' => 'required|string',
-            'requirements' => 'required|string',
-            'open_date' => 'required|date',
-            'deadline' => 'required|date|after:open_date',
-            'status' => 'required|in:open,closed,draft',
-            'blind_screening' => 'boolean',
+            'name'             => 'required|string|max:255',
+            'provider_name'    => 'required|string|max:255',
+            'tagline'          => 'nullable|string|max:255',
+            'description'      => 'required|string',
+            'gpa_requirement'  => 'nullable|numeric|min:0|max:100',
+            'income_bracket'   => 'nullable|string|max:100',
+            'slots'            => 'required|integer|min:0',
+            'eligibility'      => 'required|string',
+            'benefits'         => 'required|string',
+            'requirements'     => 'required|string',
+            'open_date'        => 'required|date',
+            'deadline'         => 'required|date',
+            'status'           => 'required|in:open,closed,draft,closing_soon,coming_soon',
+            'blind_screening'  => 'boolean',
             'ai_match_enabled' => 'boolean',
-            'weight_gpa' => 'nullable|numeric|min:0|max:100',
-            'weight_income' => 'nullable|numeric|min:0|max:100',
-            'tags' => 'nullable|array',
-            'contact_email' => 'nullable|email|max:255',
-            'website' => 'nullable|url|max:255',
-            'address' => 'nullable|string|max:500',
+            'weight_gpa'       => 'nullable|numeric|min:0|max:100',
+            'weight_income'    => 'nullable|numeric|min:0|max:100',
+            'tags'             => 'nullable|array',
+            'contact_email'    => 'nullable|email|max:255',
+            'website'          => 'nullable|url|max:255',
+            'address'          => 'nullable|string|max:500',
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['_token', '_method']);
+        // Ensure boolean fields
+        $data['blind_screening']   = $request->boolean('blind_screening');
+        $data['ai_match_enabled']  = $request->boolean('ai_match_enabled');
+
         $scholarship->update($data);
 
-        return redirect()->route('admin.scholarships.index')->with('success', 'Scholarship updated successfully.');
+        return redirect()->route('admin.scholarships.index')
+            ->with('success', '"'.$scholarship->name.'" updated successfully.');
     }
 
     public function destroy($id)

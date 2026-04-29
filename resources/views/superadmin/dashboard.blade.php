@@ -41,7 +41,7 @@
         {{-- Org Performance Chart --}}
         <div class="card">
             <div class="section-header">
-                <div class="section-title">Org Performance <small>by applications processed</small></div>
+                <div class="section-title">Organization Performance <small>by applications processed</small></div>
                 <button class="btn btn-outline btn-sm">Export</button>
             </div>
             <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">

@@ -29,6 +29,66 @@
     </div>
 </div>
 
+@php
+    $splitPattern = '/\n\n+/';
+    $eligibilityItems  = array_values(array_filter(array_map('trim', preg_split($splitPattern, old('eligibility', $scholarship->eligibility) ?? ''))));
+    $benefitsItems     = array_values(array_filter(array_map('trim', preg_split($splitPattern, old('benefits', $scholarship->benefits) ?? ''))));
+    $requirementsItems = array_values(array_filter(array_map('trim', preg_split($splitPattern, old('requirements', $scholarship->requirements) ?? ''))));
+    $currentTags       = is_array(old('tags', $scholarship->tags)) ? old('tags', $scholarship->tags) : (is_string(old('tags', $scholarship->tags)) ? json_decode(old('tags', $scholarship->tags), true) ?? [] : []);
+    $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
+    $selectedTags = array_values(array_filter($currentTags, fn($t) => in_array($t, $standards)));
+    $customTags   = array_values(array_filter($currentTags, fn($t) => !in_array($t, $standards)));
+@endphp
+
+{{-- JSON data island - safe way to pass PHP data to Alpine without breaking scripts --}}
+<script type="application/json" id="scholarship-init-data">{!! json_encode([
+    'eligibility'   => $eligibilityItems,
+    'benefits'      => $benefitsItems,
+    'requirements'  => $requirementsItems,
+    'selectedTags'  => $selectedTags,
+    'customTags'    => $customTags,
+    'gpaScale'      => (old('gpa_requirement', $scholarship->gpa_requirement) > 5) ? 'shs' : 'college',
+    'gpaWeight'     => (int) old('weight_gpa', $scholarship->weight_gpa ?? 60),
+    'incomeWeight'  => (int) old('weight_income', $scholarship->weight_income ?? 40),
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) !!}</script>
+
+<script>
+function scholarshipForm() {
+    const _d = JSON.parse(document.getElementById('scholarship-init-data').textContent);
+    return {
+        eligibility:    _d.eligibility,
+        newEligibility: '',
+        benefits:       _d.benefits,
+        newBenefit:     '',
+        requirements:   _d.requirements,
+        newRequirement: '',
+        gpaScale:       _d.gpaScale,
+        gpaWeight:      _d.gpaWeight,
+        incomeWeight:   _d.incomeWeight,
+        syncWeights(changed) {
+            if (changed === 'gpa') { this.incomeWeight = 100 - this.gpaWeight; }
+            else { this.gpaWeight = 100 - this.incomeWeight; }
+        },
+        courseModalOpen: false,
+        standardCourses: {
+            eng: ['BS Civil Engineering','BS Computer Engineering','BS Information Technology','BS Computer Science','BS Electrical Engineering','BS Mechanical Engineering'],
+            biz: ['BS Accountancy','BS Business Administration','BS Economics','BS Finance'],
+            health: ['BS Nursing','BS Biology','BS Pharmacy','BS Medical Technology','BS Public Health'],
+            arts: ['BA Psychology','BA Communication','BA Political Science','BSED English','BSED Math']
+        },
+        selectedTags:   _d.selectedTags,
+        customTags:     _d.customTags,
+        addCustomTag(value) {
+            const v = value.trim().replace(/,$/, '');
+            const all = [...this.standardCourses.eng,...this.standardCourses.biz,...this.standardCourses.health,...this.standardCourses.arts];
+            if (v && !this.customTags.includes(v) && !this.selectedTags.includes(v) && !all.includes(v)) {
+                this.customTags.push(v);
+            }
+        }
+    }
+}
+</script>
+
 <div class="page-content" x-data="scholarshipForm()">
     <form method="POST" action="{{ route('admin.scholarships.update', $scholarship->id) }}">
         @csrf
@@ -46,9 +106,9 @@
         @endif
 
         {{-- Hidden fields to store dynamic arrays as strings --}}
-        <input type="hidden" name="eligibility" :value="eligibility.join('\n')">
-        <input type="hidden" name="benefits" :value="benefits.join('\n')">
-        <input type="hidden" name="requirements" :value="requirements.join('\n')">
+        <input type="hidden" name="eligibility" :value="eligibility.join('\n\n')">
+        <input type="hidden" name="benefits" :value="benefits.join('\n\n')">
+        <input type="hidden" name="requirements" :value="requirements.join('\n\n')">
 
         <div class="grid grid-cols-3 gap-6">
             {{-- LEFT COLUMN: Main details --}}
@@ -281,6 +341,8 @@
                             <select id="status" name="status" class="input-field">
                                 <option value="draft" {{ old('status', $scholarship->status) === 'draft' ? 'selected' : '' }}>Draft</option>
                                 <option value="open" {{ old('status', $scholarship->status) === 'open' ? 'selected' : '' }}>Open (Published)</option>
+                                <option value="closing_soon" {{ old('status', $scholarship->status) === 'closing_soon' ? 'selected' : '' }}>Closing Soon</option>
+                                <option value="coming_soon" {{ old('status', $scholarship->status) === 'coming_soon' ? 'selected' : '' }}>Coming Soon</option>
                                 <option value="closed" {{ old('status', $scholarship->status) === 'closed' ? 'selected' : '' }}>Closed</option>
                             </select>
                         </div>
@@ -423,61 +485,4 @@
     </form>
 </div>
 
-@push('scripts')
-<script>
-function scholarshipForm() {
-    return {
-        // Dynamic Fields setup
-        eligibility: {!! json_encode(array_values(array_filter(old('eligibility', $scholarship->eligibility) ? explode("\n", old('eligibility', $scholarship->eligibility)) : []))) !!},
-        newEligibility: '',
-        benefits: {!! json_encode(array_values(array_filter(old('benefits', $scholarship->benefits) ? explode("\n", old('benefits', $scholarship->benefits)) : []))) !!},
-        newBenefit: '',
-        requirements: {!! json_encode(array_values(array_filter(old('requirements', $scholarship->requirements) ? explode("\n", old('requirements', $scholarship->requirements)) : []))) !!},
-        newRequirement: '',
-        
-        // GPA Scale
-        gpaScale: {{ (old('gpa_requirement', $scholarship->gpa_requirement) > 5) ? "'shs'" : "'college'" }},
-
-        // Scoring Weights
-        gpaWeight: {{ old('weight_gpa', $scholarship->weight_gpa ?? 60) }},
-        incomeWeight: {{ old('weight_income', $scholarship->weight_income ?? 40) }},
-        syncWeights(changed) {
-            if (changed === 'gpa') {
-                this.incomeWeight = 100 - this.gpaWeight;
-            } else {
-                this.gpaWeight = 100 - this.incomeWeight;
-            }
-        },
-
-        // Courses Modal setup
-        courseModalOpen: false,
-        standardCourses: {
-            eng: ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering'],
-            biz: ['BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance'],
-            health: ['BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health'],
-            arts: ['BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math']
-        },
-        @php
-            $currentTags = is_array(old('tags', $scholarship->tags)) ? old('tags', $scholarship->tags) : (is_string(old('tags', $scholarship->tags)) ? json_decode(old('tags', $scholarship->tags), true) ?? [] : []);
-        @endphp
-        selectedTags: {!! json_encode(array_values(array_filter($currentTags, function($tag) {
-            $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
-            return in_array($tag, $standards);
-        }))) !!},
-        customTags: {!! json_encode(array_values(array_filter($currentTags, function($tag) {
-            $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
-            return !in_array($tag, $standards);
-        }))) !!},
-        
-        addCustomTag(value) {
-            const v = value.trim().replace(/,$/, '');
-            const allStandards = [...this.standardCourses.eng, ...this.standardCourses.biz];
-            if (v && !this.customTags.includes(v) && !this.selectedTags.includes(v) && !allStandards.includes(v)) {
-                this.customTags.push(v);
-            }
-        }
-    }
-}
-</script>
-@endpush
 @endsection

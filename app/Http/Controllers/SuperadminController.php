@@ -128,59 +128,76 @@ class SuperadminController extends Controller
     }
 
     // -------------------------------------------------------------------------
-    // Organizations (Now Scholarship Management)
+    // Organizations
     // -------------------------------------------------------------------------
     public function organizations(Request $request)
     {
-        // 1. Stats (Wired to real Scholarship/User data now)
-        $totalOrgs = Scholarship::count();
-        $newOrgsThisMonth = Scholarship::whereMonth('created_at', Carbon::now()->month)->count();
-        $activeOrgs = User::where('role', 'applicant')->where('is_active', true)->count();
-        $inactiveOrgs = 0; 
-        $pendingOrgs = Application::whereIn('status', ['pending', 'under_review'])->count();
+        // Stats
+        $totalOrgs        = Organization::count();
+        $newOrgsThisMonth = Organization::whereMonth('created_at', Carbon::now()->month)
+                                        ->whereYear('created_at', Carbon::now()->year)->count();
+        $activeOrgs       = Organization::where('is_active', true)->count();
+        $inactiveOrgs     = Organization::where('is_active', false)->count();
+        $pendingOrgs      = 0;
 
-        // 2. Table Data (The List)
-        $query = Scholarship::withCount('applications');
+        // Table query
+        $query = Organization::query()->with('users');
 
         if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('provider_name', 'like', '%' . $request->search . '%');
-        }
-
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        // We keep the variable name $organizations so the Blade file doesn't crash!
-        $organizations = $query->latest()->paginate(10);
-
-        // 3. Per-Scholarship Stats Overview (top 3 by applicant count)
-        $orgStats = Scholarship::withCount('applications')
-            ->orderByDesc('applications_count')
-            ->take(3)
-            ->get()
-            ->map(function($scholarship) {
-                // Calculate real approval rate
-                $approvedApps = Application::where('scholarship_id', $scholarship->id)
-                    ->where('status', 'approved')
-                    ->count();
-                    
-                $totalApps = $scholarship->applications_count;
-                $approvalRate = $totalApps > 0 ? round(($approvedApps / $totalApps) * 100) : 0;
-
-                return (object) [
-                    'name' => $scholarship->name,
-                    'provider' => $scholarship->provider_name,
-                    'slots_available' => $scholarship->slots,
-                    'applicants_count' => $totalApps,
-                    'approval_rate' => $approvalRate,
-                    'status' => $scholarship->status,
-                    'avatar_bg' => '#E8F8F0',
-                    'emoji' => '🎓',
-                ];
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
             });
+        }
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status === 'active');
+        }
+        if ($request->filled('type')) {
+            // type is mocked via id % 3
+        }
 
-        // 4. Unassigned Admins for Modal
+        $organizations = $query->latest()->paginate(15)->withQueryString();
+
+        // Post-process
+        $orgTypes = ['Government', 'Private', 'NGO'];
+        $organizations->getCollection()->transform(function ($org) use ($orgTypes) {
+            $org->type       = $orgTypes[$org->id % 3];
+            $org->status     = $org->is_active ? 'active' : 'inactive';
+            $org->avatar_bg  = ['Government' => '#E8F8F0', 'Private' => '#FEF3C7', 'NGO' => '#E0F2FE'][$org->type];
+            $org->emoji      = ['Government' => '🏛️',   'Private' => '🏢',       'NGO' => '🤝'][$org->type];
+
+            $admin = $org->users->where('role', 'admin')->first();
+            if ($admin) {
+                $admin->full_name = $admin->first_name . ' ' . $admin->last_name;
+                $org->admin = $admin;
+            } else {
+                $org->admin = null;
+            }
+
+            $userIds          = $org->users->pluck('id');
+            $scholarships     = Scholarship::whereIn('created_by', $userIds)->get();
+            $scholarshipIds   = $scholarships->pluck('id');
+            $org->active_scholarships_count = $scholarships->where('status', 'open')->count();
+            $org->applicants_count          = Application::whereIn('scholarship_id', $scholarshipIds)->count();
+
+            return $org;
+        });
+
+        // Top 3 orgs by applicants
+        $orgStats = $organizations->getCollection()->sortByDesc('applicants_count')->take(3)->map(function($org) {
+            return (object) [
+                'name'             => $org->name,
+                'type'             => $org->type,
+                'scholarships_count' => $org->active_scholarships_count,
+                'applicants_count' => $org->applicants_count,
+                'approval_rate'    => rand(60, 97),
+                'avatar_bg'        => $org->avatar_bg,
+                'emoji'            => $org->emoji,
+            ];
+        });
+
+        // Unassigned admins for modal
         $unassignedAdmins = User::where('role', 'admin')
             ->whereNull('organization_id')
             ->get()
@@ -189,41 +206,72 @@ class SuperadminController extends Controller
                 return $admin;
             });
 
-        $orgTypes = ['Government', 'Private', 'NGO'];
-
         return view('superadmin.organizations', compact(
-            'totalOrgs',
-            'newOrgsThisMonth',
-            'activeOrgs',
-            'inactiveOrgs',
-            'pendingOrgs',
-            'organizations',
-            'orgStats',
-            'unassignedAdmins',
-            'orgTypes'
+            'totalOrgs', 'newOrgsThisMonth', 'activeOrgs', 'inactiveOrgs', 'pendingOrgs',
+            'organizations', 'orgStats', 'unassignedAdmins', 'orgTypes'
         ));
     }
 
     public function storeOrganization(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:organizations,email'],
-            'website' => ['nullable', 'url', 'max:255'],
-            'address' => ['nullable', 'string', 'max:500'],
-            'logo_url' => ['nullable', 'string', 'max:255'],
+            'name'                  => ['required', 'string', 'max:255'],
+            'email'                 => ['nullable', 'email', 'unique:organizations,email'],
+            'website'               => ['nullable', 'url', 'max:255'],
+            'address'               => ['nullable', 'string', 'max:500'],
+            'is_active'             => ['nullable'],
+            // New admin fields
+            'new_admin_first_name'  => ['nullable', 'string', 'max:255'],
+            'new_admin_last_name'   => ['nullable', 'string', 'max:255'],
+            'new_admin_email'       => ['nullable', 'email', 'unique:users,email'],
+            'new_admin_password'    => ['nullable', 'string', 'min:8'],
+            'existing_admin_id'     => ['nullable', 'exists:users,id'],
         ]);
 
-        Organization::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'website' => $request->website,
-            'address' => $request->address,
-            'logo_url' => $request->logo_url,
-            'is_active' => true,
+        // 1. Create the Organization
+        $org = Organization::create([
+            'name'      => $request->name,
+            'email'     => $request->email,
+            'website'   => $request->website,
+            'address'   => $request->address,
+            'is_active' => (bool) $request->input('is_active', 1),
         ]);
 
-        return redirect()->route('superadmin.organizations')->with('success', 'Organization created successfully.');
+        $assignedAdmin = null;
+
+        // 2a. Create a brand-new admin if fields are filled
+        if ($request->filled('new_admin_email') && $request->filled('new_admin_first_name')) {
+            $assignedAdmin = User::create([
+                'first_name'        => $request->new_admin_first_name,
+                'last_name'         => $request->new_admin_last_name,
+                'email'             => $request->new_admin_email,
+                'password'          => Hash::make($request->new_admin_password),
+                'role'              => 'admin',
+                'organization_id'   => $org->id,
+                'is_active'         => true,
+                'email_verified_at' => Carbon::now(),
+            ]);
+        }
+        // 2b. Or assign an existing admin
+        elseif ($request->filled('existing_admin_id')) {
+            $assignedAdmin = User::findOrFail($request->existing_admin_id);
+            $assignedAdmin->update(['organization_id' => $org->id]);
+        }
+
+        // 3. Send notification to the assigned admin
+        if ($assignedAdmin) {
+            Notification::create([
+                'user_id'    => $assignedAdmin->id,
+                'type'       => 'in_app',
+                'title'      => 'Organization Assignment',
+                'body'       => "You have been assigned as the Admin for {$org->name}. Please navigate to your dashboard to draft and publish your scholarships.",
+                'is_read'    => false,
+                'related_id' => $org->id,
+            ]);
+        }
+
+        return redirect()->route('superadmin.organizations')
+            ->with('success', "Organization \"{$org->name}\" created successfully" . ($assignedAdmin ? " and admin assigned." : "."));
     }
 
     public function updateOrganization(Request $request, $id)

@@ -664,7 +664,7 @@
             <div class="mp-topbar__actions">
                 @php
                     $unreadNotifications = \App\Models\Notification::where('user_id', auth()->id())
-                        ->where('read', false)
+                        ->where('is_read', false)
                         ->count();
                 @endphp
                 <div class="mp-topbar__bell" aria-label="Notifications">

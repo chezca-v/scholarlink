@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     AdminController,
     EvaluatorController,
     EvaluationController,
-    SuperadminController
+    SuperadminController,
+    StaticPageController
 };
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
 
@@ -23,6 +24,11 @@ Public Routes
 Route::controller(PublicController::class)->group(function () {
     Route::get('/', 'landing')->name('landing');
 });
+
+// Static Legal Pages
+Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
+Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('privacy');
+Route::get('/data-privacy', [StaticPageController::class, 'dataPrivacy'])->name('data-privacy');
 
 Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships', 'index')->name('scholarships.index');

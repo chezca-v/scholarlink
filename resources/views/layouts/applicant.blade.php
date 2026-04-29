@@ -579,6 +579,24 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
+<footer style="margin-top:auto; padding:40px 28px; border-top:1px solid rgba(15,76,92,0.1); background:#fff;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
+        <div>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink" style="width:28px; filter:grayscale(1) opacity(0.6);">
+                <span style="font-family:'Fraunces',serif; font-weight:700; font-size:16px; color:var(--primary); opacity:0.8;">ScholarLink</span>
+            </div>
+            <p style="font-size:12px; color:var(--slate);">&copy; {{ date('Y') }} ScholarLink. All rights reserved.</p>
+        </div>
+        <div style="display:flex; gap:24px; font-size:13px; font-weight:500;">
+            <a href="{{ route('terms') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Terms</a>
+            <a href="{{ route('privacy') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Privacy Policy</a>
+            <a href="{{ route('data-privacy') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Data Privacy Act</a>
+            <a href="#" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Help Center</a>
+        </div>
+    </div>
+</footer>
+
 <x-chatbot-widget />
     @include('components.toast-notification')
     @include('components.modals.session-timeout')

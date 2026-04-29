@@ -19,16 +19,22 @@ class ScholarshipController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
                 ->orWhere('provider_name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('description', 'like', "%{$search}%")
+                ->orWhere('benefits', 'like', "%{$search}%")
+                ->orWhere('eligibility', 'like', "%{$search}%")
+                ->orWhere('requirements', 'like', "%{$search}%");
             });
         }
 
         // Apply status filter (multiple)
-        if ($request->has('status') && is_array($request->status)) {
-            $query->whereIn('status', $request->status);
-        } else {
-            // Default show open, closing_soon, coming_soon
+        if ($request->has('status')) {
+            $query->whereIn('status', (array) $request->status);
+        } elseif (!$request->has('filter_submitted')) {
+            // Default show open, closing_soon, coming_soon only on first load
             $query->whereIn('status', ['open', 'closing_soon', 'coming_soon']);
+        } else {
+            // filter_submitted is true but no status checked -> show nothing
+            $query->whereRaw('1 = 0');
         }
 
         // Apply category filter (tags JSON contains any of the categories)
@@ -202,7 +208,14 @@ class ScholarshipController extends Controller
     public function show($id)
     {
         $scholarship = Scholarship::withCount('applications')->findOrFail($id);
-        return view('scholarships.show', compact('scholarship'));
+
+        // Calculate real slots remaining
+        $approvedCount = \App\Models\Application::where('scholarship_id', $id)
+            ->where('status', 'approved')
+            ->count();
+        $slotsRemaining = max(0, ($scholarship->slots ?? 0) - $approvedCount);
+
+        return view('scholarships.show', compact('scholarship', 'slotsRemaining', 'approvedCount'));
     }
 
     public function edit($id)
