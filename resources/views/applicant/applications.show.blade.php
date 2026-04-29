@@ -30,7 +30,7 @@ $statusConfig = config('applications.statuses');
 {{-- TOPBAR --}}
 <div class="ma-topbar">
     <div class="ma-topbar__brand">
-        <div class="ma-topbar__logo">{{ config('app.logo_icon') }}</div>
+        <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="ma-topbar__logo" style="object-fit:contain;">
         {{ config('app.name') }}
     </div>
 

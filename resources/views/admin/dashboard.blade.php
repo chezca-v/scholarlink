@@ -67,12 +67,8 @@
         .logo-icon {
             width: 32px;
             height: 32px;
-            background: linear-gradient(135deg, var(--teal-mid), var(--warm-amber));
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,.18));
         }
 
         .side-nav {

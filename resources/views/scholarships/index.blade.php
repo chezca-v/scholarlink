@@ -37,13 +37,8 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
 .logo-box{
   width:32px;height:32px;
-  background: #0F4C5C;
-  color:#fff;
-  font-size:18px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.12);
-  border:1.5px solid rgba(255,255,255,0.25);
-  border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
+  object-fit:contain;
+  filter:drop-shadow(0 4px 10px rgba(15,76,92,0.18));
 }
 .logo-text{font-family:'Fraunces', serif;font-size:16px;font-weight:700;color:#0F4C5C;letter-spacing:-0.2px;}
 .nav-search{flex:1;max-width:440px;margin:0 auto;position:relative;}
@@ -232,7 +227,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 {{--═══════════════════════════════════════════════════ NAVBAR ══════════════ --}}
 <nav class="navbar">
   <a class="nav-logo" href="{{ route('landing') }}">
-    <div class="logo-box">🎓</div>
+    <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="logo-box">
     <span class="logo-text">ScholarLink</span>
   </a>
 
