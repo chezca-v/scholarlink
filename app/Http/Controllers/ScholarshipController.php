@@ -175,7 +175,7 @@ class ScholarshipController extends Controller
             'blind_screening' => 'boolean',
             'weight_gpa' => 'nullable|numeric|min:0|max:100',
             'weight_income' => 'nullable|numeric|min:0|max:100',
-            'tags' => 'nullable|array',
+            'courses' => 'nullable|array',
             'ai_match_enabled' => 'boolean',
             'contact_email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
@@ -194,6 +194,13 @@ class ScholarshipController extends Controller
             $data['org_logo'] = $request->file('org_logo')->store('logos', 'public');
         }
 
+        // Automatically extract the first two benefits as snippets
+        if (!empty($data['benefits'])) {
+            $benefitsArray = array_values(array_filter(array_map('trim', explode("\n", $data['benefits']))));
+            $data['benefit_snippet_1'] = $benefitsArray[0] ?? null;
+            $data['benefit_snippet_2'] = $benefitsArray[1] ?? null;
+        }
+
         Scholarship::create($data);
 
         return redirect()->route('admin.scholarships.index')->with('success', 'Scholarship created successfully.');
@@ -203,12 +210,6 @@ class ScholarshipController extends Controller
     {
         $scholarship = Scholarship::withCount('applications')->findOrFail($id);
         return view('scholarships.show', compact('scholarship'));
-    }
-
-    public function edit($id)
-    {
-        $scholarship = Scholarship::findOrFail($id);
-        return view('admin.scholarships.edit', compact('scholarship'));
     }
 
     public function update(Request $request, $id)
@@ -233,7 +234,7 @@ class ScholarshipController extends Controller
             'blind_screening' => 'boolean',
             'weight_gpa' => 'nullable|numeric|min:0|max:100',
             'weight_income' => 'nullable|numeric|min:0|max:100',
-            'tags' => 'nullable|array',
+            'courses' => 'nullable|array',
             'ai_match_enabled' => 'boolean',
             'contact_email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
@@ -252,6 +253,13 @@ class ScholarshipController extends Controller
                 Storage::disk('public')->delete($scholarship->org_logo);
             }
             $data['org_logo'] = $request->file('org_logo')->store('logos', 'public');
+        }
+
+        // Automatically extract the first two benefits as snippets
+        if (!empty($data['benefits'])) {
+            $benefitsArray = array_values(array_filter(array_map('trim', explode("\n", $data['benefits']))));
+            $data['benefit_snippet_1'] = $benefitsArray[0] ?? null;
+            $data['benefit_snippet_2'] = $benefitsArray[1] ?? null;
         }
 
         $scholarship->update($data);

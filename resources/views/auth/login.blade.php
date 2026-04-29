@@ -851,7 +851,7 @@
         toLogin.addEventListener('click', activateLogin);
 
         {{-- Auto-switch to signup panel on register validation errors --}}
-        @if ($errors->hasAny(['first_name', 'last_name', 'role', 'terms']))
+        @if (old('first_name') || old('last_name') || $errors->hasAny(['first_name', 'last_name', 'role', 'terms']))
             activateSignup();
         @endif
 
