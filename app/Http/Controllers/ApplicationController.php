@@ -201,7 +201,28 @@ class ApplicationController extends Controller
             'is_4ps' => 'nullable|boolean',
             'father_employment_status' => 'nullable|string|max:100',
             'mother_employment_status' => 'nullable|string|max:100',
+            'documents' => 'nullable|array',
+            'uploads' => 'nullable|array',
+            'uploads.*' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
+
+        $documents = $request->input('documents', []);
+        $uploads = $request->file('uploads', []);
+
+        $requiredSlugs = [
+            \Illuminate\Support\Str::slug('Proof of Enrollment'),
+            \Illuminate\Support\Str::slug('Report Card / Transcript'),
+            \Illuminate\Support\Str::slug('Valid ID'),
+            \Illuminate\Support\Str::slug('ITR / Tax Exemption'),
+            \Illuminate\Support\Str::slug('Barangay Indigency'),
+            \Illuminate\Support\Str::slug('Endorsement Letter'),
+        ];
+
+        foreach ($requiredSlugs as $slug) {
+            if (empty($documents[$slug]) && empty($uploads[$slug])) {
+                return back()->withErrors(['error' => 'Missing required document: ' . ucwords(str_replace('-', ' ', $slug))])->withInput();
+            }
+        }
 
         // Update or create applicant profile
         ApplicantProfile::updateOrCreate(
@@ -226,7 +247,53 @@ class ApplicationController extends Controller
             'submitted_at' => now(),
         ]);
 
-        return redirect()->route('applications.show', $application->id)->with('success', 'Application submitted successfully.');
+        $docTypes = [
+            \Illuminate\Support\Str::slug('Proof of Enrollment') => 'Proof of Enrollment / Acceptance Letter',
+            \Illuminate\Support\Str::slug('Report Card / Transcript') => 'Latest Report Card / TOR',
+            \Illuminate\Support\Str::slug('Valid ID') => 'Other',
+            \Illuminate\Support\Str::slug('ITR / Tax Exemption') => 'Income Tax Return / Certificate of Non-Filing',
+            \Illuminate\Support\Str::slug('Barangay Indigency') => 'Barangay Certificate of Indigency',
+            \Illuminate\Support\Str::slug('Utility Bill') => 'Other',
+            \Illuminate\Support\Str::slug('Endorsement Letter') => 'Letter of Recommendation',
+        ];
+
+        foreach ($uploads as $slug => $file) {
+            if ($file) {
+                $filePath = $file->store('documents/user_' . auth()->id(), 'public');
+                $docTypeStr = $docTypes[$slug] ?? 'Other';
+                
+                $doc = \App\Models\Document::create([
+                    'user_id' => auth()->id(),
+                    'document_type' => $docTypeStr,
+                    'file_url' => $filePath,
+                    'status' => 'pending',
+                ]);
+                
+                \App\Models\ApplicationDocument::create([
+                    'application_id' => $application->id,
+                    'document_id' => $doc->id,
+                    'submitted_at' => now(),
+                ]);
+            }
+        }
+
+        foreach ($documents as $slug => $docId) {
+            if ($docId) {
+                \App\Models\ApplicationDocument::create([
+                    'application_id' => $application->id,
+                    'document_id' => $docId,
+                    'submitted_at' => now(),
+                ]);
+            }
+        }
+
+        $scholarship = \App\Models\Scholarship::find($application->scholarship_id);
+
+        return back()->with('application_submitted', [
+            'application_id' => $application->id,
+            'reference_code' => $application->reference_code,
+            'scholarship_name' => $scholarship->name ?? 'Scholarship',
+        ]);
     }
 
 

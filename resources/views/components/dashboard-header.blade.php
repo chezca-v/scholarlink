@@ -4,10 +4,10 @@
     <div class="breadcrumb">ScholarLink <span style="opacity:0.3">›</span> <b style="color:white">Dashboard</b></div>
     <nav class="tab-group">
         <a href="{{ route('admin.dashboard') ?? '#' }}" class="tab-link active">Overview</a>
-        <a href="{{ route('admin.applications.index') ?? '#' }}" class="tab-link">Applications</a>
+        <a href="#" class="tab-link">Applications</a>
         <a href="{{ route('admin.scholarships.index') ?? '#' }}" class="tab-link">Scholarships</a>
-        <a href="{{ route('admin.evaluators.index') ?? '#' }}" class="tab-link">Evaluators</a>
-        <a href="{{ route('admin.reports.index') ?? '#' }}" class="tab-link">Reports</a>
+        <a href="#" class="tab-link">Evaluators</a>
+        <a href="#" class="tab-link">Reports</a>
     </nav>
     <div class="topbar-right">
         <div class="admin-pill">Admin</div>

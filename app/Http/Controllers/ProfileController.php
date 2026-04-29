@@ -69,6 +69,11 @@ class ProfileController extends Controller
             ->limit(5)
             ->get();
 
+        $unreadNotifications = Notification::query()
+            ->where('user_id', $user->id)
+            ->where('is_read', false)
+            ->count();
+
         $stats = [
             'active_applications' => (clone $applicationBaseQuery)
                 ->whereIn('status', ['pending', 'under_review', 'revision'])
@@ -109,16 +114,17 @@ class ProfileController extends Controller
             ? 0
             : (int) round(($profileFields->filter(fn ($value) => !is_null($value) && $value !== '')->count() / $profileFields->count()) * 100);
 
-        return view('dashboard', compact(
-            'user',
+        return view('applicant.dashboard', compact(            'user',
             'profile',
             'stats',
             'activeApplications',
             'recommendedScholarships',
             'upcomingDeadlines',
             'notifications',
-            'profileCompleteness'
-        ));    }
+            'profileCompleteness',
+            'unreadNotifications'
+        ));
+    }
 
     public function setup()
     {
@@ -145,7 +151,7 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.show')->with('status', 'profile-updated');
     }
 
     /**

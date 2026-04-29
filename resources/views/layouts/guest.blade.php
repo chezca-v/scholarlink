@@ -26,5 +26,7 @@
                 {{ $slot }}
             </div>
         </div>
+        <x-chatbot-widget />
+        @stack('scripts')
     </body>
 </html>
