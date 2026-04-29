@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Scholarship;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
 class AIController extends Controller
@@ -14,60 +18,69 @@ class AIController extends Controller
     public function chat(Request $request)
     {
         $validated = $request->validate([
-            'message' => ['required', 'string', 'max:2000'],
+            'message' => ['required', 'string', 'max:500'],
         ]);
 
-        $apiKey = config('services.gemini.api_key');
-        $model = config('services.gemini.model', 'gemini-1.5-flash');
+        $message = Str::of($validated['message'])->squish()->toString();
+        $user = $request->user();
+        $profile = $user?->applicantProfile;
+        $profileFingerprint = md5(json_encode([
+            $profile?->course,
+            $profile?->university_name,
+            $profile?->gpa,
+            $profile?->income_bracket,
+        ]));
+        $cacheKey = 'ai-chat-response:' . md5(($user?->id ?? $request->ip()) . '|' . $profileFingerprint . '|' . Str::lower($message));
 
-        if (blank($apiKey)) {
+        if ($cachedReply = Cache::get($cacheKey)) {
             return response()->json([
-                'reply' => 'Chat service is not configured yet. Please set GEMINI_API_KEY.',
-            ], 503);
-        }
-
-        $systemInstruction = 'You are Scholar, a helpful scholarship assistant for students. '
-            .'Keep answers concise, actionable, and friendly.';
-
-        $endpoint = sprintf(
-            'https://generativelanguage.googleapis.com/v1beta/models/%s:generateContent',
-            $model
-        );
-
-        $response = Http::timeout(20)
-            ->acceptJson()
-            ->withQueryParameters(['key' => $apiKey])
-            ->post($endpoint, [
-                'contents' => [[
-                    'role' => 'user',
-                    'parts' => [[
-                        'text' => $validated['message'],
-                    ]],
-                ]],
-                'systemInstruction' => [
-                    'parts' => [[
-                        'text' => $systemInstruction,
-                    ]],
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.6,
-                    'maxOutputTokens' => 512,
-                ],
+                'reply' => $cachedReply,
+                'cached' => true,
             ]);
-
-        if (! $response->ok()) {
-            return response()->json([
-                'reply' => 'I could not reach Gemini right now. Please try again in a moment.',
-            ], 502);
         }
 
-        $reply = data_get($response->json(), 'candidates.0.content.parts.0.text');
-        $fallback = 'I am here to help with scholarships. Could you rephrase your question?';
+        $rateKey = 'ai-chat:' . ($user?->id ? 'user:' . $user->id : 'ip:' . $request->ip());
+
+        if (RateLimiter::tooManyAttempts($rateKey, 3)) {
+            $seconds = RateLimiter::availableIn($rateKey);
+
+            return response()->json([
+                'reply' => "I'm pausing Gemini requests for a bit to protect the free-tier quota. Please try again in {$seconds} seconds.",
+            ], 429);
+        }
+
+        RateLimiter::hit($rateKey, 60);
+
+        $name = $user?->first_name ?? $user?->name ?? 'Guest';
+        $course = $profile?->course ?? 'not set';
+        $university = $profile?->university_name ?? 'not set';
+        $gpa = $profile?->gpa ?? 'not set';
+        $income = $profile?->income_bracket ?? 'not set';
+
+        $prompt = <<<PROMPT
+You are Isko, ScholarLink's scholarship assistant.
+Reply in plain text only. Keep it under 80 words unless the user asks for details.
+
+Student: {$name}; course: {$course}; school: {$university}; GPA: {$gpa}; income: {$income}.
+
+User: {$message}
+PROMPT;
+
+        $reply = Str::of($this->callGemini($prompt, 220))->trim()->toString()
+            ?: 'I am here to help with scholarships. Could you rephrase your question?';
+
+        if (! Str::startsWith($reply, [
+            'Gemini is available, but this API key',
+            'Unable to get AI response',
+        ])) {
+            Cache::put($cacheKey, $reply, now()->addMinutes(20));
+        }
 
         return response()->json([
-            'reply' => Str::of((string) ($reply ?: $fallback))->trim()->toString(),
+            'reply' => $reply,
         ]);
     }
+
     /**
      * Match a student profile against available scholarships.
      */
@@ -99,49 +112,15 @@ class AIController extends Controller
             'matches' => json_decode($response, true),
         ]);
     }
-    public function chat(Request $request)
+
+    /**
+     * Backward-compatible API route name.
+     */
+    public function match(Request $request)
     {
-        $request->validate(['message' => 'required|string|max:500']);
-
-        $user = $request->user();
-        
-        if ($user) {
-            $profile = $user->applicantProfile;
-            $course = $profile->course ?? 'not set';
-            $uni = $profile->university_name ?? 'not set';
-            $gpa = $profile->gpa ?? 'not set';
-            $income = $profile->income_bracket ?? 'not set';
-            $name = $user->first_name ?? $user->name;
-        } else {
-            $course = 'not set';
-            $uni = 'not set';
-            $gpa = 'not set';
-            $income = 'not set';
-            $name = 'Guest';
-        }
-
-        $prompt = "
-            You are Scholar, a friendly AI scholarship assistant for ScholarLink —
-            a Philippine scholarship platform. Keep answers concise (2-4 sentences max).
-
-            Student context:
-            - Name: {$name}
-            - Course: {$course}
-            - University: {$uni}
-            - GPA: {$gpa}
-            - Income bracket: {$income}
-
-            User message: {$request->message}
-
-            Reply helpfully and in a warm, encouraging tone.
-            If asked about scholarships, refer to ScholarLink's browse page.
-            Do not use markdown. Plain text only.
-        ";
-
-        $reply = $this->callGemini($prompt);
-
-        return response()->json(['reply' => $reply]);
+        return $this->matchScholarships($request);
     }
+
     /**
      * Generate AI recommendation summary for the dashboard.
      */
@@ -162,52 +141,67 @@ class AIController extends Controller
     }
 
     /**
-     * Core method — calls the Gemini REST API.
+     * Core method: calls the Gemini REST API.
      */
-    private function callGemini(string $prompt): string
+    private function callGemini(string $prompt, int $maxOutputTokens = 512): string
     {
-        if (empty($this->apiKey)) {
-            return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar, your AI assistant! How can I help you today?";
+        $apiKey = config('services.gemini.key');
+        $model = config('services.gemini.model', 'gemini-2.0-flash');
+
+        if (blank($apiKey)) {
+            return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar AI, your AI assistant. How can I help you today?";
         }
 
-        $url = "{$this->baseUrl}/{$this->model}:generateContent?key={$this->apiKey}";
+        if (Cache::has('gemini-quota-cooldown')) {
+            return 'Gemini recently reported a quota or rate limit. I am pausing new AI requests briefly to protect your free-tier usage. Please try again in a minute.';
+        }
 
-        $response = Http::timeout(30)->post($url, [
-            'contents' => [
-                [
-                    'parts' => [
-                        ['text' => $prompt]
-                    ]
-                ]
-            ],
-            'generationConfig' => [
-                'temperature'     => 0.7,
-                'maxOutputTokens' => 1024,
-            ],
-        ]);
+        $response = Http::timeout(30)
+            ->acceptJson()
+            ->withQueryParameters(['key' => $apiKey])
+            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt],
+                        ],
+                    ],
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.4,
+                    'maxOutputTokens' => $maxOutputTokens,
+                ],
+            ]);
 
         if ($response->failed()) {
-            \Log::error('Gemini API error', [
+            Log::error('Gemini API error', [
                 'status' => $response->status(),
-                'body'   => $response->body(),
+                'body' => $response->body(),
             ]);
+
+            if ($response->status() === 429) {
+                Cache::put('gemini-quota-cooldown', true, now()->addMinute());
+
+                return 'Gemini is available, but this API key has reached its current quota or rate limit. Please try again later or check your Google AI Studio quota/billing settings.';
+            }
+
             return 'Unable to get AI response at this time.';
         }
 
-        return $response->json('candidates.0.content.parts.0.text', '');
+        return (string) $response->json('candidates.0.content.parts.0.text', '');
     }
 
     /**
-     * Helper — format scholarships for the prompt.
+     * Helper: format scholarships for the prompt.
      */
     private function formatScholarships(): string
     {
-        $scholarships = \App\Models\Scholarship::where('is_active', true)
+        $scholarships = Scholarship::where('is_active', true)
             ->select('id', 'name', 'provider_name', 'min_gpa', 'course_requirements', 'income_requirement')
             ->get();
 
-        return $scholarships->map(fn($s) =>
-            "ID:{$s->id} | {$s->name} by {$s->provider_name} | Min GPA: {$s->min_gpa} | Courses: {$s->course_requirements} | Income: {$s->income_requirement}"
+        return $scholarships->map(fn ($scholarship) =>
+            "ID:{$scholarship->id} | {$scholarship->name} by {$scholarship->provider_name} | Min GPA: {$scholarship->min_gpa} | Courses: {$scholarship->course_requirements} | Income: {$scholarship->income_requirement}"
         )->implode("\n");
     }
 }
