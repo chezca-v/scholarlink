@@ -481,8 +481,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 </script>
 
 
-<!-- Logout Confirmation Modal -->
-<x-logout-modal />
+
 
 <!-- Browser History Management -->
 <script>
@@ -516,34 +515,84 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<style>
+/* Custom Modal CSS */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.modal-backdrop.show {
+    display: flex;
+    opacity: 1;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 380px;
+    padding: 24px;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    margin: 0 16px;
+}
+.modal-backdrop.show .modal-content {
+    transform: translateY(0);
+}
+.modal-icon {
+    width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+}
+.modal-title { font-size: 18px; font-weight: 600; color: #111827; text-align: center; margin-bottom: 8px; font-family: 'DM Sans', sans-serif;}
+.modal-text { font-size: 14px; color: #6b7280; text-align: center; margin-bottom: 24px; font-family: 'DM Sans', sans-serif; line-height: 1.5;}
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.modal-btn-cancel { background: #fff; border-color: #d1d5db; color: #374151; }
+.modal-btn-cancel:hover { background: #f9fafb; }
+.modal-btn-logout { background: #dc2626; color: #fff; width: 100%; }
+.modal-btn-logout:hover { background: #b91c1c; }
+</style>
+
 <!-- Logout Confirmation Modal -->
-<div x-data="{ open: false }" @open-modal.window="if ($event.detail === 'confirm-logout') open = true">
-    <div x-show="open" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
-        <div @click.away="open = false" class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 transform transition-all mx-4">
-            <div class="text-center">
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">Ready to leave?</h3>
-                <p class="text-sm text-gray-500 mb-6">Select "Log Out" below if you are ready to end your current session.</p>
-            </div>
-            <div class="flex justify-center gap-3">
-                <button @click="open = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none transition-colors">
-                    Cancel
+<div x-data="{ open: false }" 
+     @open-modal.window="if ($event.detail === 'confirm-logout') { open = true; setTimeout(() => $el.classList.add('show'), 10); }"
+     @keydown.escape.window="open = false; $el.classList.remove('show')"
+     x-show="open" 
+     style="display: none;" 
+     class="modal-backdrop"
+     :class="{ 'show': open }">
+    
+    <div @click.away="open = false; $el.closest('.modal-backdrop').classList.remove('show')" class="modal-content">
+        <div class="modal-icon">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+        </div>
+        <h3 class="modal-title">Ready to leave?</h3>
+        <p class="modal-text">Select "Log Out" below if you are ready to end your current session.</p>
+        
+        <div class="modal-actions">
+            <button @click="open = false; $el.closest('.modal-backdrop').classList.remove('show')" type="button" class="modal-btn modal-btn-cancel">
+                Cancel
+            </button>
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; flex: 1;">
+                @csrf
+                <button type="submit" class="modal-btn modal-btn-logout">
+                    Log Out
                 </button>
-                <form method="POST" action="{{ route('logout') }}" class="m-0">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none transition-colors">
-                        Log Out
-                    </button>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 </div>
 
 @stack('scripts')
+<x-chatbot-widget />
 </body>
 </html>

@@ -340,12 +340,12 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
             ];
         @endphp
 
-        <div class="filters-row">
-            <a href="#" class="filter-pill active">All ({{ $counts['all'] }})</a>
-            <a href="#" class="filter-pill">Applications ({{ $counts['apps'] }})</a>
-            <a href="#" class="filter-pill">Documents ({{ $counts['docs'] }})</a>
-            <a href="#" class="filter-pill">SMS ({{ $counts['sms'] }})</a>
-            <a href="#" class="filter-pill">Matches ({{ $counts['matches'] }})</a>
+        <div class="filters-row" id="notif-filters">
+            <button type="button" class="filter-pill active" data-filter="all">All ({{ $counts['all'] }})</button>
+            <button type="button" class="filter-pill" data-filter="applications">Applications ({{ $counts['apps'] }})</button>
+            <button type="button" class="filter-pill" data-filter="documents">Documents ({{ $counts['docs'] }})</button>
+            <button type="button" class="filter-pill" data-filter="sms">SMS ({{ $counts['sms'] }})</button>
+            <button type="button" class="filter-pill" data-filter="matches">Matches ({{ $counts['matches'] }})</button>
         </div>
 
         <div class="notif-list">
@@ -410,5 +410,39 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         </div>
     </div>
   </div>
+
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+          const filters = document.querySelectorAll('#notif-filters .filter-pill');
+          const items = document.querySelectorAll('.n-item');
+
+          filters.forEach(filter => {
+              filter.addEventListener('click', function() {
+                  // Update active state
+                  filters.forEach(f => f.classList.remove('active'));
+                  this.classList.add('active');
+
+                  const type = this.dataset.filter;
+
+                  items.forEach(item => {
+                      if (type === 'all') {
+                          item.style.display = 'flex';
+                          return;
+                      }
+
+                      const title = item.querySelector('.n-title')?.textContent.toLowerCase() || '';
+                      let show = false;
+
+                      if (type === 'applications' && title.includes('application')) show = true;
+                      if (type === 'documents' && (title.includes('document') || title.includes('action required'))) show = true;
+                      if (type === 'sms' && item.querySelector('.n-icon.blue')) show = true; // Assuming SMS uses blue icon
+                      if (type === 'matches' && (title.includes('match') || title.includes('congratulations'))) show = true;
+
+                      item.style.display = show ? 'flex' : 'none';
+                  });
+              });
+          });
+      });
+  </script>
 @endsection
 

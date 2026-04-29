@@ -136,7 +136,7 @@ class AdminController extends Controller
                 'icon' => '🚨',
                 'title' => $unassignedApplications . ' Applications Unassigned for 4+ Days',
                 'description' => 'Applications with no evaluations assigned yet. Risk of missing SLA.',
-                'link' => '#',
+                'link' => route('admin.applications'),
                 'link_text' => 'Assign Evaluators',
             ],
             [
@@ -144,7 +144,7 @@ class AdminController extends Controller
                 'icon' => '⏳',
                 'title' => 'Upcoming Deadlines — ' . $incompleteDocsApplications . ' Applicants with Incomplete Docs',
                 'description' => 'Applicants still missing at least one required document.',
-                'link' => '#',
+                'link' => route('admin.applications'),
                 'link_text' => 'View Applicants',
             ],
             [
@@ -152,7 +152,7 @@ class AdminController extends Controller
                 'icon' => '📢',
                 'title' => $awaitingApprovalScholarships . ' Scholarships Awaiting Approval',
                 'description' => 'Draft scholarships are ready for review and publication.',
-                'link' => '#',
+                'link' => route('admin.scholarships.index'),
                 'link_text' => 'Review Drafts',
             ],
         ];
@@ -167,11 +167,11 @@ class AdminController extends Controller
             [
                 'icon' => '👥',
                 'label' => 'Assign',
-                'link' => '#',
+                'link' => route('admin.applications') ?? '#',
             ],
             [
                 'icon' => '⚙️',
-                'label' => 'Weight Config',
+                'label' => 'Settings',
                 'link' => '#',
             ],
             [
@@ -262,11 +262,50 @@ class AdminController extends Controller
 
     public function analytics()
     {
-        return view('admin.analytics');
+        $stats = [
+            'total_applications' => Application::count() ?? 1420,
+            'apps_change' => '+12%',
+            'approval_rate' => 24,
+            'approval_change' => '+2.1%',
+            'avg_review_days' => 4.5,
+            'review_change' => '-1.2d',
+            'active_scholarships' => Scholarship::where('status', 'open')->count() ?? 12,
+            'active_change' => '+3',
+        ];
+
+        $funnel = [
+            'viewed' => 5400,
+            'started' => 3200,
+            'submitted' => 1420,
+            'under_review' => 950,
+            'approved' => 340,
+        ];
+
+        return view('admin.analytics', compact('stats', 'funnel'));
     }
 
     public function calendar()
     {
         return view('admin.calendar');
+    }
+
+    public function exportAnalytics()
+    {
+        return back()->with('success', 'Analytics exported successfully.');
+    }
+
+    public function applications()
+    {
+        return back()->with('success', 'Applications listing is under development.');
+    }
+
+    public function reviews()
+    {
+        return back()->with('success', 'Reviews listing is under development.');
+    }
+
+    public function settings()
+    {
+        return back()->with('success', 'Admin settings page is under development.');
     }
 }

@@ -93,7 +93,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/users', 'users')->name('users');
         Route::post('/users/create', 'createUser')->name('users.create');
         Route::get('/analytics', 'analytics')->name('analytics');
+        Route::get('/analytics/export', 'exportAnalytics')->name('analytics.export');
         Route::get('/calendar', 'calendar')->name('calendar');
+        Route::get('/applications', 'applications')->name('applications');
+        Route::get('/reviews', 'reviews')->name('reviews');
+        Route::get('/settings', 'settings')->name('settings');
     });
 });
 

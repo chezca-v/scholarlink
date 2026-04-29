@@ -199,6 +199,14 @@
             </button>
             {{-- Role badge --}}
             <span style="background:rgba(232,168,56,0.2);color:var(--accent-light);font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;">ADMIN</span>
+            {{-- Top Navbar Logout --}}
+            <form method="POST" action="{{ route('logout') }}" class="ml-2 m-0">
+                @csrf
+                <button type="submit" style="background: rgba(220,38,38,0.1); color: #FCA5A5; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(220,38,38,0.2)'; this.style.color='#FECACA';" onmouseout="this.style.background='rgba(220,38,38,0.1)'; this.style.color='#FCA5A5';">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Logout
+                </button>
+            </form>
         </div>
     </header>
 
