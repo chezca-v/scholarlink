@@ -194,10 +194,10 @@
                                 <div class="flex-1">
                                     <div x-show="selectedTags.length > 0 || customTags.length > 0" class="flex flex-wrap gap-2">
                                         <template x-for="(tag, i) in selectedTags" :key="'s'+i">
-                                            <span class="tag-chip shadow-sm"><span x-text="tag"></span> <input type="hidden" name="tags[]" :value="tag"></span>
+                                            <span class="tag-chip shadow-sm"><span x-text="tag"></span> <input type="hidden" name="courses[]" :value="tag"></span>
                                         </template>
                                         <template x-for="(tag, i) in customTags" :key="'c'+i">
-                                            <span class="tag-chip shadow-sm bg-blue-50 text-blue-700"><span x-text="tag"></span> <input type="hidden" name="tags[]" :value="tag"></span>
+                                            <span class="tag-chip shadow-sm bg-blue-50 text-blue-700"><span x-text="tag"></span> <input type="hidden" name="courses[]" :value="tag"></span>
                                         </template>
                                     </div>
                                     <p x-show="selectedTags.length === 0 && customTags.length === 0" class="text-sm text-gray-500">All courses eligible by default.</p>
@@ -435,11 +435,11 @@ function scholarshipForm() {
             health: ['BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health'],
             arts: ['BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math']
         },
-        selectedTags: {!! json_encode(array_values(array_filter(old('tags', []), function($tag) {
+        selectedTags: {!! json_encode(array_values(array_filter(old('courses', []), function($tag) {
             $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return in_array($tag, $standards);
         }))) !!},
-        customTags: {!! json_encode(array_values(array_filter(old('tags', []), function($tag) {
+        customTags: {!! json_encode(array_values(array_filter(old('courses', []), function($tag) {
             $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return !in_array($tag, $standards);
         }))) !!},
