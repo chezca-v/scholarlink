@@ -251,6 +251,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
   <div class="nav-right">
     @auth
+    <a href="{{ route('dashboard') }}" class="pbtn" style="text-decoration:none;padding:0 14px;margin-right:8px;background:var(--cloud);border-color:var(--mist);color:var(--ink);display:flex;align-items:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Dashboard
+    </a>
     <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -296,6 +300,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <span class="sb-title">Filters</span>
       <a href="{{ route('scholarships.index') }}" class="btn-clr">Clear all</a>
     </div>
+
+    {{-- Quick Navigation --}}
+    @auth
+    <div class="fg" style="border-bottom: 1px solid var(--mist); padding-bottom: 12px; margin-bottom: 12px;">
+      <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--teal); font-size: 13px; font-weight: 600; transition: all 0.15s;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Back to Dashboard
+      </a>
+    </div>
+    @endauth
 
     {{-- Status --}}
     <div class="fg">
@@ -761,5 +775,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1700);
 }
 </script>
+<x-chatbot-widget />
 </body>
 </html>

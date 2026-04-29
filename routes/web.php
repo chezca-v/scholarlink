@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     EvaluationController,
     SuperadminController
 };
+use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
 
 /*
 Public Routes
@@ -80,10 +81,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Scholarship CRUD & Extensions
-    Route::resource('scholarships', ScholarshipController::class);
-    Route::controller(ScholarshipController::class)->group(function () {
+    Route::resource('scholarships', AdminScholarshipController::class);
+    Route::controller(AdminScholarshipController::class)->group(function () {
         Route::post('/scholarships/{id}/close', 'close')->name('scholarships.close');
         Route::post('/scholarships/{id}/extend', 'extendDeadline')->name('scholarships.extend');
+        Route::patch('/scholarships/{id}/toggle', 'toggle')->name('scholarships.toggle');
     });
 
     // User Management & Analytics

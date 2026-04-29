@@ -50,6 +50,12 @@
 
                 {{-- Right Icons --}}
                 <div class="flex items-center gap-3 flex-shrink-0">
+                    
+                    {{-- Back to Dashboard Button --}}
+                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 border" style="background: #FFFFFF; border-color: #C8E8E4; color: #0F4C5C;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                        Dashboard
+                    </a>
 
                     {{-- Notifications Bell --}}
                     <a href="{{ route('notifications.index') }}"
@@ -563,6 +569,6 @@ function countdownTimer(deadline) {
     }
 }
 </script>
-
+<x-chatbot-widget />
 </body>
 </html>
