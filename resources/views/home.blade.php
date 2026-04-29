@@ -35,33 +35,7 @@ body {
   background: var(--white);
   color: var(--navy);
   overflow-x: hidden;
-  cursor: none;
 }
-
-/* ── CUSTOM CURSOR ─────────────────────────────── */
-#cursor-dot {
-  position: fixed;
-  width: 8px; height: 8px;
-  background: var(--gold);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
-  mix-blend-mode: multiply;
-}
-#cursor-ring {
-  position: fixed;
-  width: 36px; height: 36px;
-  border: 1.5px solid var(--teal-mid);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  transition: width 0.4s cubic-bezier(.17,.67,.35,1.3), height 0.4s cubic-bezier(.17,.67,.35,1.3), border-color 0.3s, transform 0.12s;
-}
-body.cursor-hover #cursor-dot { width: 14px; height: 14px; background: var(--teal-mid); }
-body.cursor-hover #cursor-ring { width: 54px; height: 54px; border-color: var(--gold); }
 
 /* ── NAV ───────────────────────────────────────── */
 nav {
@@ -104,13 +78,13 @@ nav {
 .nav-actions { display: flex; gap: 10px; align-items: center; }
 .btn-text {
   font-size: 14px; font-weight: 600; padding: 8px 18px;
-  border: none; background: transparent; color: var(--teal-mid); cursor: none;
+  border: none; background: transparent; color: var(--teal-mid); cursor: pointer;
   text-decoration: none;
 }
 .btn-pill {
   font-size: 13px; font-weight: 700; padding: 9px 22px;
   border: none; background: var(--teal-mid); color: var(--gold-light);
-  border-radius: 999px; cursor: none;
+  border-radius: 999px; cursor: pointer;
   box-shadow: 0 4px 16px rgba(15,76,92,0.25);
   text-decoration: none; display: inline-block;
   transition: all 0.3s cubic-bezier(.17,.67,.35,1.3);
@@ -196,7 +170,7 @@ nav {
 .btn-hero-main {
   font-size: 15px; font-weight: 700; padding: 15px 34px;
   border: none; background: var(--teal-mid); color: var(--gold-light);
-  border-radius: 14px; cursor: none;
+  border-radius: 14px; cursor: pointer;
   box-shadow: 0 8px 30px rgba(15,76,92,0.28),
               0 0 0 0 rgba(15,76,92,0);
   text-decoration: none; display: inline-block;
@@ -214,7 +188,7 @@ nav {
 .btn-ghost {
   font-size: 15px; font-weight: 600; color: var(--teal-pale);
   background: transparent; border: 1.5px solid var(--teal-ghost);
-  border-radius: 14px; padding: 14px 28px; cursor: none;
+  border-radius: 14px; padding: 14px 28px; cursor: pointer;
   display: flex; align-items: center; gap: 10px;
   transition: all 0.3s; text-decoration: none;
 }
@@ -260,7 +234,7 @@ nav {
   border-radius: 18px; padding: 22px; text-align: left;
   box-shadow: 0 4px 20px rgba(15,76,92,0.06);
   transition: all 0.4s cubic-bezier(.17,.67,.35,1.3);
-  position: relative; overflow: hidden; cursor: none;
+  position: relative; overflow: hidden; cursor: pointer;
 }
 .mini-schol-card::before {
   content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -301,7 +275,7 @@ nav {
 .logo-item {
   font-family: 'Fraunces', serif; font-size: 15px; font-weight: 700;
   color: var(--teal-ghost); letter-spacing: -0.5px; white-space: nowrap;
-  padding: 0 36px; transition: color 0.3s; cursor: none;
+  padding: 0 36px; transition: color 0.3s; cursor: pointer;
 }
 .logo-item:hover { color: var(--teal-pale); }
 @keyframes scrollLogos { from { transform: translateX(0); } to { transform: translateX(-50%); } }
@@ -351,7 +325,7 @@ nav {
 .filter {
   font-size: 12px; font-weight: 600; padding: 8px 18px;
   border-radius: 999px; border: 1px solid var(--teal-ghost);
-  background: var(--white); color: #4A7A80; cursor: none;
+  background: var(--white); color: #4A7A80; cursor: pointer;
   transition: all 0.25s cubic-bezier(.17,.67,.35,1.3);
 }
 .filter.active, .filter:hover { background: var(--teal-mid); color: var(--gold-light); border-color: var(--teal-mid); transform: translateY(-2px); }
@@ -361,7 +335,7 @@ nav {
   background: var(--white); border: 1px solid var(--teal-mist);
   border-radius: 20px; padding: 26px;
   display: flex; flex-direction: column;
-  transition: all 0.4s cubic-bezier(.17,.67,.35,1.3); cursor: none;
+  transition: all 0.4s cubic-bezier(.17,.67,.35,1.3); cursor: pointer;
   opacity: 0; transform: translateY(30px) scale(0.98);
   position: relative; overflow: hidden;
 }
@@ -423,7 +397,7 @@ nav {
   background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1);
   border-radius: 14px; padding: 16px 18px;
   display: flex; gap: 14px; align-items: center;
-  transition: all 0.3s; cursor: none;
+  transition: all 0.3s; cursor: pointer;
 }
 .feat-right-item:hover { background: rgba(255,255,255,0.14); transform: translateX(6px); }
 .fri-icon { font-size: 20px; }
@@ -459,7 +433,7 @@ nav {
 .btn-cta-main {
   font-size: 15px; font-weight: 700; padding: 15px 36px;
   border: none; background: var(--teal-mid); color: var(--gold-light);
-  border-radius: 14px; cursor: none;
+  border-radius: 14px; cursor: pointer;
   box-shadow: 0 8px 28px rgba(15,76,92,0.25);
   text-decoration: none; display: inline-block;
   transition: all 0.35s cubic-bezier(.17,.67,.35,1.3);
@@ -479,7 +453,7 @@ nav {
 .btn-cta-sec {
   font-size: 15px; font-weight: 600; padding: 14px 32px;
   border: 1.5px solid var(--teal-ghost); background: transparent;
-  color: #4A7A80; border-radius: 14px; cursor: none;
+  color: #4A7A80; border-radius: 14px; cursor: pointer;
   transition: all 0.3s; text-decoration: none; display: inline-block;
 }
 .btn-cta-sec:hover { border-color: var(--teal-mid); color: var(--teal-mid); transform: translateY(-2px); }
@@ -505,7 +479,7 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
 .footer-tagline { font-size: 13px; color: rgba(255,255,255,0.3); line-height: 1.8; max-width: 280px; }
 .footer-col-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 16px; }
 .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
-.footer-links li { font-size: 13px; color: rgba(255,255,255,0.4); cursor: none; transition: color 0.2s; }
+.footer-links li { font-size: 13px; color: rgba(255,255,255,0.4); cursor: pointer; transition: color 0.2s; }
 .footer-links li:hover { color: var(--gold-light); }
 .footer-bottom { display: flex; justify-content: space-between; align-items: center; }
 .footer-copy { font-size: 12px; color: rgba(255,255,255,0.18); }
@@ -543,8 +517,6 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
   .feat-card.highlighted { grid-column: span 2; grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr 1fr; }
   .stats-row { gap: 32px; }
-  body { cursor: auto; }
-  #cursor-dot, #cursor-ring { display: none; }
 }
 @media (max-width: 600px) {
   .cards-row, .steps, .s-grid, .feat-grid { grid-template-columns: 1fr; }
@@ -559,10 +531,6 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
 </style>
 </head>
 <body>
-
-<!-- Cursor -->
-<div id="cursor-dot"></div>
-<div id="cursor-ring"></div>
 
 <!-- Scroll progress bar -->
 <div id="scroll-progress"></div>
@@ -828,29 +796,6 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
 <script>
 // ── GSAP + ScrollTrigger Init ───────────────────────────────
 gsap.registerPlugin(ScrollTrigger);
-
-// ── CUSTOM CURSOR ────────────────────────────────────────────
-const dot = document.getElementById('cursor-dot');
-const ring = document.getElementById('cursor-ring');
-let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
-
-document.addEventListener('mousemove', e => {
-  mouseX = e.clientX; mouseY = e.clientY;
-  gsap.to(dot, { x: mouseX, y: mouseY, duration: 0.1 });
-});
-
-function animateRing() {
-  ringX += (mouseX - ringX) * 0.12;
-  ringY += (mouseY - ringY) * 0.12;
-  gsap.set(ring, { x: ringX, y: ringY });
-  requestAnimationFrame(animateRing);
-}
-animateRing();
-
-document.querySelectorAll('a, button, .mini-schol-card, .s-card, .feat-card, .filter, .logo-item').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-});
 
 // ── SCROLL PROGRESS ──────────────────────────────────────────
 const progressBar = document.getElementById('scroll-progress');
