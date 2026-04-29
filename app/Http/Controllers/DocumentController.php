@@ -57,7 +57,7 @@ class DocumentController extends Controller
             });
 
         $documentTypes = collect(self::DOCUMENT_TYPES)
-            ->mapWithKeys(fn (string $type) => [str_slug($type) => $type])
+            ->mapWithKeys(fn (string $type) => [\Illuminate\Support\Str::slug($type) => $type])
             ->all();
 
         $stats = [

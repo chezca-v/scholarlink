@@ -163,7 +163,7 @@
     <div class="hero-eyebrow">Good Afternoon</div>
     <div class="hero-name">Kamusta, <em>{{ $user->first_name }}!</em></div>
     <div class="hero-sub">You have {{ $upcomingDeadlines->count() }} deadlines this week and {{ $stats['ai_matched'] }} new AI-matched scholarships ready.</div>
-    <a href="{{ route('scholarships.index') }}" class="btn-ai" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+    <a href="#ai-recommendations" class="btn-ai" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       View AI Recommendations
     </a>
@@ -226,7 +226,7 @@
 </div>
 
 <!-- AI MATCHED -->
-<div class="section ai-section">
+<div class="section ai-section" id="ai-recommendations">
   <div class="sec-hd">
     <div class="sec-title-wrap">
       <div class="sec-title">
@@ -247,7 +247,7 @@
         $fitLabel = $matchScore >= 90 ? 'Top Match' : ($matchScore >= 80 ? 'Great Fit' : ($matchScore >= 70 ? 'Good Fit' : 'Explore'));
         $benefitAmount = $scholarship->benefit_snippet_1 ? (int) preg_replace('/[^0-9]/', '', $scholarship->benefit_snippet_1) : 0;
     @endphp
-    <div class="match-card {{ $isTop ? 'top' : '' }}">
+    <div class="match-card {{ $isTop ? 'top' : '' }}" onclick="window.location='{{ route('scholarships.show', $scholarship->id) }}'" style="cursor:pointer;">
       <div class="mc-top"><span class="mc-cat">{{ $scholarship->provider_name ?? 'Scholarship' }}</span><span class="mc-fit {{ $isTop ? 'top' : ($matchScore >= 80 ? 'great' : ($matchScore >= 70 ? 'good' : 'explore')) }}">{{ $fitLabel }}</span></div>
       <div class="mc-name">{{ $scholarship->name }}</div>
       <div class="mc-org">{{ $scholarship->tagline ?? '' }}</div>
@@ -257,16 +257,16 @@
       <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill {{ $isTop ? 'gold' : '' }}" style="width:{{ $matchScore }}%"></div></div><span class="mc-pct">{{ round($matchScore) }}%</span></div>
       @endif
       <div class="mc-btn-row">
-        <a href="{{ route('applications.create', $scholarship->id) }}" class="btn-apply-full" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Apply Now</a>
-        <a href="{{ route('scholarships.show', $scholarship->id) }}" class="btn-view" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">View</a>
+        <a href="{{ route('applications.create', $scholarship->id) }}" onclick="event.stopPropagation();" class="btn-apply-full" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Apply Now</a>
+        <a href="{{ route('scholarships.show', $scholarship->id) }}" onclick="event.stopPropagation();" class="btn-view" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">View</a>
       </div>
     </div>
     @empty
-    <div class="match-card">
+    <div class="match-card" onclick="window.location='{{ route('profile.show') }}'" style="cursor:pointer;">
       <div class="mc-top"><span class="mc-cat">No matches</span></div>
       <div class="mc-name">Complete your profile</div>
       <div class="mc-org">Add your GPA and income details to get personalized scholarship recommendations.</div>
-      <div class="mc-btn-row"><a href="{{ route('profile.show') }}" class="btn-view" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Set Up Profile</a></div>
+      <div class="mc-btn-row"><a href="{{ route('profile.show') }}" onclick="event.stopPropagation();" class="btn-view" style="text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center;">Set Up Profile</a></div>
     </div>
     @endforelse
 

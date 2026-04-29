@@ -287,18 +287,19 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <div class="logo-box">🎓</div>
     <span class="logo-text">ScholarLink</span>
   </a>
-  <div class="nav-search">
+  <form action="{{ route('scholarships.index') }}" method="GET" class="nav-search">
     <span class="si"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-    <input type="text" placeholder="Search scholarships, requirements…">
-  </div>
+    <input type="text" name="q" placeholder="Search scholarships, requirements…">
+  </form>
   <div class="nav-right">
     <button class="nav-ibtn">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
     </button>
     <a class="nav-ibtn" href="{{ route('notifications.index') }}">      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        @if(\App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->exists())
             <span class="nbadge"></span>
+        @endif
     </a>
-    <div class="nav-av">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</div>
     <form method="POST" action="{{ route('logout') }}" style="margin:0;">
       @csrf
       <button type="submit" class="nav-logout" title="Log Out">Log Out</button>
@@ -359,7 +360,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     </a>
 
     <div class="sb-spacer"></div>
-    <a href="#" x-data="" x-on:click.prevent="$dispatch('open-modal', 'confirm-logout')" class="sb-nav-item text-red-600" style="color:#e53e3e;">
+    <a href="#" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();" class="sb-nav-item text-red-600" style="color:#e53e3e;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -368,18 +369,9 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
         Log Out
     </a>
 
-    <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display:none;">
+    <form method="POST" action="{{ route('logout') }}" id="sidebar-logout-form" style="display:none;">
         @csrf
     </form>
-    <x-modal name="confirm-logout" :show="$errors->userDeletion->isNotEmpty()" focusable>
-        <div style="padding: 24px;">
-            <h2 style="font-size:18px;font-weight:700;color:var(--ink);">Are you sure you want to log out?</h2>
-            <div style="margin-top:24px;display:flex;justify-content:flex-end;gap:12px;">
-                <button type="button" x-on:click="$dispatch('close')" style="padding:8px 16px;background:#f3f4f6;border:none;border-radius:8px;font-weight:600;color:#374151;cursor:pointer;">Cancel</button>
-                <button type="button" onclick="document.getElementById('logout-form').submit();" style="padding:8px 16px;background:#dc2626;border:none;border-radius:8px;font-weight:600;color:#fff;cursor:pointer;">Log Out</button>
-            </div>
-        </div>
-    </x-modal>
   </aside>
 
   <main class="main">

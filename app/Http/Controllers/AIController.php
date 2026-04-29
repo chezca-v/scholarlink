@@ -23,7 +23,7 @@ class AiController extends Controller
      */
     public function matchScholarships(Request $request)
     {
-        $profile = $request->user()->profile;
+        $profile = $request->user()->applicantProfile;
 
         $prompt = "
             You are a scholarship matching assistant for ScholarLink, a Philippine scholarship platform.
@@ -54,7 +54,7 @@ class AiController extends Controller
             $request->validate(['message' => 'required|string|max:500']);
 
             $user    = $request->user();
-            $profile = $user->profile;
+            $profile = $user->applicantProfile;
 
             $prompt = "
                 You are Scholar, a friendly AI scholarship assistant for ScholarLink —
@@ -83,7 +83,7 @@ class AiController extends Controller
      */
     public function getDashboardSummary(Request $request)
     {
-        $profile = $request->user()->profile;
+        $profile = $request->user()->applicantProfile;
 
         $prompt = "
             You are a friendly scholarship advisor for ScholarLink.

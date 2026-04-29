@@ -191,6 +191,12 @@
           <span class="alert-star">★</span>
           <span>Scholarship: {{ $scholarship->name }}</span>
         </div>
+        @if($errors->any())
+        <div class="alert" style="background:#fee2e2;color:#b91c1c;">
+          <span class="alert-dot"></span>
+          <span>{{ $errors->first() }}</span>
+        </div>
+        @endif
         @php
           $pendingCount = collect($eligibility)->filter(fn($e) => $e['pass'] === null)->count();
         @endphp

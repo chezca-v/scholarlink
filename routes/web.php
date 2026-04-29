@@ -59,6 +59,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
         Route::get('/applicant/applications', 'index')->name('applications.index');
         Route::get('/apply/{id}', 'create')->name('applications.create');
         Route::post('/apply/{id}', 'store')->name('applications.store');
+        Route::get('/applicant/applications/{id}', 'show')->name('applications.show');
         Route::get('/applicant/applications/{id}/track', 'track')->name('applications.track');
     });
 
