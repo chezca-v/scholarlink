@@ -551,7 +551,7 @@
           <div class="doc-actions">
 
             {{-- Preview --}}
-            <a href="{{ route('documents.preview', $doc->id) }}"
+            <a href="{{ route('applicant.documents.preview', $doc->id) }}"
                target="_blank"
                class="doc-btn">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -564,7 +564,7 @@
 
             {{-- Replace (re-uses documents.store, controller detects existing doc) --}}
             <form method="POST"
-                  action="{{ route('documents.store') }}"
+                  action="{{ route('applicant.documents.store') }}"
                   enctype="multipart/form-data"
                   id="replace-{{ $typeKey }}">
               @csrf
@@ -593,7 +593,7 @@
         @else
 
           <form method="POST"
-                action="{{ route('documents.store') }}"
+                action="{{ route('applicant.documents.store') }}"
                 enctype="multipart/form-data"
                 id="upload-{{ $typeKey }}">
             @csrf

@@ -293,11 +293,15 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <input type="text" name="q" placeholder="Search scholarships, requirements…">
   </form>
   <div class="nav-right">
-    <button class="nav-ibtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    </button>
-    <a class="nav-ibtn" href="{{ route('dashboard') }}" title="Back to Dashboard">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+      @if($navUnread > 0)
+        <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--accent);border-radius:99px;border:2px solid var(--primary);"></span>
+      @endif
     </a>
     <a href="{{ route('profile.show') }}" class="nav-av" title="My Profile">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</a>
   </div>
@@ -511,6 +515,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+
+<!-- Logout Confirmation Modal -->
+<div x-data="{ open: false }" @open-modal.window="if ($event.detail === 'confirm-logout') open = true">
+    <div x-show="open" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
+        <div @click.away="open = false" class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 transform transition-all mx-4">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
+                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                </div>
+                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">Ready to leave?</h3>
+                <p class="text-sm text-gray-500 mb-6">Select "Log Out" below if you are ready to end your current session.</p>
+            </div>
+            <div class="flex justify-center gap-3">
+                <button @click="open = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none transition-colors">
+                    Cancel
+                </button>
+                <form method="POST" action="{{ route('logout') }}" class="m-0">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none transition-colors">
+                        Log Out
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 @stack('scripts')
 </body>

@@ -225,16 +225,18 @@ class ApplicationController extends Controller
         }
 
         // Update or create applicant profile
+        $profileData = $request->only([
+            'date_of_birth', 'sex', 'home_address', 'city', 'province', 'zip_code',
+            'mobile_number', 'university_name', 'university_email', 'course_program',
+            'student_number', 'year_level', 'semester', 'academic_year', 'gwa',
+            'gwa_scale', 'monthly_household_income', 'num_dependents', 'is_breadwinner',
+            'is_4ps', 'father_employment_status', 'mother_employment_status'
+        ]);
+        $profileData['profile_completed_at'] = now(); // Mark as completed
+
         ApplicantProfile::updateOrCreate(
             ['user_id' => auth()->id()],
-            $request->only([
-                'date_of_birth', 'sex', 'home_address', 'city', 'province', 'zip_code',
-                'mobile_number', 'university_name', 'university_email', 'course_program',
-                'student_number', 'year_level', 'semester', 'academic_year', 'gwa',
-                'gwa_scale', 'monthly_household_income', 'num_dependents', 'is_breadwinner',
-                'is_4ps', 'father_employment_status', 'mother_employment_status',
-                'profile_completed_at' => now(), // Mark as completed
-            ])
+            $profileData
         );
 
         // Create the application

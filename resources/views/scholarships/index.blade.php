@@ -251,6 +251,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
   <div class="nav-right">
     @auth
+    <a href="{{ route('dashboard') }}" class="pbtn" style="text-decoration:none;padding:0 14px;margin-right:8px;background:var(--cloud);border-color:var(--mist);color:var(--ink);display:flex;align-items:center;gap:6px;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Dashboard
+    </a>
     <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -771,5 +775,6 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1700);
 }
 </script>
+<x-chatbot-widget />
 </body>
 </html>

@@ -282,8 +282,11 @@
 
         </div>
         <div class="footer-nav">
-          <span class="step-counter">Step 1 of 3</span>
-          <button type="button" class="btn-next" onclick="goTo(2)">Next </button>
+          <a href="{{ route('scholarships.show', $scholarship->id) }}" class="btn-back" style="text-decoration:none">Cancel</a>
+          <div style="display:flex;align-items:center;gap:14px">
+            <span class="step-counter">Step 1 of 3</span>
+            <button type="button" class="btn-next" onclick="goTo(2)">Next </button>
+          </div>
         </div>
       </div>
 
@@ -616,6 +619,37 @@ function goTo(step) {
 function guardSubmit() {
   const cb  = document.getElementById('certify');
   const lbl = document.getElementById('certify-label');
+  
+  // Check required documents
+  const requiredSlugs = [
+    'proof-of-enrollment', 'report-card-transcript', 'valid-id',
+    'itr-tax-exemption', 'barangay-indigency', 'endorsement-letter'
+  ];
+  let missing = false;
+  
+  requiredSlugs.forEach(slug => {
+    const fileInput = document.querySelector(`input[type="file"][data-slug="${slug}"]`);
+    const radios = document.querySelectorAll(`input[type="radio"][name="documents[${slug}]"]`);
+    
+    let hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+    let hasRadio = Array.from(radios).some(r => r.checked);
+    
+    if (!hasFile && !hasRadio) {
+      missing = true;
+      const el = document.getElementById('confirm-val-' + slug);
+      if (el) {
+        el.style.color = 'var(--red)';
+        el.textContent = 'Missing required document';
+      }
+    }
+  });
+
+  if (missing) {
+    alert('Please upload or select all required documents before submitting.');
+    goTo(2);
+    return false;
+  }
+
   if (!cb.checked) {
     lbl.classList.add('error');
     lbl.scrollIntoView({ behavior: 'smooth', block: 'center' });
