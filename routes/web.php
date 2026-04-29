@@ -86,6 +86,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/scholarships/{id}/close', 'close')->name('scholarships.close');
         Route::post('/scholarships/{id}/extend', 'extendDeadline')->name('scholarships.extend');
         Route::patch('/scholarships/{id}/toggle', 'toggle')->name('scholarships.toggle');
+        Route::get('/scholarships/{id}/applications/export', 'exportApplications')->name('scholarships.applications.export');
     });
 
     // User Management & Analytics
@@ -96,8 +97,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/analytics/export', 'exportAnalytics')->name('analytics.export');
         Route::get('/calendar', 'calendar')->name('calendar');
         Route::get('/applications', 'applications')->name('applications');
+        Route::get('/applications/{id}', 'showApplication')->name('applications.show');
+        Route::patch('/applications/bulk-assign', 'bulkAssign')->name('applications.bulk-assign');
+        Route::patch('/applications/{id}/assign', 'assign')->name('applications.assign');
+        Route::patch('/applications/bulk-approve', 'bulkApprove')->name('applications.bulk-approve');
+        Route::patch('/applications/bulk-reject', 'bulkReject')->name('applications.bulk-reject');
+        Route::patch('/applications/{id}/approve', 'approveApplication')->name('applications.approve');
+        Route::get('/applications/{id}/reject', 'rejectForm')->name('applications.reject-form');
         Route::get('/reviews', 'reviews')->name('reviews');
         Route::get('/settings', 'settings')->name('settings');
+        Route::patch('/settings', 'updateSettings')->name('settings.update');
     });
 });
 
