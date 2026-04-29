@@ -30,6 +30,14 @@ Route::controller(ScholarshipController::class)->group(function () {
 });
 Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');
 
+Route::middleware(['auth', 'role:applicant'])->group(function () {
+    Route::get('/profile/setup', [ProfileController::class, 'setup'])->name('profile.setup');
+    Route::post('/profile/setup/step-1', [ProfileController::class, 'setupStep1'])->name('profile.setup.step1');
+    Route::post('/profile/setup/step-2', [ProfileController::class, 'setupStep2'])->name('profile.setup.step2');
+    Route::post('/profile/setup/step-3', [ProfileController::class, 'setupStep3'])->name('profile.setup.step3');
+    Route::post('/profile/setup', [ProfileController::class, 'setupSubmit'])->name('profile.setup.submit');
+});
+
 /*
 Applicant Routes (Role: applicant)
 */
@@ -57,6 +65,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
         Route::get('', 'index')->name('index');
         Route::post('', 'store')->name('store');
         Route::get('/{id}/preview', 'preview')->name('preview');
+        Route::delete('/{id}', 'destroy')->name('destroy');
     });
 
     // Backward-compatible route aliases used by older views/scripts

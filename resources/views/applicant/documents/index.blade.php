@@ -316,6 +316,7 @@
   background: rgba(15,76,92,.03);
 }
 .doc-drop input[type="file"] { display: none; }
+.doc-actions input[type="file"] { display: none; }
 .doc-drop__icon svg { width: 32px; height: 32px; color: #94A3B8; }
 .doc-drop__label {
   font-size: 13px;
@@ -336,7 +337,7 @@
 /* ── Buttons ─────────────────────────────────────────── */
 .doc-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-top: auto;
 }
@@ -469,7 +470,7 @@
   <div class="dw__grid">
     @foreach ($documentTypes as $typeKey => $typeLabel)
       @php
-        $doc        = $documents->get($typeKey);   // Document nullable
+        $doc        = $documents->firstWhere('document_type', $typeLabel);   // Document nullable
         $hasFile    = $doc && $doc->file_url;
 
         $isExpired  = $hasFile
@@ -562,17 +563,37 @@
               Preview
             </a>
 
+            {{-- Delete uploaded document --}}
+            <form method="POST"
+                  action="{{ route('applicant.documents.destroy', $doc->id) }}"
+                  onsubmit="return confirm('Delete this uploaded document? This cannot be undone.');">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="doc-btn doc-btn--danger">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path d="M3 6h18" />
+                  <path d="M8 6v14c0 1.1.9 2 2 2h4c1.1 0 2-.9 2-2V6" />
+                  <path d="M10 11v6" />
+                  <path d="M14 11v6" />
+                  <path d="M9 6V4h6v2" />
+                </svg>
+                Delete
+              </button>
+            </form>
+
             {{-- Replace (re-uses documents.store, controller detects existing doc) --}}
             <form method="POST"
                   action="{{ route('applicant.documents.store') }}"
                   enctype="multipart/form-data"
                   id="replace-{{ $typeKey }}">
               @csrf
-              <input type="hidden" name="document_type" value="{{ $typeKey }}">
+              <input type="hidden" name="document_type" value="{{ $typeLabel }}">
               <input type="file"
                      id="file-replace-{{ $typeKey }}"
                      name="file"
                      accept=".pdf,.jpg,.jpeg,.png"
+                     style="display:none"
                      onchange="this.closest('form').submit()">
               <button type="button"
                       class="doc-btn {{ $isExpired ? 'doc-btn--danger' : '' }}"
@@ -597,7 +618,7 @@
                 enctype="multipart/form-data"
                 id="upload-{{ $typeKey }}">
             @csrf
-            <input type="hidden" name="document_type" value="{{ $typeKey }}">
+            <input type="hidden" name="document_type" value="{{ $typeLabel }}">
 
             <label class="doc-drop"
                    for="file-upload-{{ $typeKey }}"

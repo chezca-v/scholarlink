@@ -86,13 +86,44 @@ PROMPT;
      */
     public function matchScholarships(Request $request)
     {
-        $profile = $request->user()->applicantProfile;
+      $user = $request->user();
+        $profile = $user->applicantProfile;
+        $profileFingerprint = md5(json_encode([
+            $profile?->gpa,
+            $profile?->course,
+            $profile?->university_name,
+            $profile?->income_bracket,
+            $profile?->region,
+        ]));
+        $formattedScholarships = $this->formatScholarships();
+        $scholarshipSnapshot = md5($formattedScholarships);
+        $cacheKey = 'ai-scholarship-match:' . $user->id . ':' . $profileFingerprint . ':' . $scholarshipSnapshot;
+
+        if ($cachedMatches = Cache::get($cacheKey)) {
+            return response()->json([
+                'matches' => $cachedMatches,
+                'cached' => true,
+            ]);
+        }
+
+        $rateKey = 'ai-match:' . $user->id;
+
+        if (RateLimiter::tooManyAttempts($rateKey, 2)) {
+            $seconds = RateLimiter::availableIn($rateKey);
+
+            return response()->json([
+                'matches' => [],
+                'message' => "I'm pausing new AI matching requests to prevent Gemini rate limits. Please try again in {$seconds} seconds.",
+            ], 429);
+        }
+
+        RateLimiter::hit($rateKey, 60);
 
         $prompt = "
             You are a scholarship matching assistant for ScholarLink, a Philippine scholarship platform.
 
             Student Profile:
-            - Name: {$request->user()->first_name}
+            - Name: {$user->first_name}
             - GPA: {$profile->gpa}
             - Course: {$profile->course}
             - University: {$profile->university_name}
@@ -104,12 +135,17 @@ PROMPT;
             [{ \"scholarship_id\": 1, \"score\": 92, \"reason\": \"High GPA match\" }]
 
             Scholarships to evaluate:
-            " . $this->formatScholarships();
+            " . $formattedScholarships;
 
-        $response = $this->callGemini($prompt);
+        $matches = json_decode($this->callGemini($prompt), true);
+        $matches = is_array($matches) ? $matches : [];
+
+        if (! empty($matches)) {
+            Cache::put($cacheKey, $matches, now()->addMinutes(15));
+        }
 
         return response()->json([
-            'matches' => json_decode($response, true),
+            'matches' => $matches,
         ]);
     }
 
@@ -145,51 +181,77 @@ PROMPT;
      */
     private function callGemini(string $prompt, int $maxOutputTokens = 512): string
     {
+       $apiKeys = collect(config('services.gemini.keys', []))
+            ->filter(fn ($key) => filled($key))
+            ->values()
+            ->all();
         $apiKey = config('services.gemini.key');
         $model = config('services.gemini.model', 'gemini-2.0-flash');
 
-        if (blank($apiKey)) {
-            return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar AI, your AI assistant. How can I help you today?";
+        if (blank($apiKey) && empty($apiKeys)) {
+                        return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar AI, your AI assistant. How can I help you today?";
         }
 
         if (Cache::has('gemini-quota-cooldown')) {
             return 'Gemini recently reported a quota or rate limit. I am pausing new AI requests briefly to protect your free-tier usage. Please try again in a minute.';
         }
 
-        $response = Http::timeout(30)
-            ->acceptJson()
-            ->withQueryParameters(['key' => $apiKey])
-            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt],
-                        ],
-                    ],
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.4,
-                    'maxOutputTokens' => $maxOutputTokens,
-                ],
-            ]);
+        if (empty($apiKeys) && filled($apiKey)) {
+            $apiKeys = [$apiKey];
+        }
 
-        if ($response->failed()) {
+        $startIndex = (int) Cache::get('gemini-key-rr-index', 0);
+        $keyCount = count($apiKeys);
+
+        for ($attempt = 0; $attempt < $keyCount; $attempt++) {
+            $index = ($startIndex + $attempt) % $keyCount;
+            $currentKey = $apiKeys[$index];
+
+            if (Cache::has("gemini-key-cooldown:{$index}")) {
+                continue;
+            }
+
+            $response = Http::timeout(30)
+                ->acceptJson()
+                ->withQueryParameters(['key' => $currentKey])
+                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
+                    'contents' => [
+                        [
+                            'parts' => [
+                                ['text' => $prompt],
+                            ],
+                        ],
+                ],
+                     'generationConfig' => [
+                        'temperature' => 0.4,
+                        'maxOutputTokens' => $maxOutputTokens,
+                    ],
+                ]);
+
+            if ($response->successful()) {
+                Cache::put('gemini-key-rr-index', ($index + 1) % $keyCount, now()->addHours(6));
+
+                return (string) $response->json('candidates.0.content.parts.0.text', '');
+            }
+
             Log::error('Gemini API error', [
+                'key_index' => $index + 1,
                 'status' => $response->status(),
                 'body' => $response->body(),
             ]);
 
             if ($response->status() === 429) {
-                Cache::put('gemini-quota-cooldown', true, now()->addMinute());
-
-                return 'Gemini is available, but this API key has reached its current quota or rate limit. Please try again later or check your Google AI Studio quota/billing settings.';
+                Cache::put("gemini-key-cooldown:{$index}", true, now()->addMinute());
+                continue;
             }
 
             return 'Unable to get AI response at this time.';
         }
 
-        return (string) $response->json('candidates.0.content.parts.0.text', '');
-    }
+        Cache::put('gemini-quota-cooldown', true, now()->addMinute());
+
+        return 'Gemini is available, but all configured API keys are currently rate-limited. Please try again in about a minute.';
+            }
 
     /**
      * Helper: format scholarships for the prompt.
