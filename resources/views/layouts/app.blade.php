@@ -145,5 +145,7 @@
         <x-chatbot-widget />
         <x-logout-modal />
         @stack('scripts')
+        @include('components.toast-notification')
+        @include('components.modals.session-timeout')
     </body>
 </html>

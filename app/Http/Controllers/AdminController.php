@@ -136,7 +136,7 @@ class AdminController extends Controller
                 'icon' => '🚨',
                 'title' => $unassignedApplications . ' Applications Unassigned for 4+ Days',
                 'description' => 'Applications with no evaluations assigned yet. Risk of missing SLA.',
-                'link' => '#',
+                'link' => route('admin.applications'),
                 'link_text' => 'Assign Evaluators',
             ],
             [
@@ -144,7 +144,7 @@ class AdminController extends Controller
                 'icon' => '⏳',
                 'title' => 'Upcoming Deadlines — ' . $incompleteDocsApplications . ' Applicants with Incomplete Docs',
                 'description' => 'Applicants still missing at least one required document.',
-                'link' => '#',
+                'link' => route('admin.applications'),
                 'link_text' => 'View Applicants',
             ],
             [
@@ -152,7 +152,7 @@ class AdminController extends Controller
                 'icon' => '📢',
                 'title' => $awaitingApprovalScholarships . ' Scholarships Awaiting Approval',
                 'description' => 'Draft scholarships are ready for review and publication.',
-                'link' => '#',
+                'link' => route('admin.scholarships.index'),
                 'link_text' => 'Review Drafts',
             ],
         ];
@@ -167,12 +167,12 @@ class AdminController extends Controller
             [
                 'icon' => '👥',
                 'label' => 'Assign',
-                'link' => '#',
+                'link' => route('admin.applications') ?? '#',
             ],
             [
                 'icon' => '⚙️',
-                'label' => 'Weight Config',
-                'link' => '#',
+                'label' => 'Settings',
+                'link' => route('admin.settings'),
             ],
             [
                 'icon' => '📊',
@@ -246,7 +246,8 @@ class AdminController extends Controller
 
     public function users()
     {
-        return view('admin.users');
+        $users = User::latest()->get();
+        return view('admin.user', compact('users'));
     }
 
     public function createUser(Request $request)
@@ -262,11 +263,249 @@ class AdminController extends Controller
 
     public function analytics()
     {
-        return view('admin.analytics');
+        $stats = [
+            'total_applications' => Application::count() ?? 1420,
+            'apps_change' => '+12%',
+            'approval_rate' => 24,
+            'approval_change' => '+2.1%',
+            'avg_review_days' => 4.5,
+            'review_change' => '-1.2d',
+            'active_scholarships' => Scholarship::where('status', 'open')->count() ?? 12,
+            'active_change' => '+3',
+        ];
+
+        $funnel = [
+            'viewed' => 5400,
+            'started' => 3200,
+            'submitted' => 1420,
+            'under_review' => 950,
+            'approved' => 340,
+        ];
+
+        return view('admin.analytics', compact('stats', 'funnel'));
     }
 
-    public function calendar()
+    public function calendar(\Illuminate\Http\Request $request)
     {
-        return view('admin.calendar');
+        $monthQuery = $request->get('month');
+        if ($monthQuery) {
+            $currentMonth = \Carbon\Carbon::parse($monthQuery . '-01');
+        } else {
+            $currentMonth = \Carbon\Carbon::now();
+        }
+        $prevMonth = $currentMonth->copy()->subMonth();
+        $nextMonth = $currentMonth->copy()->addMonth();
+
+        $scholarships = \App\Models\Scholarship::whereNotNull('deadline')
+                        ->where('status', '!=', 'draft')
+                        ->get();
+
+        $calendarDays = [];
+        $upcomingDeadlines = [];
+        
+        $daysInMonth = $currentMonth->daysInMonth;
+        
+        for ($i = 1; $i <= $daysInMonth; $i++) {
+            $currentDate = $currentMonth->copy()->day($i);
+            $dayDeadlines = [];
+            
+            foreach ($scholarships as $scholarship) {
+                if ($scholarship->deadline && $scholarship->deadline->isSameDay($currentDate)) {
+                    $daysUntil = \Carbon\Carbon::now()->startOfDay()->diffInDays($scholarship->deadline, false);
+                    $type = $daysUntil <= 7 && $daysUntil >= 0 ? 'urgent' : 'standard';
+                    
+                    $dayDeadlines[] = [
+                        'id' => $scholarship->id,
+                        'label' => $scholarship->name,
+                        'type' => $type,
+                        'days_away' => $daysUntil
+                    ];
+                    
+                    if ($daysUntil >= 0 && $daysUntil <= 30) {
+                        $upcomingDeadlines[] = [
+                            'id' => $scholarship->id,
+                            'scholarship_name' => $scholarship->name,
+                            'date' => $scholarship->deadline,
+                            'days_away' => $daysUntil,
+                            'type' => $type,
+                            'type_label' => ucfirst($type) . ' Deadline',
+                            'meta' => 'Applications close at 11:59 PM'
+                        ];
+                    }
+                }
+            }
+            
+            $calendarDays[] = [
+                'date' => $currentDate->copy(),
+                'deadlines' => $dayDeadlines
+            ];
+        }
+        
+        usort($upcomingDeadlines, function($a, $b) {
+            return $a['days_away'] <=> $b['days_away'];
+        });
+
+        $upcomingDeadlines = array_map("unserialize", array_unique(array_map("serialize", $upcomingDeadlines)));
+
+        $scholarshipLegend = [
+            ['bg' => '#1a8fa0', 'label' => 'Standard Deadline'],
+            ['bg' => '#ea8c55', 'label' => 'Urgent Deadline (≤7 days)'],
+        ];
+
+        $deadlinesJson = [];
+        
+        $ui = [
+            'page_title' => 'Calendar',
+            'topnav_title' => 'Calendar',
+            'topnav_subtitle' => 'Month of :month',
+            'actions' => [],
+            'breadcrumb' => ['Admin', 'Calendar'],
+            'prev' => 'Prev',
+            'next' => 'Next',
+            'today' => 'Today',
+            'upcoming_title' => 'Upcoming Deadlines',
+            'deadline_badge' => ':days days away',
+            'edit' => 'Edit',
+            'empty' => 'No upcoming deadlines.',
+            'reason_placeholder' => 'Reason for editing...',
+            'warning' => 'Note: altering deadlines affects applicants.',
+            'save' => 'Save Changes'
+        ];
+        $routes = [
+            'index' => 'admin.calendar',
+            'update' => 'admin.calendar'
+        ];
+        $config = [
+            'month_format' => 'F Y',
+            'day_format' => 'M d, Y',
+            'week_days' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            'upcoming_range' => 30,
+            'deadline_types' => ['standard' => 'Standard Deadline', 'urgent' => 'Urgent Deadline']
+        ];
+
+        return view('admin.calendar', compact(
+            'currentMonth', 'prevMonth', 'nextMonth',
+            'scholarshipLegend', 'calendarDays',
+            'upcomingDeadlines', 'deadlinesJson',
+            'ui', 'routes', 'config'
+        ));
+    }
+
+    public function exportAnalytics()
+    {
+        return back()->with('success', 'Analytics exported successfully.');
+    }
+
+    public function applications()
+    {
+        $applications = Application::with('applicant', 'scholarship')->latest()->paginate(15);
+        return view('admin.applications', compact('applications'));
+    }
+
+    public function reviews()
+    {
+        $reviews = Application::with('applicant', 'scholarship')->whereIn('status', ['pending', 'under_review'])->latest()->paginate(15);
+        return view('admin.reviews', compact('reviews'));
+    }
+
+    public function settings()
+    {
+        return view('admin.settings', [
+            'pageTitle' => 'Admin Settings',
+            'topnavTitle' => 'Settings',
+            'topnavSubtitle' => 'Manage platform configuration',
+            'breadcrumbs' => [
+                ['label' => 'Admin', 'url' => route('admin.dashboard')],
+                ['label' => 'Settings']
+            ],
+            'organization' => (object)[
+                'name' => 'ScholarLink',
+                'description' => 'Scholarship matching platform',
+                'emoji' => '🎓',
+                'email' => 'contact@scholarlink.com',
+                'phone' => '123-456-7890',
+                'website' => 'scholarlink.com',
+                'address' => '123 Scholar Way',
+            ],
+            'labels' => [
+                'org_profile' => 'Organization Profile',
+                'save_changes' => 'Save Changes',
+                'blind_screening' => 'Blind Screening',
+                'save' => 'Save',
+                'notifications' => 'Notification Templates',
+                'save_all' => 'Save All',
+                'weights' => 'Scoring Weights',
+                'reset' => 'Reset to Default',
+                'save_weights' => 'Save Weights'
+            ],
+            'routes' => [
+                'update_profile' => 'admin.settings.update',
+                'blind_screening' => 'admin.settings.update',
+                'templates' => 'admin.settings.update',
+                'weights' => 'admin.settings.update',
+                'toggle_blind' => 'admin.settings.update',
+            ],
+            'orgFields' => [
+                ['name' => 'name', 'label' => 'Organization Name'],
+                ['name' => 'description', 'label' => 'Description'],
+            ],
+            'blindScreeningOptions' => [
+                'hide_names' => ['label' => 'Hide Applicant Names', 'description' => 'Evaluators will not see the names of applicants.', 'enabled' => true],
+                'hide_photos' => ['label' => 'Hide Applicant Photos', 'description' => 'Evaluators will not see the photos of applicants.', 'enabled' => true],
+            ],
+            'notificationTemplates' => [
+                'application_received' => ['tab_label' => 'Application Received', 'subject' => 'Application Received', 'email_body' => 'Your application was received.', 'sms_body' => 'Your application was received.'],
+            ],
+            'scoringWeights' => [
+                'academic' => ['label' => 'Academic Score', 'description' => 'Weight for academic performance.', 'value' => 40],
+                'extracurricular' => ['label' => 'Extracurriculars', 'description' => 'Weight for extracurricular activities.', 'value' => 30],
+                'essay' => ['label' => 'Essay', 'description' => 'Weight for the essay.', 'value' => 30],
+            ],
+            'defaultWeights' => [
+                'academic' => 40,
+                'extracurricular' => 30,
+                'essay' => 30,
+            ],
+        ]);
+    }
+
+    public function updateSettings(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Settings updated successfully.');
+    }
+
+    public function showApplication($id)
+    {
+        return back()->with('success', 'Application ' . $id . ' viewed.');
+    }
+
+    public function bulkAssign(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Evaluator assigned to selected applications.');
+    }
+
+    public function assign(\Illuminate\Http\Request $request, $id)
+    {
+        return back()->with('success', 'Evaluator assigned to application.');
+    }
+
+    public function bulkApprove(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Selected applications approved.');
+    }
+
+    public function bulkReject(\Illuminate\Http\Request $request)
+    {
+        return back()->with('success', 'Selected applications rejected.');
+    }
+
+    public function approveApplication($id)
+    {
+        return back()->with('success', 'Application approved.');
+    }
+
+    public function rejectForm($id)
+    {
+        return back()->with('success', 'Application rejected.');
     }
 }

@@ -361,18 +361,42 @@
                         @endauth
 
                         {{-- Save Scholarship --}}
+                        @php
+                            $isSaved = false;
+                            if (auth()->check()) {
+                                $isSaved = \App\Models\SavedScholarship::where('user_id', auth()->id())
+                                    ->where('scholarship_id', $scholarship->id)
+                                    ->exists();
+                            }
+                        @endphp
+
                         @auth
-                            <form action="{{ route('scholarships.save', $scholarship->id) }}" method="POST">
-                                @csrf
-                                <button type="submit"
-                                        class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-[11px] text-[15px] font-bold border transition-all hover:bg-gray-50"
-                                        style="background: #FFFFFF; color: #0F4C5C; border-color: #C8E8E4;">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                                        <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
-                                    </svg>
-                                    Save Scholarship
-                                </button>
-                            </form>
+                            @if($isSaved)
+                                <form action="{{ route('scholarships.unsave', $scholarship->id) }}" method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-[11px] text-[15px] font-bold border transition-all hover:bg-gray-50"
+                                            style="background: #F0FAFA; color: #0F4C5C; border-color: #0F4C5C;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#0F4C5C" stroke="#0F4C5C" stroke-width="1.6">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                                        </svg>
+                                        Saved
+                                    </button>
+                                </form>
+                            @else
+                                <form action="{{ route('scholarships.save', $scholarship->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit"
+                                            class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-[11px] text-[15px] font-bold border transition-all hover:bg-gray-50"
+                                            style="background: #FFFFFF; color: #0F4C5C; border-color: #C8E8E4;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+                                            <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+                                        </svg>
+                                        Save Scholarship
+                                    </button>
+                                </form>
+                            @endif
                         @else
                             <a href="{{ route('login') }}"
                                class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-[11px] text-[15px] font-bold border transition-all hover:bg-gray-50"

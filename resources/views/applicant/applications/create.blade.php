@@ -220,39 +220,58 @@
 
               {{-- GPA --}}
               @php $gpa = $eligibility['gpa']; @endphp
-              <div class="req-item">
+              <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
                 <div class="req-check {{ $gpa['pass'] ? 'ok' : 'warn' }}">{{ $gpa['pass'] ? '✓' : '' }}</div>
                 <div>
                   GPA of {{ $scholarship->gpa_requirement }} or better
                   <span class="req-sub">
-                    Your GWA: {{ number_format((float) $profile->gwa, 2) }} —
-                    {{ $gpa['pass'] ? 'qualifies' : 'does not qualify' }}
+                    @if($profile->gwa)
+                      Your GWA: {{ number_format((float) $profile->gwa, 2) }} — {{ $gpa['pass'] ? 'qualifies' : 'does not qualify' }}
+                    @else
+                      Your GWA: Not provided — Click to certify
+                    @endif
                   </span>
                 </div>
               </div>
 
               {{-- Income --}}
               @php $inc = $eligibility['income']; @endphp
-              <div class="req-item">
+              <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
                 <div class="req-check {{ $inc['pass'] === true ? 'ok' : 'warn' }}">{{ $inc['pass'] === true ? '✓' : '' }}</div>
                 <div>
                   Annual family income
-                  <span class="req-sub">Limit: {{ $scholarship->income_bracket }} — income not yet verified</span>
+                  <span class="req-sub">
+                    Limit: {{ $scholarship->income_bracket }} — 
+                    @if($profile->monthly_household_income !== null)
+                      Your income: ₱{{ number_format($profile->monthly_household_income * 12) }}/yr — {{ $inc['pass'] ? 'qualifies' : 'does not qualify' }}
+                    @else
+                      Income not yet verified — Click to certify
+                    @endif
+                  </span>
                 </div>
               </div>
 
               {{-- No concurrent scholarship --}}
               @php $conc = $eligibility['concurrent']; @endphp
-              <div class="req-item">
+              <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
                 <div class="req-check {{ $conc['pass'] ? 'ok' : 'warn' }}">{{ $conc['pass'] ? '✓' : '' }}</div>
                 <div>No active scholarship grant</div>
               </div>
 
               {{-- Enrollment --}}
               @php $enr = $eligibility['enrollment']; @endphp
-              <div class="req-item">
+              <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
                 <div class="req-check {{ $enr['pass'] ? 'ok' : 'warn' }}">{{ $enr['pass'] ? '✓' : '' }}</div>
-                <div>Currently enrolled (college level)</div>
+                <div>
+                  Currently enrolled (college level)
+                  <span class="req-sub">
+                    @if($profile->university_name || $profile->course_program)
+                      {{ $profile->university_name ?? '' }} {{ $profile->course_program ? '- '.$profile->course_program : '' }}
+                    @else
+                      Enrollment details not provided — Click to certify
+                    @endif
+                  </span>
+                </div>
               </div>
 
               {{-- Endorsement letter — always shows as pending until Step 2 --}}
@@ -403,6 +422,18 @@
 
       <div class="panel" id="panel-3">
         <p class="panel-hint">Review your application carefully. You will not be able to make changes after submission.</p>
+
+        {{-- Missing requirements confirmation block (Populated by JS) --}}
+        <div class="confirm-block" id="missing-requirements-block" style="display:none; background:#fff8e1; border:1px solid #f9d679; padding:16px; border-radius:var(--r-lg); margin-bottom:20px;">
+          <div style="font-family:'dm sans',sans-serif; font-size:15px; font-weight:700; color:#9a6b00; margin-bottom:8px;">
+            <span style="margin-right:6px;">⚠️</span> Unverified or Missing Requirements
+          </div>
+          <div style="font-size:12.5px; color:#7a5500; margin-bottom:12px; line-height:1.5;">
+            You have not certified the following eligibility criteria. You may still submit your application, but these will require manual verification by the provider:
+          </div>
+          <ul id="missing-requirements-list" style="margin:0; padding-left:22px; font-size:12.5px; color:#9a6b00; font-weight:600;">
+          </ul>
+        </div>
 
         {{-- Scholarship & applicant details --}}
         <div class="confirm-block">
@@ -605,6 +636,14 @@ function updateConfirm(slug, fileName) {
 }
 
 function goTo(step) {
+  if (step > 1) {
+    const okChecks = document.querySelectorAll('#panel-1 .req-check.ok');
+    if (okChecks.length === 0) {
+      alert('Please certify at least one requirement before proceeding.');
+      return;
+    }
+  }
+
   [1, 2, 3].forEach(i => {
     document.getElementById('panel-' + i).classList.toggle('active', i === step);
     const n = document.getElementById('sn' + i);
@@ -614,6 +653,41 @@ function goTo(step) {
   });
   document.getElementById('alerts-bar').classList.toggle('hidden', step !== 1);
   window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (step === 3) {
+    const missingList = document.getElementById('missing-requirements-list');
+    const missingBlock = document.getElementById('missing-requirements-block');
+    missingList.innerHTML = '';
+    let missingCount = 0;
+    
+    const reqItems = document.querySelectorAll('#panel-1 .req-item');
+    reqItems.forEach(item => {
+      const check = item.querySelector('.req-check');
+      if (check && check.classList.contains('warn')) {
+        let text = '';
+        const divNodes = item.querySelector('div:nth-child(2)').childNodes;
+        for (let j = 0; j < divNodes.length; j++) {
+          if (divNodes[j].nodeType === Node.TEXT_NODE && divNodes[j].textContent.trim().length > 0) {
+            text = divNodes[j].textContent.trim();
+            break;
+          }
+        }
+        if (text) {
+          const li = document.createElement('li');
+          li.textContent = text;
+          li.style.marginBottom = '4px';
+          missingList.appendChild(li);
+          missingCount++;
+        }
+      }
+    });
+    
+    if (missingCount > 0) {
+      missingBlock.style.display = 'block';
+    } else {
+      missingBlock.style.display = 'none';
+    }
+  }
 }
 
 function guardSubmit() {
@@ -656,6 +730,51 @@ function guardSubmit() {
     return false;
   }
   return true;
+}
+
+function toggleCheck(el) {
+  const check = el.querySelector('.req-check');
+  if (check.classList.contains('warn')) {
+    check.classList.remove('warn');
+    check.classList.add('ok');
+    check.innerHTML = '✓';
+    
+    // Attempt to update the Eligibility results table as visual feedback
+    const labelText = el.querySelector('div:nth-child(2)').innerText.split('\n')[0].trim();
+    updateEligibilityRow(labelText, true);
+  } else {
+    check.classList.add('warn');
+    check.classList.remove('ok');
+    check.innerHTML = '';
+    
+    const labelText = el.querySelector('div:nth-child(2)').innerText.split('\n')[0].trim();
+    updateEligibilityRow(labelText, false);
+  }
+}
+
+function updateEligibilityRow(label, isOk) {
+  const rows = document.querySelectorAll('.elig-row');
+  rows.forEach(row => {
+    const key = row.querySelector('.elig-key').innerText.trim().toLowerCase();
+    const lbl = label.toLowerCase();
+    
+    let match = false;
+    if (lbl.includes('gpa') && key.includes('gpa')) match = true;
+    if (lbl.includes('income') && key.includes('income')) match = true;
+    if (lbl.includes('scholarship') && key.includes('concurrent')) match = true;
+    if (lbl.includes('enrolled') && key.includes('enrolled')) match = true;
+    
+    if (match) {
+      const badge = row.querySelector('.badge');
+      if (isOk) {
+        badge.className = 'badge b-green';
+        badge.innerText = 'Passed';
+      } else {
+        badge.className = 'badge b-amber';
+        badge.innerText = 'Pending';
+      }
+    }
+  });
 }
 </script>
 @endpush

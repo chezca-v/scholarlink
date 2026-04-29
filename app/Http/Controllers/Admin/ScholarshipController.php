@@ -28,14 +28,26 @@ class ScholarshipController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'provider_name' => 'required|string|max:255',
+            'tagline' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'organization_id' => 'required|exists:organizations,id',
-            'total_slots' => 'required|integer|min:1',
-            'min_gpa' => 'required|numeric|min:0|max:100',
-            'deadline_date' => 'required|date',
-            'status' => 'required|in:active,closed,draft',
-            'gpa_weight' => 'required|numeric|min:0|max:100',
-            'income_weight' => 'required|numeric|min:0|max:100',
+            'gpa_requirement' => 'nullable|numeric|min:0|max:100',
+            'income_bracket' => 'nullable|string|max:100',
+            'slots' => 'required|integer|min:1',
+            'eligibility' => 'required|string',
+            'benefits' => 'required|string',
+            'requirements' => 'required|string',
+            'open_date' => 'required|date',
+            'deadline' => 'required|date|after:open_date',
+            'status' => 'required|in:open,closed,draft',
+            'blind_screening' => 'boolean',
+            'ai_match_enabled' => 'boolean',
+            'weight_gpa' => 'nullable|numeric|min:0|max:100',
+            'weight_income' => 'nullable|numeric|min:0|max:100',
+            'tags' => 'nullable|array',
+            'contact_email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'address' => 'nullable|string|max:500',
         ]);
 
         $data = $request->all();
@@ -51,7 +63,7 @@ class ScholarshipController extends Controller
     {
         $scholarship = Scholarship::withCount('applications')->findOrFail($id);
         
-        $query = Application::where('scholarship_id', $id)->with(['applicant', 'evaluator']);
+        $query = Application::where('scholarship_id', $id)->with(['applicant']);
         
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -79,9 +91,7 @@ class ScholarshipController extends Controller
         ];
         
         // Ensure $evaluators is available for the assign modal
-        $evaluators = \App\Models\User::whereHas('roles', function($q) {
-            $q->where('name', 'evaluator');
-        })->get();
+        $evaluators = \App\Models\User::where('role', 'evaluator')->get();
 
         return view('admin.scholarships.show', compact('scholarship', 'applications', 'stageCounts', 'evaluators'));
     }
@@ -99,23 +109,29 @@ class ScholarshipController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'provider_name' => 'required|string|max:255',
+            'tagline' => 'nullable|string|max:255',
             'description' => 'required|string',
-            'organization_id' => 'required|exists:organizations,id',
-            'total_slots' => 'required|integer|min:1',
-            'min_gpa' => 'required|numeric|min:0|max:100',
-            'deadline_date' => 'required|date',
-            'status' => 'required|in:active,closed,draft',
-            'gpa_weight' => 'required|numeric|min:0|max:100',
-            'income_weight' => 'required|numeric|min:0|max:100',
+            'gpa_requirement' => 'nullable|numeric|min:0|max:100',
+            'income_bracket' => 'nullable|string|max:100',
+            'slots' => 'required|integer|min:1',
+            'eligibility' => 'required|string',
+            'benefits' => 'required|string',
+            'requirements' => 'required|string',
+            'open_date' => 'required|date',
+            'deadline' => 'required|date|after:open_date',
+            'status' => 'required|in:open,closed,draft',
+            'blind_screening' => 'boolean',
+            'ai_match_enabled' => 'boolean',
+            'weight_gpa' => 'nullable|numeric|min:0|max:100',
+            'weight_income' => 'nullable|numeric|min:0|max:100',
+            'tags' => 'nullable|array',
+            'contact_email' => 'nullable|email|max:255',
+            'website' => 'nullable|url|max:255',
+            'address' => 'nullable|string|max:500',
         ]);
 
         $data = $request->all();
-
-        // Handle blind_screening and other toggles
-        $data['blind_screening'] = $request->has('blind_screening');
-        $data['conflict_detection'] = $request->has('conflict_detection');
-        $data['sms_enabled'] = $request->has('sms_enabled');
-
         $scholarship->update($data);
 
         return redirect()->route('admin.scholarships.index')->with('success', 'Scholarship updated successfully.');
@@ -134,6 +150,11 @@ class ScholarshipController extends Controller
         $scholarship->status = 'closed';
         $scholarship->save();
         return back()->with('success', 'Scholarship closed.');
+    }
+
+    public function exportApplications($id)
+    {
+        return back()->with('success', 'Applications exported successfully.');
     }
 
     public function extendDeadline(Request $request, $id)

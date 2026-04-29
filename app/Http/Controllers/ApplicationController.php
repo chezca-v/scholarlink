@@ -65,14 +65,29 @@ class ApplicationController extends Controller
 
         // Check GPA eligibility
         $gpaPass = null;
-        if ($profile->gwa && $scholarship->gpa_requirement) {
-            $gpaPass = $profile->gwa <= $scholarship->gpa_requirement; // Assuming lower is better in PH system
+        if ($profile->gwa) {
+            if ($scholarship->gpa_requirement) {
+                $gpaPass = $profile->gwa <= $scholarship->gpa_requirement; // Assuming lower is better in PH system
+            } else {
+                $gpaPass = true;
+            }
         }
 
         // Check Income eligibility
         $incomePass = null;
         if ($profile->monthly_household_income !== null) {
-            $incomePass = true; // Placeholder for simple pass check
+            if ($scholarship->income_bracket) {
+                preg_match_all('/\d+/', str_replace(',', '', $scholarship->income_bracket), $matches);
+                if (!empty($matches[0])) {
+                    $limit = (float) $matches[0][0];
+                    $annualIncome = $profile->monthly_household_income * 12;
+                    $incomePass = $annualIncome <= $limit;
+                } else {
+                    $incomePass = true;
+                }
+            } else {
+                $incomePass = true;
+            }
         }
 
         // Check concurrent scholarship
@@ -82,7 +97,10 @@ class ApplicationController extends Controller
         $concurrentPass = !$hasActiveScholarship;
 
         // Check enrollment
-        $enrollmentPass = true; // Placeholder
+        $enrollmentPass = null;
+        if ($profile->university_name || $profile->course_program || $profile->year_level) {
+            $enrollmentPass = true;
+        }
 
         $eligibility = [
             'gpa' => [

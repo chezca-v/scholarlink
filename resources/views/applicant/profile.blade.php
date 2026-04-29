@@ -728,74 +728,66 @@
             </aside>
 
             {{-- MAIN CONTENT --}}
-            <main class="mp-main">
-                <div class="mp-content-grid">
-                    
-                    {{-- LEFT COLUMN: Summary --}}
-                    <div class="mp-summary-col">
-                        {{-- 04 — HERO BANNER --}}
-                        <div class="mp-hero">
-                            <div class="mp-hero__avatar">
-                                @if (!empty($applicantUser?->avatar_url))
-                                    <img src="{{ $applicantUser->avatar_url }}" alt="{{ $applicantUser->name }}" />
-                                @else
-                                    {{ strtoupper(substr($applicantUser?->name ?? 'A', 0, 1)) }}{{ strtoupper(substr(explode(' ', $applicantUser?->name ?? 'A')[1] ?? '', 0, 1)) }}
-                                @endif
-                            </div>
+            <main class="mp-main" style="padding: 28px; display: flex; flex-direction: column; gap: 24px;">
+                {{-- 04 — HERO BANNER --}}
+                <div class="mp-hero">
+                    <div class="mp-hero__avatar">
+                        @if (!empty($applicantUser?->avatar_url))
+                            <img src="{{ $applicantUser->avatar_url }}" alt="{{ $applicantUser->name }}" />
+                        @else
+                            {{ strtoupper(substr($applicantUser?->name ?? 'A', 0, 1)) }}{{ strtoupper(substr(explode(' ', $applicantUser?->name ?? 'A')[1] ?? '', 0, 1)) }}
+                        @endif
+                    </div>
 
-                            <div class="mp-hero__info">
-                                <div class="mp-hero__name">{{ $applicantUser?->name ?? 'Applicant' }}</div>
-                                <div class="mp-hero__sub">
-                                    {{ $applicantProfile?->program ?? 'Unknown Program' }}<br>
-                                    {{ $applicantProfile?->school ?? 'Unknown School' }}
-                                </div>
-                                <div class="mp-hero__updated">
-                                    📅 Last updated {{ $applicantProfile?->updated_at?->format('M d, Y') ?? now()->format('M d, Y') }}
-                                </div>
-                            </div>
-
-                            <button class="mp-hero__edit-btn"
-                                    onclick="MyProfile.editSection('hero')">
-                                ✏️ Edit Profile
-                            </button>
+                    <div class="mp-hero__info">
+                        <div class="mp-hero__name">{{ $applicantUser?->name ?? 'Applicant' }}</div>
+                        <div class="mp-hero__sub">
+                            {{ $applicantProfile?->program ?? 'Unknown Program' }}<br>
+                            {{ $applicantProfile?->school ?? 'Unknown School' }}
                         </div>
-
-                        {{-- 05 — PROFILE COMPLETION --}}
-                        <div class="mp-completion" style="margin-top:24px;">
-                            @php
-                                $profileFields = [
-                                    $applicantProfile?->date_of_birth,
-                                    $applicantProfile?->phone_number,
-                                    $applicantProfile?->address,
-                                    $applicantProfile?->school,
-                                    $applicantProfile?->program,
-                                    $applicantProfile?->year_level,
-                                    $applicantProfile?->gpa,
-                                ];
-                                $completedFields = count(array_filter($profileFields, fn($f) => !is_null($f)));
-                                $totalFields = count($profileFields);
-                                $percent = $totalFields > 0 ? round(($completedFields / $totalFields) * 100) : 0;
-                                $incompleteCount = $totalFields - $completedFields;
-                            @endphp
-                            <div class="mp-completion__header">
-                                <span class="mp-completion__label">Profile Completion</span>
-                                <div class="mp-completion__right">
-                                    <span class="mp-completion__pct">{{ $percent }}%</span>
-                                    <span class="mp-completion__note">
-                                        {{ $incompleteCount }} sections<br>incomplete
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="mp-completion__bar">
-                                <div class="mp-completion__fill"
-                                     style="width:{{ $percent }}%">
-                                </div>
-                            </div>
+                        <div class="mp-hero__updated">
+                            📅 Last updated {{ $applicantProfile?->updated_at?->format('M d, Y') ?? now()->format('M d, Y') }}
                         </div>
                     </div>
 
-                    {{-- RIGHT COLUMN: Main Content --}}
-                    <div class="mp-detail-col">
+                    <button class="mp-hero__edit-btn"
+                            onclick="MyProfile.editSection('hero')">
+                        ✏️ Edit Profile
+                    </button>
+                </div>
+
+                {{-- 05 — PROFILE COMPLETION --}}
+                <div class="mp-completion">
+                    @php
+                        $profileFields = [
+                            $applicantProfile?->date_of_birth,
+                            $applicantProfile?->phone_number,
+                            $applicantProfile?->address,
+                            $applicantProfile?->school,
+                            $applicantProfile?->program,
+                            $applicantProfile?->year_level,
+                            $applicantProfile?->gpa,
+                        ];
+                        $completedFields = count(array_filter($profileFields, fn($f) => !is_null($f)));
+                        $totalFields = count($profileFields);
+                        $percent = $totalFields > 0 ? round(($completedFields / $totalFields) * 100) : 0;
+                        $incompleteCount = $totalFields - $completedFields;
+                    @endphp
+                    <div class="mp-completion__header">
+                        <span class="mp-completion__label">Profile Completion</span>
+                        <div class="mp-completion__right">
+                            <span class="mp-completion__pct">{{ $percent }}%</span>
+                            <span class="mp-completion__note">
+                                {{ $incompleteCount }} sections<br>incomplete
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mp-completion__bar">
+                        <div class="mp-completion__fill"
+                             style="width:{{ $percent }}%">
+                        </div>
+                    </div>
+                </div>
                         {{-- 06 — PERSONAL INFORMATION --}}
                         <div class="mp-info-card" style="--i:1">
                         <div class="mp-info-card__header">
@@ -916,8 +908,7 @@
                         </div>
                     </div>
 
-                    </div>{{-- /mp-detail-col --}}
-                </div>{{-- /mp-content-grid --}}
+
             </main>
         </div>{{-- /mp-body --}}
     </div>{{-- /mp-shell --}}

@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'ScholarLink — Applicant Portal')</title>
     <meta name="auth-check" content="authenticated">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -243,41 +241,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .section{margin-bottom:24px;}
 </style>
 
-<button class="fab-ai" title="AI Assistant">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <span class="fab-badge">AI</span>
-</button>
 
-<style>
-.fab-ai{
-  position:fixed;
-  bottom:24px;right:24px;
-  width:54px;height:54px;
-  border-radius:50%;
-  background:linear-gradient(160deg,#0F4C5C,#2A8FA0);
-  border:none;
-  color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  box-shadow:0 6px 24px rgba(15,76,92,0.35);
-  z-index:400;
-  transition:transform .2s ease, box-shadow .2s ease;
-  position:fixed;
-}
-.fab-ai:hover{transform:scale(1.08);box-shadow:0 10px 32px rgba(15,76,92,0.45);}
-.fab-badge{
-  position:absolute;
-  top:2px;right:2px;
-  background:var(--amber);
-  color:#fff;
-  font-family:'DM Sans',sans-serif;
-  font-size:9px;font-weight:800;
-  border-radius:20px;
-  padding:2px 5px;
-  border:2px solid #fff;
-  line-height:1;
-}
-</style>
 
     @stack('styles')
 </head>
@@ -359,7 +323,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     </a>
 
     <div class="sb-spacer"></div>
-    <button onclick="document.querySelector('[x-data]')?.__x?.$dispatch('openModal', 'confirm-logout');" class="sb-nav-item text-red-600" style="color:#e53e3e; width: 100%; text-align: left; background: none; border: none; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer;">
+    <button onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'confirm-logout' }))" class="sb-nav-item text-red-600" style="color:#e53e3e; width: 100%; text-align: left; background: none; border: none; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 10px; vertical-align: middle;">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -481,8 +445,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 </script>
 
 
-<!-- Logout Confirmation Modal -->
-<x-logout-modal />
+
 
 <!-- Browser History Management -->
 <script>
@@ -516,34 +479,104 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<style>
+/* Custom Modal CSS */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.modal-backdrop.show {
+    display: flex;
+    opacity: 1;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 380px;
+    padding: 24px;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    margin: 0 16px;
+}
+.modal-backdrop.show .modal-content {
+    transform: translateY(0);
+}
+.modal-icon {
+    width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+}
+.modal-title { font-size: 18px; font-weight: 600; color: #111827; text-align: center; margin-bottom: 8px; font-family: 'DM Sans', sans-serif;}
+.modal-text { font-size: 14px; color: #6b7280; text-align: center; margin-bottom: 24px; font-family: 'DM Sans', sans-serif; line-height: 1.5;}
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.modal-btn-cancel { background: #fff; border-color: #d1d5db; color: #374151; }
+.modal-btn-cancel:hover { background: #f9fafb; }
+.modal-btn-logout { background: #dc2626; color: #fff; width: 100%; }
+.modal-btn-logout:hover { background: #b91c1c; }
+.alpine-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+
 <!-- Logout Confirmation Modal -->
-<div x-data="{ open: false }" @open-modal.window="if ($event.detail === 'confirm-logout') open = true">
-    <div x-show="open" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition-opacity">
-        <div @click.away="open = false" class="bg-white rounded-xl shadow-xl w-full max-w-sm p-6 transform transition-all mx-4">
-            <div class="text-center">
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                    <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                </div>
-                <h3 class="text-lg leading-6 font-medium text-gray-900 mb-2">Ready to leave?</h3>
-                <p class="text-sm text-gray-500 mb-6">Select "Log Out" below if you are ready to end your current session.</p>
-            </div>
-            <div class="flex justify-center gap-3">
-                <button @click="open = false" type="button" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none transition-colors">
-                    Cancel
+<div x-data="{ open: false }" 
+     @open-modal.window="if ($event.detail === 'confirm-logout') open = true;"
+     @keydown.escape.window="open = false"
+     x-show="open" 
+     style="display: none;" 
+     class="alpine-backdrop"
+     x-transition.opacity>
+    
+    <div @click.away="open = false" 
+         class="modal-content"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 transform translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform translate-y-4">
+        
+        <div class="modal-icon">
+            <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+        </div>
+        <h3 class="modal-title">Ready to leave?</h3>
+        <p class="modal-text">Select "Log Out" below if you are ready to end your current session.</p>
+        
+        <div class="modal-actions">
+            <button @click="open = false" type="button" class="modal-btn modal-btn-cancel">
+                Cancel
+            </button>
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; flex: 1;">
+                @csrf
+                <button type="submit" class="modal-btn modal-btn-logout">
+                    Log Out
                 </button>
-                <form method="POST" action="{{ route('logout') }}" class="m-0">
-                    @csrf
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none transition-colors">
-                        Log Out
-                    </button>
-                </form>
-            </div>
+            </form>
         </div>
     </div>
 </div>
 
-@stack('scripts')
+<x-chatbot-widget />
+    @include('components.toast-notification')
+    @include('components.modals.session-timeout')
+    @stack('scripts')
 </body>
 </html>

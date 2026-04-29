@@ -24,14 +24,14 @@
             $allApplicationsCount = \App\Models\Application::count();
             $pendingReviewsCount = \App\Models\Application::where('status', 'pending')->count();
         @endphp
-        <a href="#" class="nav-item"><span>📂</span> All Applications <span class="badge-nav" style="background:var(--warm-amber); color:var(--deep-teal)">{{ $allApplicationsCount }}</span></a>
-        <a href="#" class="nav-item"><span>⚠️</span> Pending Reviews <span class="badge-nav" style="background:var(--red-alert); color:white">{{ $pendingReviewsCount }}</span></a>
+        <a href="{{ route('admin.applications') }}" class="nav-item"><span>📂</span> All Applications <span class="badge-nav" style="background:var(--warm-amber); color:var(--deep-teal)">{{ $allApplicationsCount }}</span></a>
+        <a href="{{ route('admin.reviews') }}" class="nav-item"><span>⚠️</span> Pending Reviews <span class="badge-nav" style="background:var(--red-alert); color:white">{{ $pendingReviewsCount }}</span></a>
 
         <div class="nav-label">Management</div>
-        <a href="{{ route('admin.users') ?? '#' }}" class="nav-item">
+        <a href="{{ route('admin.users') }}" class="nav-item">
             <span>👥</span> User Management
         </a>
-        <a href="#" class="nav-item">
+        <a href="{{ route('admin.settings') }}" class="nav-item">
             <span>⚙️</span> Settings
         </a>
     </nav>

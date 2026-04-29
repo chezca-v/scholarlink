@@ -146,7 +146,7 @@
         </a>
 
         <p class="section-label mt-4">Management</p>
-        <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+        <a href="{{ route('admin.users') }}" class="nav-link {{ request()->routeIs('admin.users*') ? 'active' : '' }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             Users
         </a>
@@ -171,13 +171,12 @@
                 <p style="font-size:11px;color:rgba(255,255,255,0.5);" class="truncate">{{ auth()->user()->email ?? '' }}</p>
             </div>
         </div>
-        <form method="POST" action="{{ route('logout') }}" class="mt-3">
-            @csrf
-            <button type="submit" class="w-full nav-link justify-center text-xs">
+        <div class="mt-3">
+            <button x-data @click.prevent="$dispatch('open-modal', 'confirm-logout')" class="w-full nav-link justify-center text-xs">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
                 Sign Out
             </button>
-        </form>
+        </div>
     </div>
 </aside>
 
@@ -193,12 +192,16 @@
         </div>
         <div class="flex items-center gap-3">
             {{-- Notification bell --}}
-            <button style="width:36px;height:36px;background:rgba(255,255,255,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;position:relative;">
-                <svg style="width:18px;height:18px;color:white;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--accent);border-radius:99px;border:2px solid var(--primary);"></span>
-            </button>
+            <x-notification-dropdown />
             {{-- Role badge --}}
             <span style="background:rgba(232,168,56,0.2);color:var(--accent-light);font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;">ADMIN</span>
+            {{-- Top Navbar Logout --}}
+            <div class="ml-2 m-0">
+                <button type="button" x-data @click.prevent="$dispatch('open-modal', 'confirm-logout')" style="background: rgba(220,38,38,0.1); color: #FCA5A5; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; transition: all 0.2s;" onmouseover="this.style.background='rgba(220,38,38,0.2)'; this.style.color='#FECACA';" onmouseout="this.style.background='rgba(220,38,38,0.1)'; this.style.color='#FCA5A5';">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Logout
+                </button>
+            </div>
         </div>
     </header>
 
@@ -219,6 +222,10 @@
     </main>
 </div>
 
+<x-chatbot-widget />
+    @include('components.toast-notification')
+    @include('components.modals.session-timeout')
+    <x-logout-modal />
 @stack('scripts')
 </body>
 </html>
