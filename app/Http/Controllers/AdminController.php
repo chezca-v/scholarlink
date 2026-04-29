@@ -246,33 +246,8 @@ class AdminController extends Controller
 
     public function users()
     {
-        return view('admin.user', [
-            'layout' => 'admin.layouts.admin',
-            'page' => [
-                'title' => 'User Management',
-                'subtitle' => 'Manage system users and their roles'
-            ],
-            'breadcrumb' => [
-                ['label' => 'Admin', 'url' => route('admin.dashboard'), 'separator' => '/'],
-                ['label' => 'Users', 'url' => null]
-            ],
-            'stats' => [],
-            'filters' => [],
-            'actions' => [],
-            'filtersForm' => [],
-            'table' => [
-                'headers' => [
-                    ['type' => 'text', 'label' => 'Name'],
-                    ['type' => 'text', 'label' => 'Email'],
-                    ['type' => 'text', 'label' => 'Role'],
-                    ['type' => 'text', 'label' => 'Status']
-                ],
-                'rows' => [],
-                'empty' => 'No users found.'
-            ],
-            'pagination' => [],
-            'modals' => []
-        ]);
+        $users = User::latest()->get();
+        return view('admin.user', compact('users'));
     }
 
     public function createUser(Request $request)
@@ -312,30 +287,102 @@ class AdminController extends Controller
 
     public function calendar()
     {
-        $currentMonth = Carbon::now();
+        $currentMonth = \Carbon\Carbon::now();
         $prevMonth = $currentMonth->copy()->subMonth();
         $nextMonth = $currentMonth->copy()->addMonth();
 
+        $scholarships = \App\Models\Scholarship::whereNotNull('deadline')
+                        ->where('status', '!=', 'draft')
+                        ->get();
+
+        $calendarDays = [];
+        $upcomingDeadlines = [];
+        
+        $daysInMonth = $currentMonth->daysInMonth;
+        
+        for ($i = 1; $i <= $daysInMonth; $i++) {
+            $currentDate = $currentMonth->copy()->day($i);
+            $dayDeadlines = [];
+            
+            foreach ($scholarships as $scholarship) {
+                if ($scholarship->deadline && $scholarship->deadline->isSameDay($currentDate)) {
+                    $daysUntil = \Carbon\Carbon::now()->startOfDay()->diffInDays($scholarship->deadline, false);
+                    $type = $daysUntil <= 7 && $daysUntil >= 0 ? 'urgent' : 'standard';
+                    
+                    $dayDeadlines[] = [
+                        'id' => $scholarship->id,
+                        'label' => $scholarship->name,
+                        'type' => $type,
+                        'days_away' => $daysUntil
+                    ];
+                    
+                    if ($daysUntil >= 0 && $daysUntil <= 30) {
+                        $upcomingDeadlines[] = [
+                            'id' => $scholarship->id,
+                            'scholarship_name' => $scholarship->name,
+                            'date' => $scholarship->deadline,
+                            'days_away' => $daysUntil,
+                            'type' => $type,
+                            'type_label' => ucfirst($type) . ' Deadline',
+                            'meta' => 'Applications close at 11:59 PM'
+                        ];
+                    }
+                }
+            }
+            
+            $calendarDays[] = [
+                'date' => $currentDate->copy(),
+                'deadlines' => $dayDeadlines
+            ];
+        }
+        
+        usort($upcomingDeadlines, function($a, $b) {
+            return $a['days_away'] <=> $b['days_away'];
+        });
+
+        $upcomingDeadlines = array_map("unserialize", array_unique(array_map("serialize", $upcomingDeadlines)));
+
         $scholarshipLegend = [
             ['bg' => '#1a8fa0', 'label' => 'Standard Deadline'],
-            ['bg' => '#ea8c55', 'label' => 'Urgent Deadline'],
+            ['bg' => '#ea8c55', 'label' => 'Urgent Deadline (≤7 days)'],
         ];
 
-        // Basic calendar days (mock up 1 day to prevent empty errors or looping errors)
-        $calendarDays = [
-            [
-                'date' => $currentMonth,
-                'deadlines' => [],
-            ]
-        ];
-
-        $upcomingDeadlines = [];
         $deadlinesJson = [];
+        
+        $ui = [
+            'page_title' => 'Calendar',
+            'topnav_title' => 'Calendar',
+            'topnav_subtitle' => 'Month of :month',
+            'actions' => [],
+            'breadcrumb' => ['Admin', 'Calendar'],
+            'prev' => 'Prev',
+            'next' => 'Next',
+            'today' => 'Today',
+            'upcoming_title' => 'Upcoming Deadlines',
+            'deadline_badge' => ':days days away',
+            'edit' => 'Edit',
+            'empty' => 'No upcoming deadlines.',
+            'reason_placeholder' => 'Reason for editing...',
+            'warning' => 'Note: altering deadlines affects applicants.',
+            'save' => 'Save Changes'
+        ];
+        $routes = [
+            'index' => 'admin.calendar',
+            'update' => 'admin.calendar'
+        ];
+        $config = [
+            'month_format' => 'F Y',
+            'day_format' => 'M d, Y',
+            'week_days' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            'upcoming_range' => 30,
+            'deadline_types' => ['standard' => 'Standard Deadline', 'urgent' => 'Urgent Deadline']
+        ];
 
         return view('admin.calendar', compact(
             'currentMonth', 'prevMonth', 'nextMonth',
             'scholarshipLegend', 'calendarDays',
-            'upcomingDeadlines', 'deadlinesJson'
+            'upcomingDeadlines', 'deadlinesJson',
+            'ui', 'routes', 'config'
         ));
     }
 
@@ -346,13 +393,13 @@ class AdminController extends Controller
 
     public function applications()
     {
-        $applications = Application::with('user', 'scholarship')->latest()->paginate(15);
+        $applications = Application::with('applicant', 'scholarship')->latest()->paginate(15);
         return view('admin.applications', compact('applications'));
     }
 
     public function reviews()
     {
-        $reviews = Application::with('user', 'scholarship')->whereIn('status', ['pending', 'under_review'])->latest()->paginate(15);
+        $reviews = Application::with('applicant', 'scholarship')->whereIn('status', ['pending', 'under_review'])->latest()->paginate(15);
         return view('admin.reviews', compact('reviews'));
     }
 

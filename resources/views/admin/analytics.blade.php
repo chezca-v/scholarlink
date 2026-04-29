@@ -35,17 +35,17 @@
     <div class="grid grid-cols-4 gap-4">
         @php
             $statCards = [
-                ['label' => 'Total Applications', 'value' => number_format($stats['total_applications'] ?? 0), 'change' => $stats['apps_change'] ?? '+0%', 'up' => true, 'icon' => 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'],
-                ['label' => 'Approval Rate', 'value' => ($stats['approval_rate'] ?? 0) . '%', 'change' => $stats['approval_change'] ?? '+0%', 'up' => true, 'icon' => 'M22 11.08V12a10 10 0 1 1-5.93-9.14'],
-                ['label' => 'Avg. Review Time', 'value' => ($stats['avg_review_days'] ?? 0) . 'd', 'change' => $stats['review_change'] ?? '0d', 'up' => false, 'icon' => 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'],
-                ['label' => 'Active Scholarships', 'value' => number_format($stats['active_scholarships'] ?? 0), 'change' => $stats['active_change'] ?? '0', 'up' => true, 'icon' => 'M22 10v6M2 10l10-5 10 5-10 5z'],
+                ['label' => 'Total Applications', 'value' => number_format($stats['total_applications'] ?? 0), 'change' => $stats['apps_change'] ?? '+0%', 'up' => true, 'emoji' => '📈'],
+                ['label' => 'Approval Rate', 'value' => ($stats['approval_rate'] ?? 0) . '%', 'change' => $stats['approval_change'] ?? '+0%', 'up' => true, 'emoji' => '💰'],
+                ['label' => 'Avg. Review Time', 'value' => ($stats['avg_review_days'] ?? 0) . 'd', 'change' => $stats['review_change'] ?? '0d', 'up' => false, 'emoji' => '📝'],
+                ['label' => 'Active Scholarships', 'value' => number_format($stats['active_scholarships'] ?? 0), 'change' => $stats['active_change'] ?? '0', 'up' => true, 'emoji' => '📖'],
             ];
         @endphp
         @foreach($statCards as $card)
         <div class="stat-card">
             <div class="flex items-start justify-between mb-3">
-                <div style="width:38px;height:38px;background:rgba(15,76,92,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;">
-                    <svg style="width:18px;height:18px;color:var(--primary);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="{{ $card['icon'] }}"/></svg>
+                <div style="width:38px;height:38px;background:rgba(15,76,92,0.08);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;">
+                    {{ $card['emoji'] }}
                 </div>
                 <span style="font-size:12px;font-weight:600;padding:3px 8px;border-radius:99px;background:{{ $card['up'] ? '#DCFCE7' : '#FEE2E2' }};color:{{ $card['up'] ? '#16A34A' : '#DC2626' }};">
                     {{ $card['change'] }}

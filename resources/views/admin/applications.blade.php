@@ -42,7 +42,7 @@
                             {{ $app->created_at->format('M d, Y') }}
                         </td>
                         <td class="px-5 py-4 text-right">
-                            <a href="#" class="btn-ghost !px-3 !py-1.5 text-xs">View Details</a>
+                            <a href="{{ url('admin/applications/'.$app->id) }}" class="btn-ghost !px-3 !py-1.5 text-xs">View Details</a>
                         </td>
                     </tr>
                     @empty

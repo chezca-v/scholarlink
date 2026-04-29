@@ -122,9 +122,8 @@
             
         </div>
 
-        <!-- Footer -->
         <div class="p-3 border-t border-slate-100 text-center bg-white">
-            <a href="{{ route('notifications') ?? '#' }}" class="text-[12px] font-bold text-[#0F4C5C] hover:text-[#1a6878] transition-colors flex items-center justify-center gap-1">
+            <a href="#" class="text-[12px] font-bold text-[#0F4C5C] hover:text-[#1a6878] transition-colors flex items-center justify-center gap-1">
                 View all notifications
                 <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
             </a>
