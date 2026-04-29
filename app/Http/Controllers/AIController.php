@@ -50,39 +50,48 @@ class AiController extends Controller
         ]);
     }
     public function chat(Request $request)
-        {
-            $request->validate(['message' => 'required|string|max:500']);
+    {
+        $request->validate(['message' => 'required|string|max:500']);
 
-            $user    = $request->user();
+        $user = $request->user();
+        
+        if ($user) {
             $profile = $user->applicantProfile;
-
             $course = $profile->course ?? 'not set';
             $uni = $profile->university_name ?? 'not set';
             $gpa = $profile->gpa ?? 'not set';
             $income = $profile->income_bracket ?? 'not set';
-
-            $prompt = "
-                You are Scholar, a friendly AI scholarship assistant for ScholarLink —
-                a Philippine scholarship platform. Keep answers concise (2-4 sentences max).
-
-                Student context:
-                - Name: {$user->first_name}
-                - Course: {$course}
-                - University: {$uni}
-                - GPA: {$gpa}
-                - Income bracket: {$income}
-
-                User message: {$request->message}
-
-                Reply helpfully and in a warm, encouraging tone.
-                If asked about scholarships, refer to ScholarLink's browse page.
-                Do not use markdown. Plain text only.
-            ";
-
-            $reply = $this->callGemini($prompt);
-
-            return response()->json(['reply' => $reply]);
+            $name = $user->first_name ?? $user->name;
+        } else {
+            $course = 'not set';
+            $uni = 'not set';
+            $gpa = 'not set';
+            $income = 'not set';
+            $name = 'Guest';
         }
+
+        $prompt = "
+            You are Scholar, a friendly AI scholarship assistant for ScholarLink —
+            a Philippine scholarship platform. Keep answers concise (2-4 sentences max).
+
+            Student context:
+            - Name: {$name}
+            - Course: {$course}
+            - University: {$uni}
+            - GPA: {$gpa}
+            - Income bracket: {$income}
+
+            User message: {$request->message}
+
+            Reply helpfully and in a warm, encouraging tone.
+            If asked about scholarships, refer to ScholarLink's browse page.
+            Do not use markdown. Plain text only.
+        ";
+
+        $reply = $this->callGemini($prompt);
+
+        return response()->json(['reply' => $reply]);
+    }
     /**
      * Generate AI recommendation summary for the dashboard.
      */
@@ -107,6 +116,10 @@ class AiController extends Controller
      */
     private function callGemini(string $prompt): string
     {
+        if (empty($this->apiKey)) {
+            return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar, your AI assistant! How can I help you today?";
+        }
+
         $url = "{$this->baseUrl}/{$this->model}:generateContent?key={$this->apiKey}";
 
         $response = Http::timeout(30)->post($url, [

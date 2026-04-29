@@ -20,6 +20,28 @@ class SavedScholarshipController extends Controller
         return view('applicant.saved', compact('user', 'savedScholarships', 'notifications'));
     }
 
-    public function store(Request $request) { /* Save to saved_scholarships table */ }
-    public function destroy($id) { /* Remove from saved_scholarships table */ }
+    public function store(Request $request, $id)
+    {
+        $user = auth()->user();
+        
+        \App\Models\SavedScholarship::firstOrCreate([
+            'user_id' => $user->id,
+            'scholarship_id' => $id,
+        ], [
+            'saved_at' => now(),
+        ]);
+        
+        return redirect()->route('applicant.saved')->with('success', 'Scholarship saved successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $user = auth()->user();
+        
+        \App\Models\SavedScholarship::where('user_id', $user->id)
+            ->where('scholarship_id', $id)
+            ->delete();
+            
+        return back()->with('success', 'Scholarship removed from saved list.');
+    }
 }

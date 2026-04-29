@@ -3,11 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'ScholarLink — Applicant Portal')</title>
     <meta name="auth-check" content="authenticated">
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -524,6 +522,15 @@ document.addEventListener('DOMContentLoaded', function() {
 .modal-btn-cancel:hover { background: #f9fafb; }
 .modal-btn-logout { background: #dc2626; color: #fff; width: 100%; }
 .modal-btn-logout:hover { background: #b91c1c; }
+.alpine-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 </style>
 
 <!-- Logout Confirmation Modal -->
@@ -532,34 +539,34 @@ document.addEventListener('DOMContentLoaded', function() {
      @keydown.escape.window="open = false"
      x-show="open" 
      style="display: none;" 
-     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+     class="alpine-backdrop"
      x-transition.opacity>
     
     <div @click.away="open = false" 
-         class="bg-white rounded-[20px] w-full max-w-[400px] p-8 shadow-2xl relative text-center"
+         class="modal-content"
          x-show="open"
          x-transition:enter="transition ease-out duration-300"
-         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:enter-start="opacity-0 transform translate-y-4"
+         x-transition:enter-end="opacity-100 transform translate-y-0"
          x-transition:leave="transition ease-in duration-200"
-         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+         x-transition:leave-start="opacity-100 transform translate-y-0"
+         x-transition:leave-end="opacity-0 transform translate-y-4">
         
-        <div class="mx-auto w-12 h-12 bg-[#FEF2F2] rounded-full flex items-center justify-center mb-5 border border-[#FECACA]">
-            <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <div class="modal-icon">
+            <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
             </svg>
         </div>
-        <h3 class="font-display font-bold text-[22px] text-[#111827] mb-2">Ready to leave?</h3>
-        <p class="text-[13px] text-slate-500 mb-6">Select "Log Out" below if you are ready to end your current session.</p>
+        <h3 class="modal-title">Ready to leave?</h3>
+        <p class="modal-text">Select "Log Out" below if you are ready to end your current session.</p>
         
-        <div class="flex items-center justify-center gap-3">
-            <button @click="open = false" type="button" class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-colors border border-slate-200 bg-white min-w-[120px]">
+        <div class="modal-actions">
+            <button @click="open = false" type="button" class="modal-btn modal-btn-cancel">
                 Cancel
             </button>
-            <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0; flex: 1;">
                 @csrf
-                <button type="submit" class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-[#DC2626] hover:bg-[#b91c1c] shadow-md transition-colors border border-[#DC2626] min-w-[120px]">
+                <button type="submit" class="modal-btn modal-btn-logout">
                     Log Out
                 </button>
             </form>
