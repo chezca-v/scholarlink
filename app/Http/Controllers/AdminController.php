@@ -312,7 +312,31 @@ class AdminController extends Controller
 
     public function calendar()
     {
-        return view('admin.calendar');
+        $currentMonth = Carbon::now();
+        $prevMonth = $currentMonth->copy()->subMonth();
+        $nextMonth = $currentMonth->copy()->addMonth();
+
+        $scholarshipLegend = [
+            ['bg' => '#1a8fa0', 'label' => 'Standard Deadline'],
+            ['bg' => '#ea8c55', 'label' => 'Urgent Deadline'],
+        ];
+
+        // Basic calendar days (mock up 1 day to prevent empty errors or looping errors)
+        $calendarDays = [
+            [
+                'date' => $currentMonth,
+                'deadlines' => [],
+            ]
+        ];
+
+        $upcomingDeadlines = [];
+        $deadlinesJson = [];
+
+        return view('admin.calendar', compact(
+            'currentMonth', 'prevMonth', 'nextMonth',
+            'scholarshipLegend', 'calendarDays',
+            'upcomingDeadlines', 'deadlinesJson'
+        ));
     }
 
     public function exportAnalytics()

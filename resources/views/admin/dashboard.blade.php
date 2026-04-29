@@ -615,11 +615,10 @@
                     <p style="font-size:12px; color:var(--muted); margin-top:2px;">{{ $now->format('l, F j, Y') }} · Academic Year {{ $now->year }}–{{ $now->copy()->addYear()->year }}</p>
                 </div>
                 <div class="heading-actions">
-                    <form method="POST" action="{{ route('admin.analytics') }}" style="display:inline;">
-                        @csrf
+                    <form method="GET" action="{{ route('admin.analytics.export') }}" style="display:inline;">
                         <button type="submit" class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
                     </form>
-                    <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="btn-pri" style="text-decoration:none; display:inline-block;">New Scholarship</a>
+                    <a href="{{ route('admin.scholarships.create') }}" class="btn-pri" style="text-decoration:none; display:inline-block;">New Scholarship</a>
                 </div>
             </div>
 

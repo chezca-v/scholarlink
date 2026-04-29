@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('admin.layouts.admin')
 
 @php
 $ui     = $ui ?? config('ui.admin.calendar');
