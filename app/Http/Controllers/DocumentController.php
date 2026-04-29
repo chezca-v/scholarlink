@@ -172,4 +172,20 @@ class DocumentController extends Controller
 
         return redirect()->back()->with('success', 'Document rejected.');
     }
+
+    public function destroy($id)
+    {
+        $document = Document::query()
+            ->where('user_id', Auth::id())
+            ->findOrFail($id);
+
+        if ($document->file_url && Storage::disk('public')->exists($document->file_url)) {
+            Storage::disk('public')->delete($document->file_url);
+        }
+
+        $document->applicationDocuments()->delete();
+        $document->delete();
+
+        return redirect()->back()->with('success', 'Document deleted successfully.');
+    }
 }

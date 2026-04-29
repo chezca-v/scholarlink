@@ -134,44 +134,67 @@ class ApplicationController extends Controller
                 'groupTitle' => 'Identity & Academic',
                 'slots' => [
                     [
-                        'document_type' => 'Proof of Enrollment',
+                        'document_type' => 'Proof of Enrollment / Acceptance Letter',
                         'label' => 'Proof of Enrollment',
                         'smallNote' => 'Certificate of Registration',
                         'optional' => false,
                     ],
                     [
-                        'document_type' => 'Report Card / Transcript',
-                        'label' => 'Report Card',
+                        'document_type' => 'Latest Report Card / TOR',
+                        'label' => 'Latest Report Card',
                         'smallNote' => 'Previous semester',
                         'optional' => false,
                     ],
                     [
-                        'document_type' => 'Valid ID',
-                        'label' => 'Valid ID',
-                        'smallNote' => 'Student ID or Govt ID',
+                        'document_type' => '2x2 ID Photo',
+                        'label' => '2x2 ID Photo',
+                        'smallNote' => 'Passport-style photo',
                         'optional' => false,
                     ],
                 ]
             ],
             [
-                'groupTitle' => 'Financial Documents',
+                'groupTitle' => 'Financial & Legal Documents',
                 'slots' => [
                     [
-                        'document_type' => 'ITR / Tax Exemption',
+                        'document_type' => 'Income Tax Return / Certificate of Non-Filing',
                         'label' => 'Income Tax Return',
-                        'smallNote' => 'Or Certificate of Tax Exemption',
+                        'smallNote' => 'Or Certificate of Non-Filing',
                         'optional' => false,
                     ],
                     [
-                        'document_type' => 'Barangay Indigency',
-                        'label' => 'Barangay Indigency',
+                        'document_type' => 'Barangay Certificate of Indigency',
+                        'label' => 'Barangay Certificate of Indigency',
                         'smallNote' => null,
                         'optional' => false,
                     ],
                     [
-                        'document_type' => 'Utility Bill',
-                        'label' => 'Utility Bill',
-                        'smallNote' => 'Recent within 3 months',
+                        'document_type' => 'Certificate of Good Moral Character',
+                        'label' => 'Certificate of Good Moral Character',
+                        'smallNote' => 'From school/organization',
+                        'optional' => true,
+                    ]
+                ]
+            ],
+            [
+                'groupTitle' => 'Supporting Documents',
+                'slots' => [
+                    [
+                        'document_type' => 'Affidavit of Financial Need',
+                        'label' => 'Affidavit of Financial Need',
+                        'smallNote' => null,
+                        'optional' => true,
+                    ],
+                    [
+                        'document_type' => 'Letter of Recommendation',
+                        'label' => 'Letter of Recommendation',
+                        'smallNote' => 'From teacher/mentor',
+                        'optional' => true,
+                    ],
+                    [
+                        'document_type' => 'PSA Birth Certificate',
+                        'label' => 'PSA Birth Certificate',
+                        'smallNote' => 'Original or certified copy',
                         'optional' => true,
                     ]
                 ]
@@ -180,7 +203,7 @@ class ApplicationController extends Controller
 
         $endorsementSlot = [
             'groupTitle' => 'Endorsement',
-            'document_type' => 'Endorsement Letter',
+            'document_type' => 'Letter of Recommendation',
             'label' => 'Endorsement Letter',
             'smallNote' => 'From Dean or Guidance Counselor',
             'optional' => false,
