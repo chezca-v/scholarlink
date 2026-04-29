@@ -225,16 +225,18 @@ class ApplicationController extends Controller
         }
 
         // Update or create applicant profile
+        $profileData = $request->only([
+            'date_of_birth', 'sex', 'home_address', 'city', 'province', 'zip_code',
+            'mobile_number', 'university_name', 'university_email', 'course_program',
+            'student_number', 'year_level', 'semester', 'academic_year', 'gwa',
+            'gwa_scale', 'monthly_household_income', 'num_dependents', 'is_breadwinner',
+            'is_4ps', 'father_employment_status', 'mother_employment_status'
+        ]);
+        $profileData['profile_completed_at'] = now(); // Mark as completed
+
         ApplicantProfile::updateOrCreate(
             ['user_id' => auth()->id()],
-            $request->only([
-                'date_of_birth', 'sex', 'home_address', 'city', 'province', 'zip_code',
-                'mobile_number', 'university_name', 'university_email', 'course_program',
-                'student_number', 'year_level', 'semester', 'academic_year', 'gwa',
-                'gwa_scale', 'monthly_household_income', 'num_dependents', 'is_breadwinner',
-                'is_4ps', 'father_employment_status', 'mother_employment_status',
-                'profile_completed_at' => now(), // Mark as completed
-            ])
+            $profileData
         );
 
         // Create the application
@@ -242,7 +244,7 @@ class ApplicationController extends Controller
             'reference_code' => 'APP-' . Str::upper(Str::random(8)), // Generate unique code
             'applicant_id' => auth()->id(),
             'scholarship_id' => $request->scholarship_id,
-            'status' => 'pending', // Default status
+            'status' => 'submitted', // Changed from 'pending' to 'submitted'
             'stage' => 'submitted',
             'submitted_at' => now(),
         ]);
@@ -261,14 +263,14 @@ class ApplicationController extends Controller
             if ($file) {
                 $filePath = $file->store('documents/user_' . auth()->id(), 'public');
                 $docTypeStr = $docTypes[$slug] ?? 'Other';
-                
+
                 $doc = \App\Models\Document::create([
                     'user_id' => auth()->id(),
                     'document_type' => $docTypeStr,
                     'file_url' => $filePath,
                     'status' => 'pending',
                 ]);
-                
+
                 \App\Models\ApplicationDocument::create([
                     'application_id' => $application->id,
                     'document_id' => $doc->id,

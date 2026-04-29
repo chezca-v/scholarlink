@@ -344,18 +344,32 @@
     overflow:       hidden;
     background:     var(--mp-teal-xlight);
 }
+.mp-content-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 24px;
+    padding: 28px;
+    align-items: start;
+}
+@media (max-width: 992px) {
+    .mp-content-grid { grid-template-columns: 1fr; }
+}
 
 /* ════════════════════════════════════════════
    04 — HERO BANNER
 ════════════════════════════════════════════ */
 .mp-hero {
     background:      var(--mp-teal-hero);
-    padding:         28px 32px 28px;
+    padding:         36px 24px;
+    border-radius:   var(--mp-radius-lg);
     display:         flex;
+    flex-direction:  column;
     align-items:     center;
-    gap:             20px;
+    text-align:      center;
+    gap:             16px;
     position:        relative;
     overflow:        hidden;
+    box-shadow:      var(--mp-shadow-md);
 }
 
 /* Subtle decorative circles */
@@ -388,7 +402,7 @@
 }
 .mp-hero__avatar img { width:100%; height:100%; object-fit:cover; }
 
-.mp-hero__info { flex: 1; }
+.mp-hero__info { flex: none; width: 100%; }
 .mp-hero__name {
     font-family:  var(--mp-font-display);
     font-size:    28px;
@@ -407,13 +421,16 @@
     color:      rgba(255,255,255,.55);
     display:    flex;
     align-items:center;
+    justify-content:center;
     gap:        5px;
 }
 
 .mp-hero__edit-btn {
     display:        flex;
     align-items:    center;
+    justify-content:center;
     gap:            6px;
+    width:          100%;
     padding:        9px 18px;
     border-radius:  var(--mp-radius-md);
     border:         1.5px solid rgba(255,255,255,.35);
@@ -711,8 +728,7 @@
             </aside>
 
             {{-- MAIN CONTENT --}}
-            <main class="mp-main">
-
+            <main class="mp-main" style="padding: 28px; display: flex; flex-direction: column; gap: 24px;">
                 {{-- 04 — HERO BANNER --}}
                 <div class="mp-hero">
                     <div class="mp-hero__avatar">
@@ -726,7 +742,8 @@
                     <div class="mp-hero__info">
                         <div class="mp-hero__name">{{ $applicantUser?->name ?? 'Applicant' }}</div>
                         <div class="mp-hero__sub">
-                            {{ $applicantProfile?->program ?? 'Unknown Program' }} · {{ $applicantProfile?->school ?? 'Unknown School' }}
+                            {{ $applicantProfile?->program ?? 'Unknown Program' }}<br>
+                            {{ $applicantProfile?->school ?? 'Unknown School' }}
                         </div>
                         <div class="mp-hero__updated">
                             📅 Last updated {{ $applicantProfile?->updated_at?->format('M d, Y') ?? now()->format('M d, Y') }}
@@ -739,43 +756,40 @@
                     </button>
                 </div>
 
-                <div class="mp-section">
-
-                    {{-- 05 — PROFILE COMPLETION --}}
-                    <div class="mp-completion">
-                        @php
-                            $profileFields = [
-                                $applicantProfile?->date_of_birth,
-                                $applicantProfile?->phone_number,
-                                $applicantProfile?->address,
-                                $applicantProfile?->school,
-                                $applicantProfile?->program,
-                                $applicantProfile?->year_level,
-                                $applicantProfile?->gpa,
-                            ];
-                            $completedFields = count(array_filter($profileFields, fn($f) => !is_null($f)));
-                            $totalFields = count($profileFields);
-                            $percent = $totalFields > 0 ? round(($completedFields / $totalFields) * 100) : 0;
-                            $incompleteCount = $totalFields - $completedFields;
-                        @endphp
-                        <div class="mp-completion__header">
-                            <span class="mp-completion__label">Profile Completion</span>
-                            <div class="mp-completion__right">
-                                <span class="mp-completion__pct">{{ $percent }}%</span>
-                                <span class="mp-completion__note">
-                                    {{ $incompleteCount }} sections<br>incomplete
-                                </span>
-                            </div>
-                        </div>
-                        <div class="mp-completion__bar">
-                            <div class="mp-completion__fill"
-                                 style="width:{{ $percent }}%">
-                            </div>
+                {{-- 05 — PROFILE COMPLETION --}}
+                <div class="mp-completion">
+                    @php
+                        $profileFields = [
+                            $applicantProfile?->date_of_birth,
+                            $applicantProfile?->phone_number,
+                            $applicantProfile?->address,
+                            $applicantProfile?->school,
+                            $applicantProfile?->program,
+                            $applicantProfile?->year_level,
+                            $applicantProfile?->gpa,
+                        ];
+                        $completedFields = count(array_filter($profileFields, fn($f) => !is_null($f)));
+                        $totalFields = count($profileFields);
+                        $percent = $totalFields > 0 ? round(($completedFields / $totalFields) * 100) : 0;
+                        $incompleteCount = $totalFields - $completedFields;
+                    @endphp
+                    <div class="mp-completion__header">
+                        <span class="mp-completion__label">Profile Completion</span>
+                        <div class="mp-completion__right">
+                            <span class="mp-completion__pct">{{ $percent }}%</span>
+                            <span class="mp-completion__note">
+                                {{ $incompleteCount }} sections<br>incomplete
+                            </span>
                         </div>
                     </div>
-
-                    {{-- 06 — PERSONAL INFORMATION --}}
-                    <div class="mp-info-card" style="margin-top:16px; --i:1">
+                    <div class="mp-completion__bar">
+                        <div class="mp-completion__fill"
+                             style="width:{{ $percent }}%">
+                        </div>
+                    </div>
+                </div>
+                        {{-- 06 — PERSONAL INFORMATION --}}
+                        <div class="mp-info-card" style="--i:1">
                         <div class="mp-info-card__header">
                             <span class="mp-info-card__title">Personal Information</span>
                             <button class="mp-info-card__edit"
@@ -894,7 +908,7 @@
                         </div>
                     </div>
 
-                </div>{{-- /mp-section --}}
+
             </main>
         </div>{{-- /mp-body --}}
     </div>{{-- /mp-shell --}}

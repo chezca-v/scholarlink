@@ -56,16 +56,21 @@ class AiController extends Controller
             $user    = $request->user();
             $profile = $user->applicantProfile;
 
+            $course = $profile->course ?? 'not set';
+            $uni = $profile->university_name ?? 'not set';
+            $gpa = $profile->gpa ?? 'not set';
+            $income = $profile->income_bracket ?? 'not set';
+
             $prompt = "
                 You are Scholar, a friendly AI scholarship assistant for ScholarLink —
                 a Philippine scholarship platform. Keep answers concise (2-4 sentences max).
 
                 Student context:
                 - Name: {$user->first_name}
-                - Course: {$profile->course ?? 'not set'}
-                - University: {$profile->university_name ?? 'not set'}
-                - GPA: {$profile->gpa ?? 'not set'}
-                - Income bracket: {$profile->income_bracket ?? 'not set'}
+                - Course: {$course}
+                - University: {$uni}
+                - GPA: {$gpa}
+                - Income bracket: {$income}
 
                 User message: {$request->message}
 

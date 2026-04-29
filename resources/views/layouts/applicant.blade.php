@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'ScholarLink — Applicant Portal')</title>
+    <meta name="auth-check" content="authenticated">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -242,41 +243,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .section{margin-bottom:24px;}
 </style>
 
-<button class="fab-ai" title="AI Assistant">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <span class="fab-badge">AI</span>
-</button>
 
-<style>
-.fab-ai{
-  position:fixed;
-  bottom:24px;right:24px;
-  width:54px;height:54px;
-  border-radius:50%;
-  background:linear-gradient(160deg,#0F4C5C,#2A8FA0);
-  border:none;
-  color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  box-shadow:0 6px 24px rgba(15,76,92,0.35);
-  z-index:400;
-  transition:transform .2s ease, box-shadow .2s ease;
-  position:fixed;
-}
-.fab-ai:hover{transform:scale(1.08);box-shadow:0 10px 32px rgba(15,76,92,0.45);}
-.fab-badge{
-  position:absolute;
-  top:2px;right:2px;
-  background:var(--amber);
-  color:#fff;
-  font-family:'DM Sans',sans-serif;
-  font-size:9px;font-weight:800;
-  border-radius:20px;
-  padding:2px 5px;
-  border:2px solid #fff;
-  line-height:1;
-}
-</style>
 
     @stack('styles')
 </head>
@@ -292,18 +259,16 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     <input type="text" name="q" placeholder="Search scholarships, requirements…">
   </form>
   <div class="nav-right">
-    <button class="nav-ibtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-    </button>
-    <a class="nav-ibtn" href="{{ route('notifications.index') }}">      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        @if(\App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->exists())
-            <span class="nbadge"></span>
-        @endif
+    <a href="{{ route('notifications.index') }}" class="nav-ibtn" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      @php $navUnread = App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
+      @if($navUnread > 0)
+        <span style="position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--accent);border-radius:99px;border:2px solid var(--primary);"></span>
+      @endif
     </a>
-    <form method="POST" action="{{ route('logout') }}" style="margin:0;">
-      @csrf
-      <button type="submit" class="nav-logout" title="Log Out">Log Out</button>
-    </form>
     <a href="{{ route('profile.show') }}" class="nav-av" title="My Profile">{{ strtoupper(substr(auth()->user()->first_name ?? 'U', 0, 1) . substr(auth()->user()->last_name ?? '', 0, 1)) }}</a>
   </div>
 </nav>
@@ -360,18 +325,14 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     </a>
 
     <div class="sb-spacer"></div>
-    <a href="#" onclick="event.preventDefault(); document.getElementById('sidebar-logout-form').submit();" class="sb-nav-item text-red-600" style="color:#e53e3e;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <button onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'confirm-logout' }))" class="sb-nav-item text-red-600" style="color:#e53e3e; width: 100%; text-align: left; background: none; border: none; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 10px; vertical-align: middle;">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
             <line x1="21" y1="12" x2="9" y2="12"></line>
         </svg>
-        Log Out
-    </a>
-
-    <form method="POST" action="{{ route('logout') }}" id="sidebar-logout-form" style="display:none;">
-        @csrf
-    </form>
+        <span style="vertical-align: middle;">Log Out</span>
+    </button>
   </aside>
 
   <main class="main">
@@ -486,6 +447,129 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 </script>
 
 
-@stack('scripts')
+
+
+<!-- Browser History Management -->
+<script>
+// Handle browser back button - maintain auth state
+window.addEventListener('popstate', function() {
+    const isAuthenticated = !!document.querySelector('meta[name="auth-check"]');
+    const currentUrl = window.location.pathname;
+
+    // If trying to go back to landing/login pages while authenticated, redirect to dashboard
+    if (isAuthenticated && (currentUrl === '/' || currentUrl === '/login' || currentUrl === '/register')) {
+        window.location.href = '{{ route("dashboard") }}';
+    }
+});
+
+// Prevent browser back to unauthorized pages
+window.addEventListener('beforeunload', function() {
+    const isAuthenticated = !!document.querySelector('meta[name="auth-check"]');
+    sessionStorage.setItem('lastAuthState', isAuthenticated ? 'authenticated' : 'guest');
+});
+
+// Check auth state on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const currentUrl = window.location.pathname;
+    const lastAuthState = sessionStorage.getItem('lastAuthState');
+    const isCurrentlyAuthenticated = !!document.querySelector('meta[name="auth-check"]');
+
+    // If user was authenticated but is now on login page, redirect to dashboard
+    if (lastAuthState === 'authenticated' && isCurrentlyAuthenticated && (currentUrl === '/' || currentUrl === '/login')) {
+        window.location.href = '{{ route("dashboard") }}';
+    }
+});
+</script>
+
+<style>
+/* Custom Modal CSS */
+.modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+.modal-backdrop.show {
+    display: flex;
+    opacity: 1;
+}
+.modal-content {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 380px;
+    padding: 24px;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    margin: 0 16px;
+}
+.modal-backdrop.show .modal-content {
+    transform: translateY(0);
+}
+.modal-icon {
+    width: 48px; height: 48px; border-radius: 50%; background: #fee2e2; color: #dc2626;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;
+}
+.modal-title { font-size: 18px; font-weight: 600; color: #111827; text-align: center; margin-bottom: 8px; font-family: 'DM Sans', sans-serif;}
+.modal-text { font-size: 14px; color: #6b7280; text-align: center; margin-bottom: 24px; font-family: 'DM Sans', sans-serif; line-height: 1.5;}
+.modal-actions { display: flex; gap: 12px; justify-content: center; }
+.modal-btn { flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.modal-btn-cancel { background: #fff; border-color: #d1d5db; color: #374151; }
+.modal-btn-cancel:hover { background: #f9fafb; }
+.modal-btn-logout { background: #dc2626; color: #fff; width: 100%; }
+.modal-btn-logout:hover { background: #b91c1c; }
+</style>
+
+<!-- Logout Confirmation Modal -->
+<div x-data="{ open: false }" 
+     @open-modal.window="if ($event.detail === 'confirm-logout') open = true;"
+     @keydown.escape.window="open = false"
+     x-show="open" 
+     style="display: none;" 
+     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+     x-transition.opacity>
+    
+    <div @click.away="open = false" 
+         class="bg-white rounded-[20px] w-full max-w-[400px] p-8 shadow-2xl relative text-center"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+        
+        <div class="mx-auto w-12 h-12 bg-[#FEF2F2] rounded-full flex items-center justify-center mb-5 border border-[#FECACA]">
+            <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+        </div>
+        <h3 class="font-display font-bold text-[22px] text-[#111827] mb-2">Ready to leave?</h3>
+        <p class="text-[13px] text-slate-500 mb-6">Select "Log Out" below if you are ready to end your current session.</p>
+        
+        <div class="flex items-center justify-center gap-3">
+            <button @click="open = false" type="button" class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-colors border border-slate-200 bg-white min-w-[120px]">
+                Cancel
+            </button>
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
+                @csrf
+                <button type="submit" class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-[#DC2626] hover:bg-[#b91c1c] shadow-md transition-colors border border-[#DC2626] min-w-[120px]">
+                    Log Out
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<x-chatbot-widget />
+    @include('components.toast-notification')
+    @include('components.modals.session-timeout')
+    @stack('scripts')
 </body>
 </html>

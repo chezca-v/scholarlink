@@ -67,7 +67,6 @@ class DocumentController extends Controller
             'used_in'       => (int) $documents->sum('used_in_count'),
         ];
         return view('applicant.documents.index', [
-            'documents'     => $documents,
             'documents'          => $documents,
             'documentTypes'      => $documentTypes,
             'totalDocumentTypes' => count(self::DOCUMENT_TYPES),

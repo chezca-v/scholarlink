@@ -285,14 +285,14 @@
     --cw-text-light:  #7a9a96;
     --cw-chip-bg:     #eef3f2;
     --cw-chip-border: #cddedd;
-    --cw-shadow:      0 8px 32px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.10);
+    --cw-shadow:      0 4px 12px rgba(0,0,0,.08);
     --cw-radius-pill: 9999px;
     --cw-radius-lg:   16px;
     --cw-radius-md:   10px;
     --cw-fab-size:    56px;      /* spec: 56×56px */
     --cw-fab-bottom:  28px;      /* spec: bottom 28px */
     --cw-fab-right:   28px;      /* spec: right 28px */
-    --cw-z:           300;       /* spec: z-index 300 */
+    --cw-z:           9999;      /* spec: z-index 9999 */
     --cw-transition:  .28s cubic-bezier(.4,0,.2,1);
 }
 
@@ -901,18 +901,9 @@
         },
 
         /**
-         * _simulateBotResponse — internal demo helper.
-         * Replace this with a real fetch() / Axios call to your API endpoint.
-         *
-         * Example real usage:
-         *   ChatWidget.showTyping();
-         *   fetch('/api/chat', { method:'POST', body: JSON.stringify({message: text}) })
-         *     .then(r => r.json())
-         *     .then(d => { ChatWidget.hideTyping(); appendMessage(d.reply, 'bot'); });
+         * _fetchBotResponse — sends message to Gemini via Laravel backend
+         * @param {string} text — the user's message
          */
-        * _fetchBotResponse — sends message to Gemini via Laravel backend
-        * @param {string} text — the user's message
-        */
         _fetchBotResponse(text) {
             setSending(true);
             this.showTyping();
@@ -944,17 +935,5 @@
                 setSending(false);
                 input()?.focus();
             });
+        },
     };
-
-    // ── Init — show pulse on first load if no unread ─────────────────────
-    document.addEventListener('DOMContentLoaded', () => {
-        if (state.unread === 0) {
-            // Brief pulse on first load per spec
-            fab()?.classList.add('chat-fab--pulse');
-            setTimeout(() => fab()?.classList.remove('chat-fab--pulse'), 6000);
-        }
-    });
-
-})();
-</script>
-@endpush

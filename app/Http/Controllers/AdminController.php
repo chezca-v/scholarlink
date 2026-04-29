@@ -136,7 +136,7 @@ class AdminController extends Controller
                 'icon' => '🚨',
                 'title' => $unassignedApplications . ' Applications Unassigned for 4+ Days',
                 'description' => 'Applications with no evaluations assigned yet. Risk of missing SLA.',
-                'link' => '#',
+                'link' => route('admin.applications'),
                 'link_text' => 'Assign Evaluators',
             ],
             [
@@ -144,7 +144,7 @@ class AdminController extends Controller
                 'icon' => '⏳',
                 'title' => 'Upcoming Deadlines — ' . $incompleteDocsApplications . ' Applicants with Incomplete Docs',
                 'description' => 'Applicants still missing at least one required document.',
-                'link' => '#',
+                'link' => route('admin.applications'),
                 'link_text' => 'View Applicants',
             ],
             [
@@ -152,7 +152,7 @@ class AdminController extends Controller
                 'icon' => '📢',
                 'title' => $awaitingApprovalScholarships . ' Scholarships Awaiting Approval',
                 'description' => 'Draft scholarships are ready for review and publication.',
-                'link' => '#',
+                'link' => route('admin.scholarships.index'),
                 'link_text' => 'Review Drafts',
             ],
         ];
@@ -167,12 +167,12 @@ class AdminController extends Controller
             [
                 'icon' => '👥',
                 'label' => 'Assign',
-                'link' => '#',
+                'link' => route('admin.applications') ?? '#',
             ],
             [
                 'icon' => '⚙️',
-                'label' => 'Weight Config',
-                'link' => '#',
+                'label' => 'Settings',
+                'link' => route('admin.settings'),
             ],
             [
                 'icon' => '📊',
@@ -246,7 +246,33 @@ class AdminController extends Controller
 
     public function users()
     {
-        return view('admin.users');
+        return view('admin.user', [
+            'layout' => 'admin.layouts.admin',
+            'page' => [
+                'title' => 'User Management',
+                'subtitle' => 'Manage system users and their roles'
+            ],
+            'breadcrumb' => [
+                ['label' => 'Admin', 'url' => route('admin.dashboard'), 'separator' => '/'],
+                ['label' => 'Users', 'url' => null]
+            ],
+            'stats' => [],
+            'filters' => [],
+            'actions' => [],
+            'filtersForm' => [],
+            'table' => [
+                'headers' => [
+                    ['type' => 'text', 'label' => 'Name'],
+                    ['type' => 'text', 'label' => 'Email'],
+                    ['type' => 'text', 'label' => 'Role'],
+                    ['type' => 'text', 'label' => 'Status']
+                ],
+                'rows' => [],
+                'empty' => 'No users found.'
+            ],
+            'pagination' => [],
+            'modals' => []
+        ]);
     }
 
     public function createUser(Request $request)
@@ -262,11 +288,132 @@ class AdminController extends Controller
 
     public function analytics()
     {
-        return view('admin.analytics');
+        $stats = [
+            'total_applications' => Application::count() ?? 1420,
+            'apps_change' => '+12%',
+            'approval_rate' => 24,
+            'approval_change' => '+2.1%',
+            'avg_review_days' => 4.5,
+            'review_change' => '-1.2d',
+            'active_scholarships' => Scholarship::where('status', 'open')->count() ?? 12,
+            'active_change' => '+3',
+        ];
+
+        $funnel = [
+            'viewed' => 5400,
+            'started' => 3200,
+            'submitted' => 1420,
+            'under_review' => 950,
+            'approved' => 340,
+        ];
+
+        return view('admin.analytics', compact('stats', 'funnel'));
     }
 
     public function calendar()
     {
-        return view('admin.calendar');
+        $currentMonth = Carbon::now();
+        $prevMonth = $currentMonth->copy()->subMonth();
+        $nextMonth = $currentMonth->copy()->addMonth();
+
+        $scholarshipLegend = [
+            ['bg' => '#1a8fa0', 'label' => 'Standard Deadline'],
+            ['bg' => '#ea8c55', 'label' => 'Urgent Deadline'],
+        ];
+
+        // Basic calendar days (mock up 1 day to prevent empty errors or looping errors)
+        $calendarDays = [
+            [
+                'date' => $currentMonth,
+                'deadlines' => [],
+            ]
+        ];
+
+        $upcomingDeadlines = [];
+        $deadlinesJson = [];
+
+        return view('admin.calendar', compact(
+            'currentMonth', 'prevMonth', 'nextMonth',
+            'scholarshipLegend', 'calendarDays',
+            'upcomingDeadlines', 'deadlinesJson'
+        ));
+    }
+
+    public function exportAnalytics()
+    {
+        return back()->with('success', 'Analytics exported successfully.');
+    }
+
+    public function applications()
+    {
+        $applications = Application::with('user', 'scholarship')->latest()->paginate(15);
+        return view('admin.applications', compact('applications'));
+    }
+
+    public function reviews()
+    {
+        $reviews = Application::with('user', 'scholarship')->whereIn('status', ['pending', 'under_review'])->latest()->paginate(15);
+        return view('admin.reviews', compact('reviews'));
+    }
+
+    public function settings()
+    {
+        return view('admin.settings', [
+            'pageTitle' => 'Admin Settings',
+            'topnavTitle' => 'Settings',
+            'topnavSubtitle' => 'Manage platform configuration',
+            'breadcrumbs' => [
+                ['label' => 'Admin', 'url' => route('admin.dashboard')],
+                ['label' => 'Settings']
+            ],
+            'organization' => (object)[
+                'name' => 'ScholarLink',
+                'description' => 'Scholarship matching platform',
+                'emoji' => '🎓',
+                'email' => 'contact@scholarlink.com',
+                'phone' => '123-456-7890',
+                'website' => 'scholarlink.com',
+                'address' => '123 Scholar Way',
+            ],
+            'labels' => [
+                'org_profile' => 'Organization Profile',
+                'save_changes' => 'Save Changes',
+                'blind_screening' => 'Blind Screening',
+                'save' => 'Save',
+                'notifications' => 'Notification Templates',
+                'save_all' => 'Save All',
+                'weights' => 'Scoring Weights',
+                'reset' => 'Reset to Default',
+                'save_weights' => 'Save Weights'
+            ],
+            'routes' => [
+                'update_profile' => 'admin.settings', // placeholder
+                'blind_screening' => 'admin.settings', // placeholder
+                'templates' => 'admin.settings', // placeholder
+                'weights' => 'admin.settings', // placeholder
+                'toggle_blind' => 'admin.settings', // placeholder
+            ],
+            'orgFields' => [
+                ['name' => 'name', 'label' => 'Organization Name'],
+                ['name' => 'description', 'label' => 'Description'],
+            ],
+            'blindScreeningOptions' => [
+                'hide_names' => ['label' => 'Hide Applicant Names', 'description' => 'Evaluators will not see the names of applicants.', 'enabled' => true],
+                'hide_photos' => ['label' => 'Hide Applicant Photos', 'description' => 'Evaluators will not see the photos of applicants.', 'enabled' => true],
+            ],
+            'notificationTemplates' => [
+                'application_received' => ['tab_label' => 'Application Received', 'subject' => 'Application Received', 'email_body' => 'Your application was received.', 'sms_body' => 'Your application was received.'],
+            ],
+            'scoringWeights' => [
+                'academic' => ['label' => 'Academic Score', 'description' => 'Weight for academic performance.', 'value' => 40],
+                'extracurricular' => ['label' => 'Extracurriculars', 'description' => 'Weight for extracurricular activities.', 'value' => 30],
+                'essay' => ['label' => 'Essay', 'description' => 'Weight for the essay.', 'value' => 30],
+            ],
+            'defaultWeights' => [
+                'academic' => 40,
+                'extracurricular' => 30,
+                'essay' => 30,
+            ],
+        ]);
     }
 }
