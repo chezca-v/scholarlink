@@ -227,8 +227,9 @@
     </main>
 </div>
 
-@stack('scripts')
+<x-chatbot-widget />
     @include('components.toast-notification')
     @include('components.modals.session-timeout')
+@stack('scripts')
 </body>
 </html>

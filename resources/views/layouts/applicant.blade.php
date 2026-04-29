@@ -243,41 +243,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .section{margin-bottom:24px;}
 </style>
 
-<button class="fab-ai" title="AI Assistant">
-  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-  <span class="fab-badge">AI</span>
-</button>
 
-<style>
-.fab-ai{
-  position:fixed;
-  bottom:24px;right:24px;
-  width:54px;height:54px;
-  border-radius:50%;
-  background:linear-gradient(160deg,#0F4C5C,#2A8FA0);
-  border:none;
-  color:#fff;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;
-  box-shadow:0 6px 24px rgba(15,76,92,0.35);
-  z-index:400;
-  transition:transform .2s ease, box-shadow .2s ease;
-  position:fixed;
-}
-.fab-ai:hover{transform:scale(1.08);box-shadow:0 10px 32px rgba(15,76,92,0.45);}
-.fab-badge{
-  position:absolute;
-  top:2px;right:2px;
-  background:var(--amber);
-  color:#fff;
-  font-family:'DM Sans',sans-serif;
-  font-size:9px;font-weight:800;
-  border-radius:20px;
-  padding:2px 5px;
-  border:2px solid #fff;
-  line-height:1;
-}
-</style>
 
     @stack('styles')
 </head>
@@ -359,7 +325,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     </a>
 
     <div class="sb-spacer"></div>
-    <button onclick="document.querySelector('[x-data]')?.__x?.$dispatch('openModal', 'confirm-logout');" class="sb-nav-item text-red-600" style="color:#e53e3e; width: 100%; text-align: left; background: none; border: none; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer;">
+    <button onclick="window.dispatchEvent(new CustomEvent('open-modal', { detail: 'confirm-logout' }))" class="sb-nav-item text-red-600" style="color:#e53e3e; width: 100%; text-align: left; background: none; border: none; padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 10px; vertical-align: middle;">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
             <polyline points="16 17 21 12 16 7"></polyline>
@@ -562,29 +528,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- Logout Confirmation Modal -->
 <div x-data="{ open: false }" 
-     @open-modal.window="if ($event.detail === 'confirm-logout') { open = true; setTimeout(() => $el.classList.add('show'), 10); }"
-     @keydown.escape.window="open = false; $el.classList.remove('show')"
+     @open-modal.window="if ($event.detail === 'confirm-logout') open = true;"
+     @keydown.escape.window="open = false"
      x-show="open" 
      style="display: none;" 
-     class="modal-backdrop"
-     :class="{ 'show': open }">
+     class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4"
+     x-transition.opacity>
     
-    <div @click.away="open = false; $el.closest('.modal-backdrop').classList.remove('show')" class="modal-content">
-        <div class="modal-icon">
-            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+    <div @click.away="open = false" 
+         class="bg-white rounded-[20px] w-full max-w-[400px] p-8 shadow-2xl relative text-center"
+         x-show="open"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
+        
+        <div class="mx-auto w-12 h-12 bg-[#FEF2F2] rounded-full flex items-center justify-center mb-5 border border-[#FECACA]">
+            <svg class="w-6 h-6 text-[#DC2626]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
             </svg>
         </div>
-        <h3 class="modal-title">Ready to leave?</h3>
-        <p class="modal-text">Select "Log Out" below if you are ready to end your current session.</p>
+        <h3 class="font-display font-bold text-[22px] text-[#111827] mb-2">Ready to leave?</h3>
+        <p class="text-[13px] text-slate-500 mb-6">Select "Log Out" below if you are ready to end your current session.</p>
         
-        <div class="modal-actions">
-            <button @click="open = false; $el.closest('.modal-backdrop').classList.remove('show')" type="button" class="modal-btn modal-btn-cancel">
+        <div class="flex items-center justify-center gap-3">
+            <button @click="open = false" type="button" class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-slate-600 hover:bg-slate-100 hover:text-slate-800 transition-colors border border-slate-200 bg-white min-w-[120px]">
                 Cancel
             </button>
-            <form method="POST" action="{{ route('logout') }}" style="margin: 0; flex: 1;">
+            <form method="POST" action="{{ route('logout') }}" style="margin: 0;">
                 @csrf
-                <button type="submit" class="modal-btn modal-btn-logout">
+                <button type="submit" class="px-5 py-2.5 rounded-xl text-[13px] font-semibold text-white bg-[#DC2626] hover:bg-[#b91c1c] shadow-md transition-colors border border-[#DC2626] min-w-[120px]">
                     Log Out
                 </button>
             </form>
@@ -592,9 +567,9 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </div>
 
-@stack('scripts')
 <x-chatbot-widget />
     @include('components.toast-notification')
     @include('components.modals.session-timeout')
+    @stack('scripts')
 </body>
 </html>

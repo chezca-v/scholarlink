@@ -8,7 +8,7 @@ use App\Models\Organization;
 use App\Models\User;
 use App\Models\ActivityLog;
 
-class SuperadminController extends Controller
+class EvaluatorController extends Controller
 {
     // -------------------------------------------------------------------------
     // DASHBOARD
