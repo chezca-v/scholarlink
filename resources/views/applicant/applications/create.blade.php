@@ -241,7 +241,7 @@
                 <div>
                   Annual family income
                   <span class="req-sub">
-                    Limit: {{ $scholarship->income_bracket }} — 
+                    Limit: {{ $scholarship->income_bracket }} —
                     @if($profile->monthly_household_income !== null)
                       Your income: ₱{{ number_format($profile->monthly_household_income * 12) }}/yr — {{ $inc['pass'] ? 'qualifies' : 'does not qualify' }}
                     @else
@@ -579,6 +579,7 @@
     </form>
 </div>
 @endsection
+@include('applicant.applications.partials.conflict-alert-modal')
 
 @push('scripts')
 <script>
@@ -659,7 +660,7 @@ function goTo(step) {
     const missingBlock = document.getElementById('missing-requirements-block');
     missingList.innerHTML = '';
     let missingCount = 0;
-    
+
     const reqItems = document.querySelectorAll('#panel-1 .req-item');
     reqItems.forEach(item => {
       const check = item.querySelector('.req-check');
@@ -681,7 +682,7 @@ function goTo(step) {
         }
       }
     });
-    
+
     if (missingCount > 0) {
       missingBlock.style.display = 'block';
     } else {
@@ -693,21 +694,21 @@ function goTo(step) {
 function guardSubmit() {
   const cb  = document.getElementById('certify');
   const lbl = document.getElementById('certify-label');
-  
+
   // Check required documents
   const requiredSlugs = [
     'proof-of-enrollment', 'report-card-transcript', 'valid-id',
     'itr-tax-exemption', 'barangay-indigency', 'endorsement-letter'
   ];
   let missing = false;
-  
+
   requiredSlugs.forEach(slug => {
     const fileInput = document.querySelector(`input[type="file"][data-slug="${slug}"]`);
     const radios = document.querySelectorAll(`input[type="radio"][name="documents[${slug}]"]`);
-    
+
     let hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
     let hasRadio = Array.from(radios).some(r => r.checked);
-    
+
     if (!hasFile && !hasRadio) {
       missing = true;
       const el = document.getElementById('confirm-val-' + slug);
@@ -738,7 +739,7 @@ function toggleCheck(el) {
     check.classList.remove('warn');
     check.classList.add('ok');
     check.innerHTML = '✓';
-    
+
     // Attempt to update the Eligibility results table as visual feedback
     const labelText = el.querySelector('div:nth-child(2)').innerText.split('\n')[0].trim();
     updateEligibilityRow(labelText, true);
@@ -746,7 +747,7 @@ function toggleCheck(el) {
     check.classList.add('warn');
     check.classList.remove('ok');
     check.innerHTML = '';
-    
+
     const labelText = el.querySelector('div:nth-child(2)').innerText.split('\n')[0].trim();
     updateEligibilityRow(labelText, false);
   }
@@ -757,13 +758,13 @@ function updateEligibilityRow(label, isOk) {
   rows.forEach(row => {
     const key = row.querySelector('.elig-key').innerText.trim().toLowerCase();
     const lbl = label.toLowerCase();
-    
+
     let match = false;
     if (lbl.includes('gpa') && key.includes('gpa')) match = true;
     if (lbl.includes('income') && key.includes('income')) match = true;
     if (lbl.includes('scholarship') && key.includes('concurrent')) match = true;
     if (lbl.includes('enrolled') && key.includes('enrolled')) match = true;
-    
+
     if (match) {
       const badge = row.querySelector('.badge');
       if (isOk) {
