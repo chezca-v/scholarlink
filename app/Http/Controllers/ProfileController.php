@@ -152,8 +152,15 @@ class ProfileController extends Controller
 
         ApplicantProfile::updateOrCreate(
             ['user_id' => $request->user()->id],
-            $validated
-        );
+            array_merge([
+                'university_name' => '',
+                'university_address' => '',
+                'course_program' => '',
+                'student_number' => '',
+                'year_level' => '',
+                'semester' => '',
+                'academic_year' => '',
+            ], $validated)             );
 
         return redirect()->route('profile.setup', ['step' => 2]);
     }

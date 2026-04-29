@@ -9,7 +9,7 @@
             <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             Scholarships
         </a>
-        <span style="color:var(--muted);">/</span>
+        <span style="color:var(--slate);font-size:13px;display:flex;align-items:center;gap:4px;">/</span>
         <span style="font-size:13px;color:var(--ink);">Create New</span>
     </div>
     <h1 class="font-display font-bold text-2xl" style="color:var(--ink);">Create Scholarship</h1>
@@ -39,7 +39,7 @@
         <div class="grid grid-cols-3 gap-6">
             {{-- LEFT COLUMN: Main details --}}
             <div class="col-span-2 space-y-6">
-                
+
                 {{-- Basic Info Card --}}
                 <div class="card p-6">
                     <h2 class="font-display font-bold text-lg mb-5 border-b border-[var(--border)] pb-3" style="color:var(--ink);">Basic Information</h2>
@@ -83,7 +83,7 @@
                                 <input type="url" id="website" name="website" class="input-field" placeholder="https://..." value="{{ old('website') }}">
                             </div>
                         </div>
-                        
+
                         <div>
                             <label class="input-label" for="address">Address</label>
                             <input type="text" id="address" name="address" class="input-field" placeholder="e.g. Manila, NCR or Nationwide" value="{{ old('address') }}">
@@ -95,7 +95,7 @@
                 <div class="card p-6">
                     <h2 class="font-display font-bold text-lg mb-5 border-b border-[var(--border)] pb-3" style="color:var(--ink);">Details & Requirements</h2>
                     <div class="space-y-6">
-                        
+
                         {{-- Eligibility --}}
                         <div>
                             <label class="input-label">Eligibility Criteria <span style="color:#DC2626;">*</span></label>
@@ -171,11 +171,11 @@
                                         <option value="shs">SHS (100 Point)</option>
                                     </select>
                                 </div>
-                                <input type="number" id="gpa_requirement" name="gpa_requirement" class="input-field" 
-                                    :placeholder="gpaScale === 'college' ? 'e.g. 1.5' : 'e.g. 85'" 
-                                    :min="gpaScale === 'college' ? 0 : 70" 
-                                    :max="gpaScale === 'college' ? 5 : 100" 
-                                    :step="gpaScale === 'college' ? '0.01' : '1'" 
+                                <input type="number" id="gpa_requirement" name="gpa_requirement" class="input-field"
+                                    :placeholder="gpaScale === 'college' ? 'e.g. 1.5' : 'e.g. 85'"
+                                    :min="gpaScale === 'college' ? 0 : 70"
+                                    :max="gpaScale === 'college' ? 5 : 100"
+                                    :step="gpaScale === 'college' ? '0.01' : '1'"
                                     value="{{ old('gpa_requirement') }}" required>
                                 <p class="input-hint" x-text="gpaScale === 'college' ? 'Enter the equivalent (e.g. 1.5, 2.0)' : 'Enter grade out of 100'"></p>
                                 @error('gpa_requirement') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -192,7 +192,7 @@
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div>
                             <label class="input-label mb-2">Eligible Courses</label>
                             <div class="p-4 rounded-xl border border-[var(--border)] bg-gray-50 flex items-center justify-between">
@@ -335,7 +335,7 @@
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>
-                
+
                 <div class="p-6 overflow-y-auto flex-1">
                     <div class="grid grid-cols-2 gap-6 mb-6">
                         <div>
@@ -383,7 +383,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="bg-gray-50 p-4 rounded-xl border border-[var(--border)]">
                         <p class="font-bold text-[var(--ink)] text-sm mb-2">Other Courses / Custom Tags</p>
                         <div class="flex flex-wrap gap-2 mb-2">
@@ -420,7 +420,7 @@ function scholarshipForm() {
         newBenefit: '',
         requirements: {!! json_encode(array_values(array_filter(old('requirements') ? explode("\n", old('requirements')) : []))) !!},
         newRequirement: '',
-        
+
         // GPA Scale
         gpaScale: 'college',
 
@@ -451,7 +451,7 @@ function scholarshipForm() {
             $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return !in_array($tag, $standards);
         }))) !!},
-        
+
         addCustomTag(value) {
             const v = value.trim().replace(/,$/, '');
             const allStandards = [...this.standardCourses.eng, ...this.standardCourses.biz];

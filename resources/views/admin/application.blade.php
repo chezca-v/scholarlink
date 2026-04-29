@@ -163,6 +163,8 @@ $ui['topnav_subtitle']
   </div>
 </div>
 
+@include('admin.applications.partials.assign-evaluator-modal')
+
 @endsection
 
 @push('scripts')
@@ -178,6 +180,16 @@ function confirmAction(type, id=null) {
     method: 'POST',
     headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
   }).then(() => location.reload());
+}
+
+function openAssignModal() {
+  const modal = document.getElementById('assign-evaluator-modal');
+  if (!modal) return;
+  if (modal.__x && modal.__x.$data) {
+    modal.__x.$data.showAssignModal = true;
+    return;
+  }
+  modal.style.display = 'flex';
 }
 </script>
 
