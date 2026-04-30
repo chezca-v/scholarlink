@@ -589,10 +589,11 @@ document.addEventListener('DOMContentLoaded', function() {
             <p style="font-size:12px; color:var(--slate);">&copy; {{ date('Y') }} ScholarLink. All rights reserved.</p>
         </div>
         <div style="display:flex; gap:24px; font-size:13px; font-weight:500;">
+            <a href="{{ route('about') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">About</a>
+            <a href="{{ route('organizations') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Organizations</a>
             <a href="{{ route('terms') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Terms</a>
             <a href="{{ route('privacy') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Privacy Policy</a>
             <a href="{{ route('data-privacy') }}" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Data Privacy Act</a>
-            <a href="#" style="color:var(--slate); text-decoration:none; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--slate)'">Help Center</a>
         </div>
     </div>
 </footer>

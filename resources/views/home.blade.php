@@ -552,8 +552,8 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
     <ul class="nav-links">
       <li><a href="{{ route('scholarships.index') }}">Browse</a></li>
       <li><a href="#how">How It Works</a></li>
-      <li><a href="#">Organizations</a></li>
-      <li><a href="#">About</a></li>
+      <li><a href="{{ route('about') }}">About</a></li>
+      <li><a href="{{ route('organizations') }}">Organizations</a></li>
     </ul>
     <div class="nav-actions">
       <a href="{{ route('login') }}" class="btn-text">Log In</a>
@@ -638,6 +638,8 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
     @endforelse
   </div>
 </div>
+
+
 
 <!-- HOW IT WORKS -->
 <section class="how" id="how">
@@ -781,15 +783,30 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
       </div>
       <div>
         <div class="footer-col-title">Platform</div>
-        <ul class="footer-links"><li>Browse</li><li>How It Works</li><li>For Organizations</li><li>Smart Discovery</li></ul>
+        <ul class="footer-links">
+          <li><a href="{{ route('scholarships.index') }}" style="color:inherit;text-decoration:none;">Browse</a></li>
+          <li><a href="#how" style="color:inherit;text-decoration:none;">How It Works</a></li>
+          <li><a href="{{ route('organizations') }}" style="color:inherit;text-decoration:none;">For Organizations</a></li>
+          <li><a href="#features" style="color:inherit;text-decoration:none;">Smart Discovery</a></li>
+        </ul>
       </div>
       <div>
         <div class="footer-col-title">Account</div>
-        <ul class="footer-links"><li>Sign Up</li><li>Log In</li><li>My Applications</li><li>Document Wallet</li></ul>
+        <ul class="footer-links">
+          <li><a href="{{ route('register') }}" style="color:inherit;text-decoration:none;">Sign Up</a></li>
+          <li><a href="{{ route('login') }}" style="color:inherit;text-decoration:none;">Log In</a></li>
+          <li><a href="{{ route('applications.index') }}" style="color:inherit;text-decoration:none;">My Applications</a></li>
+          <li><a href="{{ route('applicant.documents.index') }}" style="color:inherit;text-decoration:none;">Document Wallet</a></li>
+        </ul>
       </div>
       <div>
         <div class="footer-col-title">Legal</div>
-        <ul class="footer-links"><li>Privacy Policy</li><li>Terms of Service</li><li>Data Privacy Act</li><li>Contact</li></ul>
+        <ul class="footer-links">
+          <li><a href="{{ route('privacy') }}" style="color:inherit;text-decoration:none;">Privacy Policy</a></li>
+          <li><a href="{{ route('terms') }}" style="color:inherit;text-decoration:none;">Terms of Service</a></li>
+          <li><a href="{{ route('data-privacy') }}" style="color:inherit;text-decoration:none;">Data Privacy Act</a></li>
+          <li><a href="mailto:support@scholarlink.ph" style="color:inherit;text-decoration:none;">Contact</a></li>
+        </ul>
       </div>
     </div>
     <div class="footer-bottom">

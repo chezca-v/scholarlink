@@ -25,6 +25,14 @@ Route::controller(PublicController::class)->group(function () {
     Route::get('/', 'landing')->name('landing');
 });
 
+// Static Public Pages
+Route::get('/about', [StaticPageController::class, 'about'])->name('about');
+Route::get('/organizations', [StaticPageController::class, 'organizations'])->name('organizations');
+
+// Legacy/alias redirects
+Route::get('/about.php', fn() => redirect()->route('about'));
+Route::get('/organizations.php', fn() => redirect()->route('organizations'));
+
 // Static Legal Pages
 Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
 Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('privacy');

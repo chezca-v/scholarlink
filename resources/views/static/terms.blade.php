@@ -1,4 +1,4 @@
-@extends('layouts.applicant')
+@extends('layouts.public')
 
 @section('title', 'Terms and Conditions — ScholarLink')
 
@@ -46,9 +46,9 @@
         </div>
 
         <div class="mt-12 pt-8 border-t border-gray-100">
-            <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 text-[#0F4C5C] font-bold hover:underline">
+            <a href="{{ route('landing') }}" class="inline-flex items-center gap-2 text-[#0F4C5C] font-bold hover:underline">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-                Back to Dashboard
+                Back to Home
             </a>
         </div>
     </div>
