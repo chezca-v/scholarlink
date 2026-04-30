@@ -144,6 +144,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .card{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:18px 18px 16px;display:flex;flex-direction:column;transition:box-shadow .15s;}
 .card:hover{box-shadow:0 2px 14px rgba(0,0,0,0.07);}
 .card.saved{border-color:var(--amber);border-width:2px;}
+.card.best-match{border-color:var(--teal);border-width:2px;box-shadow:0 4px 16px rgba(15,76,92,0.15);}
 
 .card-skel{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;}
 .sk{background:var(--mist);border-radius:5px;animation:pulse 1.6s ease-in-out infinite;}
@@ -160,6 +161,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .bdg-closing{background:var(--warn-bg);color:var(--warn-text);border-radius:5px;}
 .bdg-coming{background:var(--violet-bg);color:var(--violet-text);border-radius:20px;}
 .bdg-coming::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet-text);margin-right:4px;}
+.bdg-best{background:linear-gradient(135deg, #0F4C5C, #2A8FA0);color:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(15,76,92,0.3);}
+.bdg-match{background:var(--amber);color:var(--ink);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;text-transform:uppercase;}
 
 .ctitle{font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:5px;letter-spacing:-0.2px;}
 .cmeta{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--slate);margin-bottom:10px;}
@@ -215,10 +218,41 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .main{padding:20px 18px 28px;}
   .cgrid{grid-template-columns:repeat(2,1fr);}
 }
-@media (max-width: 820px){
-  .sidebar{width:220px;position:sticky;top:56px;height:calc(100vh - 56px);}
-  .main{padding:16px;}
+@media (max-width: 900px){
+  .layout{flex-direction:column;}
+  .sidebar{
+    width:100%;position:fixed;top:auto;bottom:0;left:0;right:0;
+    height:auto;max-height:60vh;z-index:300;
+    border-top:2px solid var(--teal);border-radius:20px 20px 0 0;
+    padding:16px;overflow-y:auto;transform:translateY(calc(100% - 52px));
+    transition:transform .3s ease;
+  }
+  .sidebar.open{transform:translateY(0);}
+  .sidebar::-webkit-scrollbar{width:3px;}
+  .filter-toggle{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .main{padding:16px;padding-bottom:70px;}
   .cgrid{grid-template-columns:1fr;}
+  .sb-hd{margin-bottom:12px;}
+  .fg{border-bottom:1px solid var(--mist);padding-bottom:12px;margin-bottom:12px;}
+  .sb-user{margin-top:12px;margin-bottom:40px;}
+}
+@media (max-width: 820px){
+  .sidebar{position:fixed;transform:translateY(calc(100% - 52px));}
+  .sidebar.open{transform:translateY(0);}
+  .main{padding:16px;padding-bottom:70px;}
+  .cgrid{grid-template-columns:1fr;}
+}
+
+/* Mobile filter toggle button */
+.filter-toggle{
+  display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+  background:var(--teal);color:#fff;border:none;border-radius:30px;
+  padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;
+  z-index:301;box-shadow:0 4px 12px rgba(15,76,92,0.3);
+  gap:8px;align-items:center;
+}
+@media (max-width: 900px){
+  .filter-toggle{display:flex;}
 }
 </style>
 </head>
@@ -295,6 +329,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </nav>
 
 {{-- ═══════════════════════════════════════════════════ LAYOUT ═════════════ --}}
+{{-- Mobile filter toggle button --}}
+<button type="button" class="filter-toggle" onclick="toggleFilters()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+  </svg>
+  <span>Filters</span>
+</button>
+
 <div class="layout">
 
  {{--───────────────────────────────────── SIDEBAR / FILTERS ───────────────--}}
@@ -508,8 +550,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         scholarship{{ $scholarships->total() !== 1 ? 's' : '' }} match your filters
       </div>
       <div class="rright">
-        <select class="sort-sel" id="sort-sel" onchange="setSort(this.value)">
-          <option value="match"    {{ ($filters['sort'] ?? 'match') === 'match'    ? 'selected' : '' }}>Best Match</option>
+<select class="sort-sel" id="sort-sel" onchange="setSort(this.value)">
+          <option value="ai_match" {{ ($filters['sort'] ?? 'ai_match') === 'ai_match' ? 'selected' : '' }}>★ Best For You</option>
+          <option value="match"    {{ ($filters['sort'] ?? '') === 'match'    ? 'selected' : '' }}>Best Match</option>
           <option value="deadline" {{ ($filters['sort'] ?? '') === 'deadline' ? 'selected' : '' }}>Deadline (Soonest)</option>
           <option value="slots"    {{ ($filters['sort'] ?? '') === 'slots'    ? 'selected' : '' }}>Most Slots</option>
           <option value="alpha"    {{ ($filters['sort'] ?? '') === 'alpha'    ? 'selected' : '' }}>A – Z</option>
@@ -569,14 +612,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           }
         @endphp
 
-        <div class="card {{ $userApplication && $userApplication->status === 'approved' ? 'saved' : '' }}"
+@php
+          $matchScore = isset($aiMatchScores[$scholarship->id]) ? $aiMatchScores[$scholarship->id] : null;
+          $isBestMatch = $topMatchId === $scholarship->id;
+        @endphp
+
+        <div class="card {{ $userApplication && $userApplication->status === 'approved' ? 'saved' : '' }} {{ $isBestMatch ? 'best-match' : '' }}"
              data-id="{{ $scholarship->id }}">
              <div class="card-body">
 
-          {{-- Card top: org name + badges --}}
+{{-- Card top: org name + badges --}}
           <div class="ctop">
             <span class="corg">{{ $scholarship->provider_name }}</span>
             <div class="cbdg">
+              @if($isBestMatch)
+                <span class="bdg bdg-best">★ Best Match</span>
+              @elseif($matchScore !== null)
+                <span class="bdg bdg-match">{{ $matchScore }}% Match</span>
+              @endif
               @if($isNew)
                 <span class="bdg bdg-new">+ New</span>
               @endif
@@ -646,16 +699,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
           <div class="cdiv"></div>
 
-          {{-- Match score (only shown to logged-in users with an AI score) --}}
+{{-- Match score (shown to logged-in users with AI score) --}}
           @auth
             @if($matchScore !== null)
-              <div class="mlbl">Your Match Score</div>
+              <div class="mlbl">{{ $isBestMatch ? '★ Best Match For You' : 'Match Score' }}</div>
               <div class="mrow" style="margin-bottom:8px;">
                 <div class="btrack">
                   <div class="bfill" style="width:{{ $matchScore }}%"></div>
                 </div>
-                <span class="mpct">{{ number_format($matchScore, 0) }}%</span>
+                <span class="mpct">{{ $matchScore }}%</span>
               </div>
+            @elseif(!$userApplication)
+              <div class="mlbl">Login to see match score</div>
             @endif
           @endauth
 
@@ -732,6 +787,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Mobile filter toggle ─────────────────────────────────────────────
+function toggleFilters() {
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('open');
+}
+
 // ── View toggle (grid vs list) ─────────────────────────────────────────────
 function setView(mode) {
   const grid = document.getElementById('cgrid');

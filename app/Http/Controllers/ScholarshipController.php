@@ -3,14 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Scholarship;
+use App\Models\ApplicantProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ScholarshipController extends Controller
 {
-    public function index(Request $request)
-    { // Start query
+public function index(Request $request)
+    {
+        // Get user profile early for sorting and scoring
+        $profile = null;
+        if (Auth::check()) {
+            $profile = Auth::user()->applicantProfile;
+        }
+
+        // Start query
         $query = Scholarship::query();
 
         // Apply search term (q)
@@ -26,15 +35,12 @@ class ScholarshipController extends Controller
             });
         }
 
-        // Apply status filter (multiple)
+// Apply status filter (multiple)
         if ($request->has('status')) {
             $query->whereIn('status', (array) $request->status);
-        } elseif (!$request->has('filter_submitted')) {
-            // Default show open, closing_soon, coming_soon only on first load
-            $query->whereIn('status', ['open', 'closing_soon', 'coming_soon']);
         } else {
-            // filter_submitted is true but no status checked -> show nothing
-            $query->whereRaw('1 = 0');
+            // Default show open, closing_soon, coming_soon (show all active scholarships)
+            $query->whereIn('status', ['open', 'closing_soon', 'coming_soon']);
         }
 
         // Apply category filter (tags JSON contains any of the categories)
@@ -92,24 +98,38 @@ class ScholarshipController extends Controller
             // });
         }
 
-        // Apply sorting
-        $sort = $request->get('sort', 'match');
-        switch ($sort) {
-            case 'deadline':
-                $query->orderBy('deadline', 'asc');
-                break;
-            case 'slots':
-                $query->orderBy('slots', 'desc');
-                break;
-            case 'alpha':
-                $query->orderBy('name', 'asc');
-                break;
-            case 'match':
-            default:
-                // If you have a computed match score for the logged-in user, order by that.
-                // Otherwise fallback to latest.
-                $query->latest('posted_at');
-                break;
+// Apply sorting
+        $sort = $request->get('sort', 'ai_match');
+
+        // For AI-based sorting, we need to get IDs and scores first (limited approach for pagination)
+        if ($sort === 'ai_match' && Auth::check() && $profile) {
+            $allScholarships = Scholarship::whereIn('status', ['open', 'closing_soon', 'coming_soon'])->get();
+            $allScores = $this->calculateMatchScores($profile, $allScholarships->all());
+            arsort($allScores);
+            $sortedIds = array_keys($allScores);
+
+            // Use FIELD() for MySQL to order by the calculated scores - requires exact match
+            if (!empty($sortedIds)) {
+                $idsStr = implode(',', $sortedIds);
+                $query->orderByRaw("FIELD(id, {$idsStr})");
+            }
+        } else {
+            switch ($sort) {
+                case 'deadline':
+                    $query->orderBy('deadline', 'asc');
+                    break;
+                case 'slots':
+                    $query->orderBy('slots', 'desc');
+                    break;
+                case 'alpha':
+                    $query->orderBy('name', 'asc');
+                    break;
+                case 'ai_match':
+                case 'match':
+                default:
+                    $query->latest('posted_at');
+                    break;
+            }
         }
 
         // Paginate (e.g., 12 per page)
@@ -144,17 +164,130 @@ class ScholarshipController extends Controller
 
         $incomeBrackets = Scholarship::select('income_bracket')->distinct()->whereNotNull('income_bracket')->pluck('income_bracket');
 
-        $applicationCount = 0;
+$applicationCount = 0;
         $savedCount = 0;
         $unreadCount = 0;
+        $aiMatchScores = [];
+        $topMatchId = null;
 
         if (Auth::check()) {
             $user = Auth::user();
             $applicationCount = \App\Models\Application::where('applicant_id', $user->id)->count();
             $savedCount = \App\Models\SavedScholarship::where('user_id', $user->id)->count();
-            $unreadCount = \App\Models\Notification::where('user_id', $user->id)->where('is_read', false)->count();        }
+            $unreadCount = \App\Models\Notification::where('user_id', $user->id)->where('is_read', false)->count();
 
-        return view('scholarships.index', compact('scholarships', 'filters', 'statusCounts', 'incomeBrackets', 'applicationCount', 'savedCount', 'unreadCount'));
+            // Calculate AI match scores for authenticated users with profile
+            if ($profile) {
+                $aiMatchScores = $this->calculateMatchScores($profile, $scholarships->items());
+                // Find top match ID for highlighting
+                if (!empty($aiMatchScores)) {
+                    $topMatchId = array_keys($aiMatchScores, max($aiMatchScores))[0] ?? null;
+                }
+            }
+        }
+
+        return view('scholarships.index', compact(
+            'scholarships', 'filters', 'statusCounts', 'incomeBrackets',
+            'applicationCount', 'savedCount', 'unreadCount', 'aiMatchScores', 'topMatchId'
+        ));
+    }
+
+    /**
+     * Calculate AI match scores for scholarships based on user profile.
+     */
+    private function calculateMatchScores(ApplicantProfile $profile, array $scholarships): array
+    {
+        $scores = [];
+        $gwa = $profile->gwa;
+        $course = $profile->course_program;
+        $income = $profile->monthly_household_income;
+
+        foreach ($scholarships as $scholarship) {
+            $gpaScore = $this->scoreGpa($gwa, $scholarship->gpa_requirement);
+            $courseScore = $this->scoreCourse($course, $scholarship->courses);
+            $incomeScore = $this->scoreIncome($income, $scholarship->income_bracket);
+
+            $score = (int) round(
+                ($gpaScore * 0.55) +
+                ($courseScore * 0.30) +
+                ($incomeScore * 0.15)
+            );
+            $scores[$scholarship->id] = max(0, min(100, $score));
+        }
+
+        return $scores;
+    }
+
+    private function scoreGpa($profileGpa, $requirement): int
+    {
+        if (blank($requirement) || blank($profileGpa)) {
+            return blank($profileGpa) ? 50 : 100;
+        }
+
+        $profileGpa = floatval($profileGpa);
+        $requirement = floatval($requirement);
+
+        if ($profileGpa >= $requirement) {
+            return 100;
+        }
+
+        $diff = max(0, $requirement - $profileGpa);
+        return max(0, 100 - (int) round($diff * 30));
+    }
+
+    private function scoreCourse($profileCourse, $scholarshipCourses): int
+    {
+        if (blank($scholarshipCourses)) {
+            return 100;
+        }
+
+        $profileCourse = Str::lower(trim((string) $profileCourse));
+        $courses = is_array($scholarshipCourses)
+            ? $scholarshipCourses
+            : explode(',', (string) $scholarshipCourses);
+        $courses = array_filter(array_map(fn($c) => Str::lower(trim($c)), $courses));
+
+        if (!$profileCourse || empty($courses)) {
+            return 50;
+        }
+
+        foreach ($courses as $course) {
+            if (!$course) continue;
+            if (Str::contains($profileCourse, $course) || Str::contains($course, $profileCourse)) {
+                return 100;
+            }
+            $profileWords = preg_split('/\s+/', $profileCourse);
+            foreach ($profileWords as $word) {
+                if ($word && Str::contains($course, $word)) {
+                    return 90;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private function scoreIncome($monthlyIncome, $bracket): int
+    {
+        if (blank($bracket)) {
+            return 100;
+        }
+
+        if (is_null($monthlyIncome)) {
+            return 50;
+        }
+
+        $annualIncome = floatval($monthlyIncome) * 12;
+
+        if (preg_match_all('/\d+[\d,]*/', (string) $bracket, $matches)) {
+            $numbers = array_map(fn($v) => (int) str_replace(',', '', $v), $matches[0]);
+            if (!empty($numbers)) {
+                $threshold = max($numbers);
+                return $annualIncome <= $threshold ? 100 : 20;
+            }
+        }
+
+        return 75;
     }
 
     public function create()
