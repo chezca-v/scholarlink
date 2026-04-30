@@ -443,11 +443,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     </div>
   </div>
 
-  <style>
-      .modal-backdrop {
-          display: flex !important;
-      }
-  </style>
+
 
   <script>
       document.addEventListener('DOMContentLoaded', function() {
