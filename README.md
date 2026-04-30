@@ -2,7 +2,7 @@
 
 <br/>
 
-<img src="public/images/logo.png" alt="ScholarLink Logo" width="80" height="80" />
+<img src="public/logo-light.png.png" alt="ScholarLink Logo" width="80" height="80" />
 
 # ScholarLink
 
