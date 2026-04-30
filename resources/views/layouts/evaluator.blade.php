@@ -303,15 +303,15 @@
     </a>
     <a href="{{ route('evaluator.queue') }}" class="sidebar-link {{ request()->routeIs('evaluator.queue') || request()->routeIs('evaluator.review.*') ? 'active' : '' }}">
       <span class="icon">📥</span> Review Queue
-      <span class="badge amber">{{ \App\Models\Application::where('status', 'pending')->count() ?? 14 }}</span>
+      <span class="badge amber">{{ \App\Models\Application::where('status', 'under_review')->count() }}</span>
     </a>
     <a href="{{ route('evaluator.completed') }}" class="sidebar-link {{ request()->routeIs('evaluator.completed') ? 'active' : '' }}">
       <span class="icon">✅</span> Completed Reviews
     </a>
-    
+
     <div class="sidebar-section">Account</div>
     <a href="{{ route('evaluator.notifications') }}" class="sidebar-link {{ request()->routeIs('evaluator.notifications') ? 'active' : '' }}">
-      <span class="icon">🔔</span> Notifications 
+      <span class="icon">🔔</span> Notifications
       @php $unreadNotifs = \App\Models\Notification::where('user_id', auth()->id())->where('is_read', false)->count(); @endphp
       @if($unreadNotifs > 0)
         <span class="badge">{{ $unreadNotifs }}</span>
@@ -320,7 +320,7 @@
     <a href="{{ route('evaluator.profile') }}" class="sidebar-link {{ request()->routeIs('evaluator.profile') ? 'active' : '' }}">
       <span class="icon">👤</span> My Profile
     </a>
-    
+
     <div class="sidebar-footer" style="margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px;">
       <div class="avatar" style="width: 32px; height: 32px; border-radius: 50%; background: rgba(15,76,92,.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--primary); flex-shrink: 0;">
         {{ strtoupper(substr(auth()->user()->first_name ?? 'E', 0, 1) . substr(auth()->user()->last_name ?? 'C', 0, 1)) }}

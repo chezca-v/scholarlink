@@ -713,6 +713,7 @@
         isMinimized: false,
         isSending: false,
         lastGeminiRequestAt: 0,
+        cooldownUntil: 0,
         unread: parseInt(document.getElementById('chat-widget-root')?.dataset.unread || '0', 10),
     };
 
@@ -927,13 +928,15 @@
                 return;
             }
 
-            const waitMs = 5000 - (Date.now() - state.lastGeminiRequestAt);
+            const waitMs = (state.cooldownUntil || 0) - Date.now();
             if (waitMs > 0) {
                 appendMessage(`Please wait ${Math.ceil(waitMs / 1000)} seconds before sending another AI request. This helps protect the free-tier quota.`, 'bot');
                 return;
             }
 
-            state.lastGeminiRequestAt = Date.now();
+            const now = Date.now();
+            state.lastGeminiRequestAt = now;
+            state.cooldownUntil = now + 5000;
             setSending(true);
             this.showTyping();
 
@@ -957,6 +960,12 @@
                 this.hideTyping();
                 const reply = data.reply || 'Sorry, I could not get a response.';
                 appendMessage(reply, 'bot');
+
+                if (data.retry_after) {
+                    state.cooldownUntil = Date.now() + (data.retry_after * 1000);
+                } else if (reply.includes('quota') || reply.includes('rate limit')) {
+                    state.cooldownUntil = Date.now() + 30000;
+                }
 
                 if (!data.cached && !reply.includes('quota') && !reply.includes('rate limit') && !reply.includes('Unable to get')) {
                     setCachedResponse(text, reply);
