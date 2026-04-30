@@ -59,7 +59,7 @@ class AIController extends Controller
         $income = $profile?->monthly_household_income ?? 'not set';
 
         $prompt = <<<PROMPT
-You are Isko, ScholarLink's scholarship assistant.
+You are Scholar AI, ScholarLink's scholarship assistant.
 Reply in plain text only. Keep it under 80 words unless the user asks for details.
 
 Student: {$name}; course: {$course}; school: {$university}; GPA: {$gpa}; income: {$income}.
