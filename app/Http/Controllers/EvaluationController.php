@@ -63,10 +63,10 @@ class EvaluationController extends Controller
         $application = Application::query()->findOrFail($id);
 
         $request->validate([
-            'gpa_score'    => ['required', 'numeric', 'min:0', 'max:100'],
-            'income_score' => ['required', 'numeric', 'min:0', 'max:100'],
+            'gpa_score'    => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'income_score' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'notes'        => ['nullable', 'string', 'max:1000'],
-            'decision'     => ['required', 'in:approved,rejected,revision_requested'],
+            'decision'     => ['required', 'in:approved,rejected,revision_requested,save_draft'],
         ]);
 
         $scholarship = $application->scholarship;
@@ -77,16 +77,20 @@ class EvaluationController extends Controller
             'evaluator_id'   => $evaluator->id,
         ]);
 
-        $evaluation->gpa_score    = $request->gpa_score;
-        $evaluation->income_score = $request->income_score;
+        $evaluation->gpa_score    = $request->gpa_score ?? 0;
+        $evaluation->income_score = $request->income_score ?? 0;
         $evaluation->notes        = $request->notes;
-        $evaluation->decision     = $request->decision;
+        $evaluation->decision     = ($request->decision === 'save_draft') ? null : $request->decision;
         $evaluation->final_score  = $evaluation->computeFinalScore(
             $scholarship->weight_gpa,
             $scholarship->weight_income
         );
         $evaluation->evaluated_at = Carbon::now();
         $evaluation->save();
+
+        if ($request->decision === 'save_draft') {
+            return redirect()->back()->with('success', 'Progress saved successfully.');
+        }
 
         // Update application status and stage
         $application->status     = match($request->decision) {
@@ -102,8 +106,11 @@ class EvaluationController extends Controller
             return redirect()->route('evaluator.rejection', ['id' => $id]);
         }
 
-        return redirect()->route('evaluator.queue')
-            ->with('success', 'Evaluation submitted successfully.');
+        $msg = $request->decision === 'revision_requested' 
+            ? 'Information request sent to applicant.' 
+            : 'Evaluation submitted successfully.';
+
+        return redirect()->route('evaluator.queue')->with('success', $msg);
     }
 
     public function reject($id)
@@ -186,13 +193,22 @@ class EvaluationController extends Controller
             $applicant->first_name = 'Anonymous';
             $applicant->last_name = 'Applicant';
         }
+        
+        $applicant->email = 'hidden@scholarlink.ph';
+        $applicant->phone = '09XX-XXX-XXXX';
 
         if ($profile) {
+            $profile->address = 'Hidden (Blind Mode)';
+            $profile->phone = 'Hidden';
+            $profile->birth_date = null;
+            $profile->gender = 'Hidden';
             $profile->university_name = 'Hidden';
             $profile->course_program = 'Hidden';
             $profile->year_level = null;
             $profile->province = 'Philippines';
             $profile->avatar_url = null;
+            $profile->fb_link = null;
+            $profile->linkedin_link = null;
         }
 
         if (property_exists($applicant, 'avatar_url')) {

@@ -61,7 +61,7 @@ class EvaluatorController extends Controller
 
         $applications = Application::with('scholarship')
             ->whereIn('scholarship_id', $assignedScholarshipIds)
-            ->where('status', 'under_review')
+            ->whereIn('status', ['under_review', 'revision'])
             ->paginate(15);
             
         return view('evaluator.queue', compact('applications'));

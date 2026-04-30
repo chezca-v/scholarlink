@@ -91,6 +91,8 @@
               <span class="badge yellow">⏳ Pending</span>
             @elseif($app->status === 'under_review')
               <span class="badge teal">💬 Under Review</span>
+            @elseif($app->status === 'revision')
+              <span class="badge amber">🔄 Revision Requested</span>
             @else
               <span class="badge gray">{{ ucfirst($app->status) }}</span>
             @endif
