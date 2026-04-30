@@ -21,7 +21,6 @@
 <br/>
 
 ![ScholarLink Landing](public/screenshots/Landing.jpeg)
-*← Replace with your actual dashboard screenshot*
 
 <br/>
 
@@ -44,7 +43,7 @@ ScholarLink is a centralized scholarship management platform designed to moderni
 <div align="center">
 
 **Applicant Dashboard**
-![Applicant Dashboard](public/screenshots/Dashboard Applicant.jpeg)
+![Applicant Dashboard](public/screenshots/DashboardApplicant.jpeg)
 *Browse scholarships, track applications, and manage your document wallet*
 
 <br/>
@@ -56,7 +55,7 @@ ScholarLink is a centralized scholarship management platform designed to moderni
 <br/>
 
 **Blind Evaluation Panel**
-![Evaluator Dashboard](public/screenshots/Evaluator Dashboard.jpeg)
+![Evaluator Dashboard](public/screenshots/EvaluatorDashboard.jpeg)
 ![Evaluator Panel](public/screenshots/BlindScreening.jpeg)
 *Applicant identity hidden — evaluators see only academic and financial data*
 
