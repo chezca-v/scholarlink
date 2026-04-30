@@ -218,8 +218,10 @@ $applicationCount = 0;
         return $scores;
     }
 
-    private function scoreGpa($profileGpa, $requirement): int
+private function scoreGpa($profileGpa, $requirement): int
     {
+        // Philippine grading scale: 1.0 = best, 5.0 = fail
+        // 1.00 = 100, 1.25 = 96, 1.50 = 92, 1.75 = 88, 2.0 = 84, etc.
         if (blank($requirement) || blank($profileGpa)) {
             return blank($profileGpa) ? 50 : 100;
         }
@@ -227,11 +229,15 @@ $applicationCount = 0;
         $profileGpa = floatval($profileGpa);
         $requirement = floatval($requirement);
 
-        if ($profileGpa >= $requirement) {
+        // With 1.0 = 100 scale, lower is better
+        // If profile GPA <= requirement (e.g., 1.0 <= 1.5), student meets requirement
+        if ($profileGpa <= $requirement) {
             return 100;
         }
 
-        $diff = max(0, $requirement - $profileGpa);
+        // Calculate score based on how much lower the requirement is
+        // e.g., profile: 1.5, req: 1.0 → diff = 0.5 → score = 100 - (0.5 * 30) = 85
+        $diff = max(0, $profileGpa - $requirement);
         return max(0, 100 - (int) round($diff * 30));
     }
 
