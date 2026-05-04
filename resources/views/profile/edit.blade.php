@@ -105,11 +105,11 @@ h2.text-lg { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; 
                 {{ auth()->user()->email ?? 'user@example.com' }}
             </div>
             <div class="profile-tags">
-                <span class="profile-tag">{{ $profile->year_level ? 'Year '.$profile->year_level : 'Applicant' }}</span>
-                @if($profile?->course_program)
+                <span class="profile-tag">{{ ($profile && $profile->year_level) ? 'Year '.$profile->year_level : 'Applicant' }}</span>
+                @if($profile && $profile->course_program)
                 <span class="profile-tag">{{ $profile->course_program }}</span>
                 @endif
-                @if($profile?->university_name)
+                @if($profile && $profile->university_name)
                 <span class="profile-tag" style="font-size:10px;">{{ $profile->university_name }}</span>
                 @endif
             </div>
@@ -153,7 +153,7 @@ h2.text-lg { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; 
                 </div>
                 <div class="info-item">
                     <span class="info-label">Date of Birth</span>
-                    <span class="info-value">{{ optional($profile)->date_of_birth ? \Carbon\Carbon::parse($profile->date_of_birth)->format('M d, Y') : 'Not provided' }}</span>
+                    <span class="info-value">{{ ($profile && $profile->date_of_birth) ? \Carbon\Carbon::parse($profile->date_of_birth)->format('M d, Y') : 'Not provided' }}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">Sex</span>
@@ -179,7 +179,7 @@ h2.text-lg { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; 
                 </div>
                 <div class="info-item">
                     <span class="info-label">Latest GPA/GWA</span>
-                    <span class="info-value">{{ optional($profile)->gwa ? number_format(optional($profile)->gwa, 2) : 'Not set' }}</span>
+                    <span class="info-value">{{ ($profile && $profile->gwa) ? number_format($profile->gwa, 2) : 'Not set' }}</span>
                 </div>
             </div>
         </div>

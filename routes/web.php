@@ -55,7 +55,7 @@ Route::middleware(['auth', 'role:applicant'])->group(function () {
 /*
 Applicant Routes (Role: applicant)
 */
-Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:applicant', 'profile.completed'])->group(function () {
 
     // Dashboard & Profile Management
     Route::controller(ProfileController::class)->group(function () {

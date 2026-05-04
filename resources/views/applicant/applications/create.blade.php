@@ -318,7 +318,7 @@
             @foreach($group['slots'] as $slot)
             @php
               $matches     = $savedDocuments->where('document_type', $slot['document_type']);
-              $slug        = Str::slug($slot['document_type']);
+              $slug        = $slot['slug'];
               $preSelected = $matches->firstWhere('status', 'verified') ?? $matches->firstWhere('status', 'pending');
             @endphp
 
@@ -387,7 +387,7 @@
         </div>
 
         {{-- Endorsement letter — separate row below the 3-col grid --}}
-        @php $endorseSlug = Str::slug($endorsementSlot['document_type']); @endphp
+        @php $endorseSlug = $endorsementSlot['slug']; @endphp
         <div class="doc-endorsement">
           <div class="doc-group-title">{{ $endorsementSlot['groupTitle'] }}</div>
           <div class="doc-subcard">
@@ -486,10 +486,10 @@
           <div class="confirm-table">
             @foreach($documentGroups as $group)
               @foreach($group['slots'] as $slot)
-              @php
-                $slug     = Str::slug($slot['document_type']);
-                $preMatch = $savedDocuments->where('document_type', $slot['document_type'])->firstWhere('status', 'verified');
-              @endphp
+                @php
+                  $slug     = $slot['slug'];
+                  $preMatch = $savedDocuments->where('document_type', $slot['document_type'])->firstWhere('status', 'verified');
+                @endphp
               <div class="confirm-row">
                 <span class="ck">{{ $slot['label'] }}</span>
                 <span class="cv {{ $preMatch ? '' : 'none' }}" id="confirm-val-{{ $slug }}">
@@ -693,10 +693,14 @@ function guardSubmit() {
   const cb  = document.getElementById('certify');
   const lbl = document.getElementById('certify-label');
 
-  // Check required documents
+  // Check required documents dynamically
   const requiredSlugs = [
-    'proof-of-enrollment', 'report-card-transcript', 'valid-id',
-    'itr-tax-exemption', 'barangay-indigency', 'endorsement-letter'
+    @foreach($documentGroups as $group)
+      @foreach($group['slots'] as $slot)
+        @if(!$slot['optional']) '{{ $slot['slug'] }}', @endif
+      @endforeach
+    @endforeach
+    @if(!$endorsementSlot['optional']) '{{ $endorsementSlot['slug'] }}', @endif
   ];
   let missing = false;
 

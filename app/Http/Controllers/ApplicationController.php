@@ -135,18 +135,21 @@ class ApplicationController extends Controller
                 'groupTitle' => 'Identity & Academic',
                 'slots' => [
                     [
+                        'slug' => 'proof-of-enrollment',
                         'document_type' => 'Proof of Enrollment / Acceptance Letter',
                         'label' => 'Proof of Enrollment',
                         'smallNote' => 'Certificate of Registration',
                         'optional' => false,
                     ],
                     [
+                        'slug' => 'report-card',
                         'document_type' => 'Latest Report Card / TOR',
                         'label' => 'Latest Report Card',
                         'smallNote' => 'Previous semester',
                         'optional' => false,
                     ],
                     [
+                        'slug' => 'id-photo',
                         'document_type' => '2x2 ID Photo',
                         'label' => '2x2 ID Photo',
                         'smallNote' => 'Passport-style photo',
@@ -158,18 +161,21 @@ class ApplicationController extends Controller
                 'groupTitle' => 'Financial & Legal Documents',
                 'slots' => [
                     [
+                        'slug' => 'income-tax-return',
                         'document_type' => 'Income Tax Return / Certificate of Non-Filing',
                         'label' => 'Income Tax Return',
                         'smallNote' => 'Or Certificate of Non-Filing',
                         'optional' => false,
                     ],
                     [
+                        'slug' => 'barangay-indigency',
                         'document_type' => 'Barangay Certificate of Indigency',
                         'label' => 'Barangay Certificate of Indigency',
                         'smallNote' => null,
                         'optional' => false,
                     ],
                     [
+                        'slug' => 'good-moral',
                         'document_type' => 'Certificate of Good Moral Character',
                         'label' => 'Certificate of Good Moral Character',
                         'smallNote' => 'From school/organization',
@@ -181,18 +187,21 @@ class ApplicationController extends Controller
                 'groupTitle' => 'Supporting Documents',
                 'slots' => [
                     [
+                        'slug' => 'affidavit-of-need',
                         'document_type' => 'Affidavit of Financial Need',
                         'label' => 'Affidavit of Financial Need',
                         'smallNote' => null,
                         'optional' => true,
                     ],
                     [
+                        'slug' => 'recommendation-letter',
                         'document_type' => 'Letter of Recommendation',
                         'label' => 'Letter of Recommendation',
                         'smallNote' => 'From teacher/mentor',
                         'optional' => true,
                     ],
                     [
+                        'slug' => 'birth-certificate',
                         'document_type' => 'PSA Birth Certificate',
                         'label' => 'PSA Birth Certificate',
                         'smallNote' => 'Original or certified copy',
@@ -203,6 +212,7 @@ class ApplicationController extends Controller
         ];
 
         $endorsementSlot = [
+            'slug' => 'endorsement-letter',
             'groupTitle' => 'Endorsement',
             'document_type' => 'Letter of Recommendation',
             'label' => 'Endorsement Letter',
@@ -252,12 +262,12 @@ class ApplicationController extends Controller
         $uploads = $request->file('uploads', []);
 
         $requiredSlugs = [
-            \Illuminate\Support\Str::slug('Proof of Enrollment'),
-            \Illuminate\Support\Str::slug('Report Card / Transcript'),
-            \Illuminate\Support\Str::slug('Valid ID'),
-            \Illuminate\Support\Str::slug('ITR / Tax Exemption'),
-            \Illuminate\Support\Str::slug('Barangay Indigency'),
-            \Illuminate\Support\Str::slug('Endorsement Letter'),
+            'proof-of-enrollment',
+            'report-card',
+            'id-photo',
+            'income-tax-return',
+            'barangay-indigency',
+            'endorsement-letter',
         ];
 
         foreach ($requiredSlugs as $slug) {
@@ -293,13 +303,16 @@ class ApplicationController extends Controller
         ]);
 
         $docTypes = [
-            \Illuminate\Support\Str::slug('Proof of Enrollment') => 'Proof of Enrollment / Acceptance Letter',
-            \Illuminate\Support\Str::slug('Report Card / Transcript') => 'Latest Report Card / TOR',
-            \Illuminate\Support\Str::slug('Valid ID') => 'Other',
-            \Illuminate\Support\Str::slug('ITR / Tax Exemption') => 'Income Tax Return / Certificate of Non-Filing',
-            \Illuminate\Support\Str::slug('Barangay Indigency') => 'Barangay Certificate of Indigency',
-            \Illuminate\Support\Str::slug('Utility Bill') => 'Other',
-            \Illuminate\Support\Str::slug('Endorsement Letter') => 'Letter of Recommendation',
+            'proof-of-enrollment' => 'Proof of Enrollment / Acceptance Letter',
+            'report-card'         => 'Latest Report Card / TOR',
+            'id-photo'            => '2x2 ID Photo',
+            'income-tax-return'   => 'Income Tax Return / Certificate of Non-Filing',
+            'barangay-indigency'  => 'Barangay Certificate of Indigency',
+            'good-moral'          => 'Certificate of Good Moral Character',
+            'affidavit-of-need'   => 'Affidavit of Financial Need',
+            'recommendation-letter' => 'Letter of Recommendation',
+            'birth-certificate'   => 'PSA Birth Certificate',
+            'endorsement-letter'  => 'Letter of Recommendation',
         ];
 
         foreach ($uploads as $slug => $file) {

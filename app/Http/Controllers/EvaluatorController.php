@@ -60,7 +60,9 @@ class EvaluatorController extends Controller
         $assignedScholarshipIds = $evaluator->evaluatorAssignments()->pluck('scholarship_id');
 
         $applications = Application::with('scholarship')
-            ->whereIn('scholarship_id', $assignedScholarshipIds)
+            ->whereHas('evaluations', function ($query) use ($evaluator) {
+                $query->where('evaluator_id', $evaluator->id);
+            })
             ->whereIn('status', ['under_review', 'revision'])
             ->paginate(15);
             

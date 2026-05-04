@@ -108,10 +108,16 @@ public function index(Request $request)
             arsort($allScores);
             $sortedIds = array_keys($allScores);
 
-            // Use FIELD() for MySQL to order by the calculated scores - requires exact match
+            // Use FIELD() for MySQL or CASE for SQLite to order by the calculated scores
             if (!empty($sortedIds)) {
-                $idsStr = implode(',', $sortedIds);
-                $query->orderByRaw("FIELD(id, {$idsStr})");
+                $driver = $query->getConnection()->getDriverName();
+                if ($driver === 'sqlite') {
+                    $cases = collect($sortedIds)->map(fn($id, $index) => "WHEN {$id} THEN {$index}")->implode(' ');
+                    $query->orderByRaw("CASE id {$cases} ELSE " . count($sortedIds) . " END");
+                } else {
+                    $idsStr = implode(',', $sortedIds);
+                    $query->orderByRaw("FIELD(id, {$idsStr})");
+                }
             }
         } else {
             switch ($sort) {

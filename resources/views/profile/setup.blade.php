@@ -332,7 +332,8 @@
                     </div>
                 </div>
 
-                <div class="form-actions" style="justify-content: flex-end;">
+                <div class="form-actions">
+                    <a href="{{ route('dashboard') }}" class="btn-back">← Back to Dashboard</a>
                     <button type="submit" class="btn-next">Save & Continue</button>
                 </div>
             </form>

@@ -128,6 +128,9 @@
           <div style="display:flex;justify-content:space-between;align-items:center">
             <div>
               <div style="font-size:12px;color:var(--slate);font-weight:500">Computed Overall Score</div>
+              <div id="computation_formula" style="font-size:11px;color:var(--slate);margin-top:2px;">
+                 (<span id="calc_gpa">{{ old('gpa_score', $evaluation->gpa_score ?? 0) }}</span> × {{ $application->scholarship->weight_gpa ?? 60 }}%) + (<span id="calc_inc">{{ old('income_score', $evaluation->income_score ?? 0) }}</span> × {{ $application->scholarship->weight_income ?? 40 }}%)
+              </div>
             </div>
             <div style="font-family:'Fraunces',serif;font-size:32px;font-weight:900;color:var(--primary)" id="computed_display">
               {{ old('final_score', $evaluation->final_score ?? 0) }}
@@ -203,6 +206,12 @@
     document.getElementById('final_score').value = total;
     document.getElementById('computed_display').innerText = total;
     document.getElementById('computed_bar').style.width = total + '%';
+    
+    // Update Computation Visual
+    if(document.getElementById('calc_gpa')) {
+      document.getElementById('calc_gpa').innerText = gpa;
+      document.getElementById('calc_inc').innerText = inc;
+    }
     
     // Update Ring Visual
     let ring = document.querySelector('.overall-score-ring');

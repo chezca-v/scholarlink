@@ -246,7 +246,7 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::where('role', '!=', 'applicant')->latest()->get();
+        $users = User::whereNotIn('role', ['applicant', 'admin', 'superadmin'])->latest()->get();
         return view('admin.user', compact('users'));
     }
 
