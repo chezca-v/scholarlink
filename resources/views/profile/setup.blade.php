@@ -368,7 +368,7 @@
                     </div>
 
                     <div class="field-group">
-                        <label class="field-label" for="student_number">Student Number <span class="field-req">*</span></label>
+                        <label class="field-label" for="student_number">Learner Reference Number <span class="field-req">*</span></label>
                         <input type="text" id="student_number" name="student_number" class="form-input" value="{{ old('student_number', $profile->student_number) }}" placeholder="e.g. 2021-12345" required>
                         @error('student_number') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
