@@ -201,7 +201,7 @@
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </div>
                         <div class="flex-1">
-                            <h3 class="font-bold text-[15px] mb-1" style="color: #0F4C5C;">Scholar AI Insight</h3>
+                            <h3 class="font-bold text-[15px] mb-1" style="color: #0F4C5C;">Soro AI Insight</h3>
                             <div x-show="loading" class="animate-pulse flex space-x-4">
                                 <div class="flex-1 space-y-3 py-1">
                                     <div class="h-2 bg-slate-200 rounded"></div>
