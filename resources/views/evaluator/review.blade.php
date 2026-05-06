@@ -165,11 +165,23 @@
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
           <div style="background:var(--page-bg);border-radius:10px;padding:10px 12px">
             <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px">Course</div>
-            <div style="font-size:13px;font-weight:500">{{ $application->applicant->applicantProfile->course_program ?? 'N/A' }}</div>
+            <div style="font-size:13px;font-weight:500">
+              @if($blindScreening)
+                <span class="masked">Hidden</span>
+              @else
+                {{ $application->applicant->applicantProfile->course_program ?? 'N/A' }}
+              @endif
+            </div>
           </div>
           <div style="background:var(--page-bg);border-radius:10px;padding:10px 12px">
             <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px">Year Level</div>
-            <div style="font-size:13px;font-weight:500">{{ $application->applicant->applicantProfile->year_level ?? 'N/A' }}</div>
+            <div style="font-size:13px;font-weight:500">
+              @if($blindScreening)
+                <span class="masked">Hidden</span>
+              @else
+                {{ $application->applicant->applicantProfile->year_level ?? 'N/A' }}
+              @endif
+            </div>
           </div>
           <div style="background:var(--page-bg);border-radius:10px;padding:10px 12px">
             <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px">Submitted</div>
@@ -186,6 +198,7 @@
       <strong>Make a decision for #{{ $application->reference_code ?? 'A-'.$application->id }}</strong>
       Your decision will trigger an automated notification to the applicant.
     </div>
+    <button type="submit" name="decision" value="save_draft" class="btn btn-outline" style="gap:6px">💾 Save Progress</button>
     <button type="submit" name="decision" value="revision_requested" class="btn btn-outline" style="gap:6px">💬 Request Info</button>
     <button type="submit" name="decision" value="rejected" class="btn btn-danger">✖ Reject</button>
     <button type="submit" name="decision" value="approved" class="btn btn-green btn-lg">✓ Approve Application</button>
@@ -209,6 +222,21 @@
     document.getElementById('final_score').value = total;
     document.getElementById('computed_display').innerText = total;
     document.getElementById('computed_bar').style.width = total + '%';
+    
+    // Update Computation Visual
+    if(document.getElementById('calc_gpa')) {
+      document.getElementById('calc_gpa').innerText = gpa;
+      document.getElementById('calc_inc').innerText = inc;
+    }
+    
+    // Update Ring Visual
+    let ring = document.querySelector('.overall-score-ring');
+    if(ring) {
+      ring.style.background = `conic-gradient(var(--primary) 0% ${total}%, var(--border) ${total}% 100%)`;
+    }
   }
+
+  // Initialize on load
+  document.addEventListener('DOMContentLoaded', calculateScore);
 </script>
 @endpush

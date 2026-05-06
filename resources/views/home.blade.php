@@ -552,8 +552,8 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
     <ul class="nav-links">
       <li><a href="{{ route('scholarships.index') }}">Browse</a></li>
       <li><a href="#how">How It Works</a></li>
-      <li><a href="#">Organizations</a></li>
-      <li><a href="#">About</a></li>
+      <li><a href="{{ route('about') }}">About</a></li>
+      <li><a href="{{ route('organizations') }}">Organizations</a></li>
     </ul>
     <div class="nav-actions">
       <a href="{{ route('login') }}" class="btn-text">Log In</a>
@@ -639,6 +639,8 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
     @endforelse
   </div>
 </div>
+
+
 
 <!-- HOW IT WORKS -->
 <section class="how" id="how">
@@ -783,15 +785,30 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
       </div>
       <div>
         <div class="footer-col-title">Platform</div>
-        <ul class="footer-links"><li>Browse</li><li>How It Works</li><li>For Organizations</li><li>Smart Discovery</li></ul>
+        <ul class="footer-links">
+          <li><a href="{{ route('scholarships.index') }}" style="color:inherit;text-decoration:none;">Browse</a></li>
+          <li><a href="#how" style="color:inherit;text-decoration:none;">How It Works</a></li>
+          <li><a href="{{ route('organizations') }}" style="color:inherit;text-decoration:none;">For Organizations</a></li>
+          <li><a href="#features" style="color:inherit;text-decoration:none;">Smart Discovery</a></li>
+        </ul>
       </div>
       <div>
         <div class="footer-col-title">Account</div>
-        <ul class="footer-links"><li>Sign Up</li><li>Log In</li><li>My Applications</li><li>Document Wallet</li></ul>
+        <ul class="footer-links">
+          <li><a href="{{ route('register') }}" style="color:inherit;text-decoration:none;">Sign Up</a></li>
+          <li><a href="{{ route('login') }}" style="color:inherit;text-decoration:none;">Log In</a></li>
+          <li><a href="{{ route('applications.index') }}" style="color:inherit;text-decoration:none;">My Applications</a></li>
+          <li><a href="{{ route('applicant.documents.index') }}" style="color:inherit;text-decoration:none;">Document Wallet</a></li>
+        </ul>
       </div>
       <div>
         <div class="footer-col-title">Legal</div>
-        <ul class="footer-links"><li>Privacy Policy</li><li>Terms of Service</li><li>Data Privacy Act</li><li>Contact</li></ul>
+        <ul class="footer-links">
+          <li><a href="{{ route('privacy') }}" style="color:inherit;text-decoration:none;">Privacy Policy</a></li>
+          <li><a href="{{ route('terms') }}" style="color:inherit;text-decoration:none;">Terms of Service</a></li>
+          <li><a href="{{ route('data-privacy') }}" style="color:inherit;text-decoration:none;">Data Privacy Act</a></li>
+          <li><a href="mailto:support@scholarlink.ph" style="color:inherit;text-decoration:none;">Contact</a></li>
+        </ul>
       </div>
     </div>
     <div class="footer-bottom">
@@ -1157,6 +1174,160 @@ console.log('%cScholarLink ✦ World-class UI loaded', 'color:#E8A838;font-famil
 </script>
 
 <x-chatbot-widget />
+<!-- SORO AI MASCOT -->
+<style>
+  #soro-mascot {
+    position: fixed;
+    bottom: 28px;
+    width: 110px;
+    cursor: pointer;
+    z-index: 9998;
+    transition: left 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                right 0.7s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    filter: drop-shadow(0 8px 24px rgba(15,76,92,0.22));
+    will-change: left, right;
+  }
+
+  #soro-mascot.side-left  { left: -120px; right: auto; transform: scaleX(1); }
+  #soro-mascot.side-right { right: -120px; left: auto; transform: scaleX(-1); }
+
+  #soro-mascot.side-left.visible  { left: 16px; }
+  #soro-mascot.side-right.visible { right: 16px; }
+
+  #soro-mascot img {
+    width: 100%;
+    display: block;
+    transform-origin: bottom center;
+  }
+
+  @keyframes soroWave {
+    0%   { transform: rotate(0deg); }
+    15%  { transform: rotate(-22deg); }
+    30%  { transform: rotate(12deg); }
+    45%  { transform: rotate(-16deg); }
+    60%  { transform: rotate(9deg); }
+    75%  { transform: rotate(-5deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  #soro-mascot.waving img {
+    animation: soroWave 0.9s ease-in-out;
+  }
+
+  /* Tooltip bubble */
+  #soro-bubble {
+    position: fixed;
+    bottom: 148px;
+    background: var(--white);
+    border: 1px solid var(--teal-ghost);
+    border-radius: 14px 14px 14px 4px;
+    padding: 8px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-mid);
+    white-space: nowrap;
+    box-shadow: 0 4px 16px rgba(15,76,92,0.12);
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none;
+    z-index: 9997;
+  }
+  #soro-bubble.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+</style>
+
+<div id="soro-mascot" class="side-left">
+  <img src="{{ asset('soro.png') }}" alt="Soro, the ScholarLink mascot">
+</div>
+<div id="soro-bubble" id="soro-bubble"></div>
+
+<script>
+(function() {
+  const mascot  = document.getElementById('soro-mascot');
+  const bubble  = document.getElementById('soro-bubble');
+  const INTERVAL = 15000;
+
+  const messages = [
+    "Hi! I'm Soro! 👋",
+    "Found a scholarship yet? 🎓",
+    "Apply once, apply everywhere!",
+    "Your dream scholar awaits! ✨",
+    "Need help finding a grant? 🔍",
+    "Don't forget to complete your profile!",
+  ];
+
+  let currentSide = 'left';
+  let hideTimeout, bubbleTimeout, timerInterval;
+
+  function showSoro() {
+    clearTimeout(hideTimeout);
+    clearTimeout(bubbleTimeout);
+
+    // Pick a random side
+    currentSide = Math.random() > 0.5 ? 'left' : 'right';
+    mascot.className = 'side-' + currentSide;
+
+    // Position the bubble
+    if (currentSide === 'left') {
+      bubble.style.left  = '132px';
+      bubble.style.right = 'auto';
+      bubble.style.borderRadius = '14px 14px 14px 4px';
+    } else {
+      bubble.style.right = '132px';
+      bubble.style.left  = 'auto';
+      bubble.style.borderRadius = '14px 14px 4px 14px';
+    }
+
+    // Random message
+    bubble.textContent = messages[Math.floor(Math.random() * messages.length)];
+
+    // Slide in
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        mascot.classList.add('visible', 'waving');
+
+        // Show bubble after 0.4s
+        bubbleTimeout = setTimeout(() => bubble.classList.add('show'), 400);
+
+        // Remove wave class after animation
+        setTimeout(() => mascot.classList.remove('waving'), 1000);
+
+        // Hide after 3.5s
+        hideTimeout = setTimeout(hideSoro, 3500);
+      });
+    });
+  }
+
+  function hideSoro() {
+    bubble.classList.remove('show');
+    mascot.classList.remove('visible');
+  }
+
+  // Click to dismiss / re-trigger
+  mascot.addEventListener('click', () => {
+    if (mascot.classList.contains('visible')) {
+      hideSoro();
+      resetTimer();
+    }
+  });
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(showSoro, INTERVAL);
+  }
+
+  // First appearance after 2s, then every 15s
+  setTimeout(() => {
+    showSoro();
+    resetTimer();
+  }, 2000);
+})();
+</script>
 @stack('scripts')
 </body>
 </html>

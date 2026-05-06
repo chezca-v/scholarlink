@@ -390,13 +390,13 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
     </div>
 
     <div class="scholarship-grid">
-        @if(isset($savedScholarships))
+@if(isset($savedScholarships))
             @foreach($savedScholarships as $saved)
                 @php
                     $scholarship = $saved->scholarship;
-                    // Mock match percentage (e.g. from 70 to 98)
-                    $matchPct = 70 + ($scholarship->id % 29); 
-                    
+                    // Use real AI match score from controller, fallback to mock if not available
+                    $matchPct = isset($matchScores[$scholarship->id]) ? $matchScores[$scholarship->id] : 70;
+
                     // Determine deadline proximity
                     $deadlineDate = \Carbon\Carbon::parse($scholarship->deadline);
                     $isClosingSoon = $deadlineDate->isFuture() && $deadlineDate->diffInDays(now()) < 14;
@@ -413,7 +413,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                             @else
                                 <span class="status-badge" style="background:#f1f5f9;color:#64748b;border-color:#e2e8f0;">Closed</span>
                             @endif
-                            
+
                             <form action="{{ route('scholarships.unsave', $scholarship->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
@@ -425,7 +425,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                     </div>
 
                     <div class="c-title">{{ $scholarship->name }}</div>
-                    
+
                     <div class="c-meta">
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                         {{ $deadlineDate->format('M j, Y') }} &middot; {{ $scholarship->slots }} slots

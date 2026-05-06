@@ -27,23 +27,6 @@
             @auth
                 {{-- ===== LOGGED IN NAV ===== --}}
 
-                {{-- Search Bar --}}
-                <div class="flex-1 max-w-[400px]">
-                    <div class="flex items-center gap-2 px-4 py-2 rounded-[10px] border transition-all duration-150 hover:border-[#1A6B7A] focus-within:border-[#1A6B7A] focus-within:shadow-sm"
-                         style="background: #F0FAFA; border-color: #C8E8E4;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A7A80" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"/>
-                            <path d="m21 21-4.35-4.35"/>
-                        </svg>
-                        <input type="text"
-                               placeholder="Search scholarships..."
-                               class="flex-1 bg-transparent text-[13px] outline-none placeholder-[#4A7A80]"
-                               style="color: #0F4C5C;"
-                               onkeydown="if(event.key==='Enter') window.location.href='{{ route('scholarships.index') }}?search='+this.value">
-                        <span class="text-[11px] font-medium px-1.5 py-0.5 rounded"
-                              style="background: #C8E8E4; color: #4A7A80;">⌘K</span>
-                    </div>
-                </div>
 
                 {{-- Right Icons --}}
                 <div class="flex items-center gap-3 flex-shrink-0">
@@ -335,8 +318,8 @@
                                      class="w-[30px] h-[30px] rounded-full object-cover flex-shrink-0"
                                      alt="{{ $scholarship->provider_name }}">
                             @else
-                                <div class="w-[30px] h-[30px] rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold"
-                                     style="background: #0F4C5C; color: #F9D679; font-family: 'Fraunces', serif;">
+                                <div class="w-[34px] h-[34px] rounded-full flex-shrink-0 flex items-center justify-center text-xs font-bold shadow-sm"
+                                     style="background: linear-gradient(135deg, #0F4C5C 0%, #2A8FA0 100%); color: #F9D679; font-family: 'Fraunces', serif; border: 1px solid rgba(255,255,255,0.2);">
                                     {{ strtoupper(substr($scholarship->provider_name, 0, 1)) }}
                                 </div>
                             @endif
@@ -449,33 +432,24 @@
                             <div class="flex items-center gap-2">
                                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(request()->url()) }}"
                                    target="_blank"
-                                   class="w-[30px] h-[30px] flex items-center justify-center rounded-[5px] border transition-all hover:scale-110"
-                                   style="background: #FFFFFF; border-color: #C8E8E4;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#1E1E1E">
+                                   class="w-[34px] h-[34px] flex items-center justify-center rounded-[8px] border transition-all hover:scale-110 hover:border-[#0F4C5C] hover:bg-[#F0FAFA]"
+                                   style="background: #FFFFFF; border-color: #C8E8E4;" title="Share on Facebook">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="#0F4C5C">
                                         <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
-                                    </svg>
-                                </a>
-                                <a href="https://www.instagram.com/" target="_blank"
-                                   class="w-[30px] h-[30px] flex items-center justify-center rounded-[5px] border transition-all hover:scale-110"
-                                   style="background: #FFFFFF; border-color: #C8E8E4;">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" stroke-width="2">
-                                        <rect x="2" y="2" width="20" height="20" rx="5"/>
-                                        <circle cx="12" cy="12" r="4"/>
-                                        <circle cx="17.5" cy="6.5" r="0.5" fill="#1E1E1E"/>
                                     </svg>
                                 </a>
                                 <a href="https://twitter.com/intent/tweet?url={{ urlencode(request()->url()) }}&text={{ urlencode($scholarship->name) }}"
                                    target="_blank"
-                                   class="w-[30px] h-[30px] flex items-center justify-center rounded-[5px] border transition-all hover:scale-110"
-                                   style="background: #FFFFFF; border-color: #C8E8E4;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="#1E1E1E">
+                                   class="w-[34px] h-[34px] flex items-center justify-center rounded-[8px] border transition-all hover:scale-110 hover:border-[#0F4C5C] hover:bg-[#F0FAFA]"
+                                   style="background: #FFFFFF; border-color: #C8E8E4;" title="Share on X">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#0F4C5C">
                                         <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                                     </svg>
                                 </a>
-                                <button onclick="navigator.clipboard.writeText(window.location.href); this.title='Copied!';"
-                                        class="w-[30px] h-[30px] flex items-center justify-center rounded-[5px] border transition-all hover:scale-110"
+                                <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!');"
+                                        class="w-[34px] h-[34px] flex items-center justify-center rounded-[8px] border transition-all hover:scale-110 hover:border-[#0F4C5C] hover:bg-[#F0FAFA]"
                                         style="background: #FFFFFF; border-color: #C8E8E4;" title="Copy link">
-                                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#1E1E1E" stroke-width="2.5">
+                                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0F4C5C" stroke-width="2.5">
                                         <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
                                         <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
                                     </svg>
@@ -495,13 +469,12 @@
                                 <span class="text-[15px] font-bold" style="color: #0F4C5C;">Slots Remaining</span>
                             </div>
                             <span style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 15px; color: #0F4C5C;">
-                                /{{ $scholarship->slots }}
+                                {{ $slotsRemaining }}/{{ $scholarship->slots }}
                             </span>
                         </div>
                         @php
-                            $applications = $scholarship->applications_count ?? 0;
                             $pct = $scholarship->slots > 0
-                                ? min(round(($applications / $scholarship->slots) * 100), 100)
+                                ? min(round(($approvedCount / $scholarship->slots) * 100), 100)
                                 : 0;
                         @endphp
                         <div class="w-full h-1 rounded-full mb-2" style="background: #D8F0EE;">
@@ -509,7 +482,7 @@
                                  style="width: {{ $pct }}%; background: linear-gradient(90deg, #0F4C5C 0%, #D4A84B 100%);"></div>
                         </div>
                         <p class="text-[13px] font-bold text-center" style="color: #7AACAA;">
-                            {{ $pct }}% of the slots have been claimed
+                            {{ $pct }}% of slots claimed &bull; {{ $slotsRemaining }} remaining
                         </p>
                     </div>
 
@@ -593,9 +566,9 @@
                 <div class="w-[160px]">
                     <p class="text-[10px] uppercase tracking-[2px] mb-[14px]" style="color: rgba(255,255,255,0.25);">Legal</p>
                     <ul class="space-y-[10px]">
-                        <li><a href="#" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">Privacy Policy</a></li>
-                        <li><a href="#" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">Terms of Service</a></li>
-                        <li><a href="#" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">Data Privacy Act</a></li>
+                        <li><a href="{{ route('privacy') }}" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">Privacy Policy</a></li>
+                        <li><a href="{{ route('terms') }}" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">Terms of Service</a></li>
+                        <li><a href="{{ route('data-privacy') }}" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">Data Privacy Act</a></li>
                         <li><a href="#" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">Contact</a></li>
                     </ul>
                 </div>

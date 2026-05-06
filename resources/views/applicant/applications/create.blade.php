@@ -219,56 +219,54 @@
             <div class="req-list">
 
               {{-- GPA --}}
-              @php $gpa = $eligibility['gpa']; @endphp
               <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
-                <div class="req-check {{ $gpa['pass'] ? 'ok' : 'warn' }}">{{ $gpa['pass'] ? '✓' : '' }}</div>
+                <div class="req-check warn" id="check-gpa"></div>
                 <div>
-                  GPA of {{ $scholarship->gpa_requirement }} or better
+                  GPA of {{ $scholarship->gpa_requirement ?? 'N/A' }} or better
                   <span class="req-sub">
                     @if($profile->gwa)
-                      Your GWA: {{ number_format((float) $profile->gwa, 2) }} — {{ $gpa['pass'] ? 'qualifies' : 'does not qualify' }}
+                      Your GWA: {{ number_format((float) $profile->gwa, 2) }} — click to certify
                     @else
-                      Your GWA: Not provided — Click to certify
+                      GWA not provided — click to self-certify
                     @endif
                   </span>
                 </div>
               </div>
 
               {{-- Income --}}
-              @php $inc = $eligibility['income']; @endphp
               <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
-                <div class="req-check {{ $inc['pass'] === true ? 'ok' : 'warn' }}">{{ $inc['pass'] === true ? '✓' : '' }}</div>
+                <div class="req-check warn" id="check-income"></div>
                 <div>
-                  Annual family income
+                  Annual family income within bracket
                   <span class="req-sub">
-                    Limit: {{ $scholarship->income_bracket }} —
+                    Limit: {{ $scholarship->income_bracket ?? 'None specified' }} —
                     @if($profile->monthly_household_income !== null)
-                      Your income: ₱{{ number_format($profile->monthly_household_income * 12) }}/yr — {{ $inc['pass'] ? 'qualifies' : 'does not qualify' }}
+                      Your income: ₱{{ number_format($profile->monthly_household_income * 12) }}/yr — click to certify
                     @else
-                      Income not yet verified — Click to certify
+                      Income not provided — click to self-certify
                     @endif
                   </span>
                 </div>
               </div>
 
               {{-- No concurrent scholarship --}}
-              @php $conc = $eligibility['concurrent']; @endphp
               <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
-                <div class="req-check {{ $conc['pass'] ? 'ok' : 'warn' }}">{{ $conc['pass'] ? '✓' : '' }}</div>
-                <div>No active scholarship grant</div>
+                <div class="req-check warn" id="check-concurrent"></div>
+                <div>No active scholarship grant
+                  <span class="req-sub">Click to certify you have no active scholarship</span>
+                </div>
               </div>
 
               {{-- Enrollment --}}
-              @php $enr = $eligibility['enrollment']; @endphp
               <div class="req-item" onclick="toggleCheck(this)" style="cursor:pointer;" title="Click to self-certify">
-                <div class="req-check {{ $enr['pass'] ? 'ok' : 'warn' }}">{{ $enr['pass'] ? '✓' : '' }}</div>
+                <div class="req-check warn" id="check-enrollment"></div>
                 <div>
                   Currently enrolled (college level)
                   <span class="req-sub">
                     @if($profile->university_name || $profile->course_program)
-                      {{ $profile->university_name ?? '' }} {{ $profile->course_program ? '- '.$profile->course_program : '' }}
+                      {{ $profile->university_name ?? '' }} {{ $profile->course_program ? '— '.$profile->course_program : '' }} — click to certify
                     @else
-                      Enrollment details not provided — Click to certify
+                      Enrollment details not provided — click to certify
                     @endif
                   </span>
                 </div>
@@ -320,8 +318,8 @@
             @foreach($group['slots'] as $slot)
             @php
               $matches     = $savedDocuments->where('document_type', $slot['document_type']);
-              $slug        = Str::slug($slot['document_type']);
-              $preSelected = $matches->firstWhere('status', 'verified');
+              $slug        = $slot['slug'];
+              $preSelected = $matches->firstWhere('status', 'verified') ?? $matches->firstWhere('status', 'pending');
             @endphp
 
             <div class="doc-subcard">
@@ -389,7 +387,7 @@
         </div>
 
         {{-- Endorsement letter — separate row below the 3-col grid --}}
-        @php $endorseSlug = Str::slug($endorsementSlot['document_type']); @endphp
+        @php $endorseSlug = $endorsementSlot['slug']; @endphp
         <div class="doc-endorsement">
           <div class="doc-group-title">{{ $endorsementSlot['groupTitle'] }}</div>
           <div class="doc-subcard">
@@ -488,10 +486,10 @@
           <div class="confirm-table">
             @foreach($documentGroups as $group)
               @foreach($group['slots'] as $slot)
-              @php
-                $slug     = Str::slug($slot['document_type']);
-                $preMatch = $savedDocuments->where('document_type', $slot['document_type'])->firstWhere('status', 'verified');
-              @endphp
+                @php
+                  $slug     = $slot['slug'];
+                  $preMatch = $savedDocuments->where('document_type', $slot['document_type'])->firstWhere('status', 'verified');
+                @endphp
               <div class="confirm-row">
                 <span class="ck">{{ $slot['label'] }}</span>
                 <span class="cv {{ $preMatch ? '' : 'none' }}" id="confirm-val-{{ $slug }}">
@@ -695,10 +693,14 @@ function guardSubmit() {
   const cb  = document.getElementById('certify');
   const lbl = document.getElementById('certify-label');
 
-  // Check required documents
+  // Check required documents dynamically
   const requiredSlugs = [
-    'proof-of-enrollment', 'report-card-transcript', 'valid-id',
-    'itr-tax-exemption', 'barangay-indigency', 'endorsement-letter'
+    @foreach($documentGroups as $group)
+      @foreach($group['slots'] as $slot)
+        @if(!$slot['optional']) '{{ $slot['slug'] }}', @endif
+      @endforeach
+    @endforeach
+    @if(!$endorsementSlot['optional']) '{{ $endorsementSlot['slug'] }}', @endif
   ];
   let missing = false;
 

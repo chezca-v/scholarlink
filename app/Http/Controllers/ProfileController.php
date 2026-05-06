@@ -159,8 +159,15 @@ class ProfileController extends Controller
 
         ApplicantProfile::updateOrCreate(
             ['user_id' => $request->user()->id],
-            $validated
-        );
+            array_merge([
+                'university_name' => '',
+                'university_address' => '',
+                'course_program' => '',
+                'student_number' => '',
+                'year_level' => '',
+                'semester' => '',
+                'academic_year' => '',
+            ], $validated)             );
 
         return redirect()->route('profile.setup', ['step' => 2]);
     }
@@ -170,13 +177,13 @@ class ProfileController extends Controller
         $validated = $request->validate([
             'university_name' => ['required', 'string', 'max:255'],
             'university_address' => ['required', 'string'],
-            'university_email' => ['required', 'email', 'max:255'],
+            'university_email' => ['nullable', 'email', 'max:255'],
             'course_program' => ['required', 'string', 'max:255'],
             'student_number' => ['required', 'string', 'max:50'],
             'year_level' => ['required', 'string', 'max:20'],
             'semester' => ['required', 'string', 'max:20'],
             'academic_year' => ['required', 'string', 'max:20'],
-            'gwa' => ['required', 'numeric', 'min:1', 'max:5'],
+            'gwa' => ['nullable', 'numeric', 'min:1', 'max:100'],
         ]);
 
         ApplicantProfile::updateOrCreate(

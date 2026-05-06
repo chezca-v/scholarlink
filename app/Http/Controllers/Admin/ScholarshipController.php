@@ -40,7 +40,7 @@ class ScholarshipController extends Controller
             'requirements' => 'required|string',
             'open_date' => 'required|date',
             'deadline' => 'required|date|after:open_date',
-            'status' => 'required|in:open,closed,draft',
+            'status' => 'required|in:open,closed,draft,closing_soon,coming_soon',
             'blind_screening' => 'boolean',
             'ai_match_enabled' => 'boolean',
             'weight_gpa' => 'nullable|numeric|min:0|max:100',
@@ -49,11 +49,20 @@ class ScholarshipController extends Controller
             'contact_email' => 'nullable|email|max:255',
             'website' => 'nullable|url|max:255',
             'address' => 'nullable|string|max:500',
+            'org_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $data = $request->all();
         $data['created_by'] = auth()->id();
         $data['posted_at'] = now();
+        
+        // Map 'courses' or 'tags' to 'courses' column
+        $data['courses'] = $request->courses ?? $request->tags;
+
+        // Handle logo upload
+        if ($request->hasFile('org_logo')) {
+            $data['org_logo'] = $request->file('org_logo')->store('logos', 'public');
+        }
 
         Scholarship::create($data);
 
@@ -64,7 +73,7 @@ class ScholarshipController extends Controller
     {
         $scholarship = Scholarship::where('created_by', auth()->id())->withCount('applications')->findOrFail($id);
         
-        $query = Application::where('scholarship_id', $id)->with(['applicant']);
+        $query = Application::where('scholarship_id', $id)->with(['applicant.applicantProfile']);
         
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -74,9 +83,9 @@ class ScholarshipController extends Controller
         if ($sort === 'oldest') {
             $query->orderBy('created_at', 'asc');
         } elseif ($sort === 'score_high') {
-            $query->orderBy('ai_score', 'desc');
+            $query->orderBy('ai_match_score', 'desc');
         } elseif ($sort === 'score_low') {
-            $query->orderBy('ai_score', 'asc');
+            $query->orderBy('ai_match_score', 'asc');
         } else {
             $query->orderBy('created_at', 'desc');
         }
@@ -84,14 +93,13 @@ class ScholarshipController extends Controller
         $applications = $query->paginate(20)->withQueryString();
 
         $stageCounts = [
-            'submitted' => Application::where('scholarship_id', $id)->where('status', 'submitted')->count(),
-            'review' => Application::where('scholarship_id', $id)->where('status', 'review')->count(),
-            'approved' => Application::where('scholarship_id', $id)->where('status', 'approved')->count(),
-            'rejected' => Application::where('scholarship_id', $id)->where('status', 'rejected')->count(),
-            'waitlisted' => Application::where('scholarship_id', $id)->where('status', 'waitlisted')->count(),
+            'submitted'  => Application::where('scholarship_id', $id)->where('status', 'pending')->count(),
+            'review'     => Application::where('scholarship_id', $id)->where('status', 'under_review')->count(),
+            'approved'   => Application::where('scholarship_id', $id)->where('status', 'approved')->count(),
+            'rejected'   => Application::where('scholarship_id', $id)->where('status', 'rejected')->count(),
+            'revision'   => Application::where('scholarship_id', $id)->where('status', 'revision')->count(),
         ];
         
-        // Ensure $evaluators is available for the assign modal
         $evaluators = \App\Models\User::where('role', 'evaluator')->get();
 
         return view('admin.scholarships.show', compact('scholarship', 'applications', 'stageCounts', 'evaluators'));
@@ -109,33 +117,52 @@ class ScholarshipController extends Controller
         $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
 
         $request->validate([
-            'name' => 'required|string|max:255',
-            'provider_name' => 'required|string|max:255',
-            'tagline' => 'nullable|string|max:255',
-            'description' => 'required|string',
-            'gpa_requirement' => 'nullable|numeric|min:0|max:100',
-            'income_bracket' => 'nullable|string|max:100',
-            'slots' => 'required|integer|min:1',
-            'eligibility' => 'required|string',
-            'benefits' => 'required|string',
-            'requirements' => 'required|string',
-            'open_date' => 'required|date',
-            'deadline' => 'required|date|after:open_date',
-            'status' => 'required|in:open,closed,draft',
-            'blind_screening' => 'boolean',
+            'name'             => 'required|string|max:255',
+            'provider_name'    => 'required|string|max:255',
+            'tagline'          => 'nullable|string|max:255',
+            'description'      => 'required|string',
+            'gpa_requirement'  => 'nullable|numeric|min:0|max:100',
+            'income_bracket'   => 'nullable|string|max:100',
+            'slots'            => 'required|integer|min:0',
+            'eligibility'      => 'required|string',
+            'benefits'         => 'required|string',
+            'requirements'     => 'required|string',
+            'open_date'        => 'required|date',
+            'deadline'         => 'required|date',
+            'status'           => 'required|in:open,closed,draft,closing_soon,coming_soon',
+            'blind_screening'  => 'boolean',
             'ai_match_enabled' => 'boolean',
-            'weight_gpa' => 'nullable|numeric|min:0|max:100',
-            'weight_income' => 'nullable|numeric|min:0|max:100',
-            'tags' => 'nullable|array',
-            'contact_email' => 'nullable|email|max:255',
-            'website' => 'nullable|url|max:255',
-            'address' => 'nullable|string|max:500',
+            'weight_gpa'       => 'nullable|numeric|min:0|max:100',
+            'weight_income'    => 'nullable|numeric|min:0|max:100',
+            'courses'          => 'nullable|array',
+            'tags'             => 'nullable|array',
+            'contact_email'    => 'nullable|email|max:255',
+            'website'          => 'nullable|url|max:255',
+            'address'          => 'nullable|string|max:500',
+            'org_logo'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['_token', '_method']);
+        
+        // Map 'courses' or 'tags' to 'courses' column
+        $data['courses'] = $request->courses ?? $request->tags;
+
+        // Ensure boolean fields
+        $data['blind_screening']   = $request->boolean('blind_screening');
+        $data['ai_match_enabled']  = $request->boolean('ai_match_enabled');
+
+        // Handle logo upload
+        if ($request->hasFile('org_logo')) {
+            if ($scholarship->org_logo) {
+                Storage::disk('public')->delete($scholarship->org_logo);
+            }
+            $data['org_logo'] = $request->file('org_logo')->store('logos', 'public');
+        }
+
         $scholarship->update($data);
 
-        return redirect()->route('admin.scholarships.index')->with('success', 'Scholarship updated successfully.');
+        return redirect()->route('admin.scholarships.index')
+            ->with('success', '"'.$scholarship->name.'" updated successfully.');
     }
 
     public function destroy($id)
@@ -197,7 +224,7 @@ class ScholarshipController extends Controller
     public function extendDeadline(Request $request, $id)
     {
         $request->validate([
-            'deadline_date' => 'required|date'
+            'deadline' => 'required|date'
         ]);
         $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
         $scholarship->deadline = $request->deadline;

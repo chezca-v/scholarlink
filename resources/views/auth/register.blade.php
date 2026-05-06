@@ -55,33 +55,24 @@
             padding: 28px 16px;
             position: relative;
             overflow: hidden;
-            background: var(--teal-950);
+            background: var(--white);
         }
 
-        /* Animated background orbs */
-        body::before,
-        body::after {
-            content: '';
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-        body::before {
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, rgba(34,136,154,0.25) 0%, transparent 70%);
-            top: -200px; left: -200px;
-            animation: floatOrb1 12s ease-in-out infinite alternate;
-        }
-        body::after {
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(201,162,39,0.12) 0%, transparent 70%);
-            bottom: -150px; right: -100px;
-            animation: floatOrb2 15s ease-in-out infinite alternate;
+        /* ── PARTICLE CANVAS ───────────────────────────── */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0;
         }
 
-        @keyframes floatOrb1 { from { transform: translate(0,0) scale(1); } to { transform: translate(80px,60px) scale(1.15); } }
-        @keyframes floatOrb2 { from { transform: translate(0,0) scale(1); } to { transform: translate(-60px,-80px) scale(1.1); } }
+        /* ── AMBIENT BG ORBS ───────────────────────────── */
+        .ambient-orb {
+            position: fixed; border-radius: 50%; pointer-events: none; z-index: 0;
+            filter: blur(80px); opacity: 0.15;
+            animation: orbFloat 12s ease-in-out infinite;
+        }
+        @keyframes orbFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(30px,-20px)} 66%{transform:translate(-20px,30px)} }
+        .orb-teal { background: var(--teal-500); width: 600px; height: 600px; top: -100px; right: -100px; animation-delay: 0s; }
+        .orb-gold { background: var(--gold); width: 400px; height: 400px; bottom: 10%; left: -100px; animation-delay: -6s; }
 
         /* ── AUTH CARD ── */
         .auth-card {
@@ -616,6 +607,13 @@
 
 <body>
 
+    <!-- Ambient orbs -->
+    <div class="ambient-orb orb-teal"></div>
+    <div class="ambient-orb orb-gold"></div>
+
+    <!-- Particle canvas -->
+    <canvas id="particle-canvas"></canvas>
+
     {{-- ═══════════════════════════════════════════
          AUTH CARD — JS toggles .active-login / .active-signup
          Default: active-login (from /login)
@@ -854,6 +852,97 @@
         @if ($errors->hasAny(['first_name', 'last_name', 'role', 'terms']))
             activateSignup();
         @endif
+
+        // ── PARTICLE SYSTEM ──────────────────────────────────────────
+        const canvas = document.getElementById('particle-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            let W, H, particles = [], mouse = { x: -9999, y: -9999 };
+
+            function resizeCanvas() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            document.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+            const COLORS = ['rgba(15,76,92,', 'rgba(232,168,56,', 'rgba(122,172,170,'];
+
+            class Particle {
+                constructor() { this.reset(true); }
+                reset(initial = false) {
+                    this.x = Math.random() * W;
+                    this.y = initial ? Math.random() * H : -10;
+                    this.baseX = this.x; this.baseY = this.y;
+                    this.vx = (Math.random() - 0.5) * 0.3;
+                    this.vy = Math.random() * 0.4 + 0.1;
+                    this.size = Math.random() * 3.5 + 1;
+                    this.alpha = Math.random() * 0.5 + 0.15;
+                    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+                    this.life = 1; this.decay = Math.random() * 0.001 + 0.0002;
+                }
+                update() {
+                    const dx = mouse.x - this.x, dy = mouse.y - this.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    const force = Math.max(0, (120 - dist) / 120);
+                    if (dist < 120) {
+                        this.x -= (dx / dist) * force * 2.5;
+                        this.y -= (dy / dist) * force * 2.5;
+                    } else {
+                        this.x += (this.baseX - this.x) * 0.02;
+                        this.y += (this.baseY - this.y) * 0.02;
+                    }
+                    this.x += this.vx; this.y += this.vy;
+                    this.baseX += this.vx; this.baseY += this.vy;
+                    this.life -= this.decay;
+                    if (this.y > H + 10 || this.life <= 0) this.reset();
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color + (this.alpha * this.life) + ')';
+                    ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < 180; i++) particles.push(new Particle());
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, W, H);
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 120) {
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.strokeStyle = `rgba(122,172,170,${(1 - dist / 120) * 0.18})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                    particles[i].update();
+                    particles[i].draw();
+                }
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+        }
+
+        // ── AMBIENT ORB PARALLAX ──────────────────────────────────────
+        document.addEventListener('mousemove', e => {
+            const orbTeal = document.querySelector('.orb-teal');
+            const orbGold = document.querySelector('.orb-gold');
+            if(orbTeal && orbGold) {
+                const x = (e.clientX / window.innerWidth - 0.5) * 20;
+                const y = (e.clientY / window.innerHeight - 0.5) * 20;
+                orbTeal.style.transform = `translate(${x}px, ${y}px)`;
+                orbGold.style.transform = `translate(${-x * 0.6}px, ${-y * 0.6}px)`;
+            }
+        });
 
     })();
     </script>

@@ -27,6 +27,9 @@ class DatabaseSeeder extends Seeder
             // 5. Applications — depends on users + scholarships
             ApplicationSeeder::class,
 
+            // 5.5 Link Applications and Documents
+            ApplicationDocumentSeeder::class,
+
             // 6. Evaluations — depends on applications + users
             EvaluationSeeder::class,
 

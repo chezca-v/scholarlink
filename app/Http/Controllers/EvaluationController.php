@@ -38,6 +38,9 @@ class EvaluationController extends Controller
 
         // Blind screening — mask applicant info if enabled
         $blindScreening = $application->scholarship->blind_screening;
+        if ($blindScreening) {
+            $application->applicant = $this->maskApplicantForBlindReview($application->applicant, $application->applicant->applicantProfile);
+        }
 
         // Precompute scores for the view
         $gpaScore = $evaluation ? $evaluation->gpa_score : 0;
@@ -121,6 +124,7 @@ class EvaluationController extends Controller
             'evaluator_id'   => $evaluator->id,
         ]);
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
         $evaluation->gpa_score    = $request->gpa_score;
         $evaluation->income_score = $request->income_score;
@@ -129,8 +133,12 @@ class EvaluationController extends Controller
         $evaluation->gpa_score    = $allDocsApproved ? $gpaScore : 0;
         $evaluation->income_score = $allDocsApproved ? $incomeScore : 0;
 >>>>>>> Stashed changes
+=======
+        $evaluation->gpa_score    = $request->gpa_score ?? 0;
+        $evaluation->income_score = $request->income_score ?? 0;
+>>>>>>> main
         $evaluation->notes        = $request->notes;
-        $evaluation->decision     = $request->decision;
+        $evaluation->decision     = ($request->decision === 'save_draft') ? null : $request->decision;
         $evaluation->final_score  = $evaluation->computeFinalScore(
             $scholarship->weight_gpa,
             $scholarship->weight_income
@@ -138,6 +146,7 @@ class EvaluationController extends Controller
         $evaluation->evaluated_at = Carbon::now();
         $evaluation->save();
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
         if ($request->decision === 'approved') {
@@ -149,11 +158,16 @@ class EvaluationController extends Controller
             }
         }
 
+=======
+>>>>>>> main
         if ($request->decision === 'save_draft') {
             return redirect()->back()->with('success', 'Progress saved successfully.');
         }
 
+<<<<<<< HEAD
 >>>>>>> Stashed changes
+=======
+>>>>>>> main
         // Update application status and stage
         $application->status     = match($request->decision) {
             'approved'            => 'approved',
@@ -174,8 +188,11 @@ class EvaluationController extends Controller
             return redirect()->route('evaluator.rejection', ['id' => $id]);
         }
 
-        return redirect()->route('evaluator.queue')
-            ->with('success', 'Evaluation submitted successfully.');
+        $msg = $request->decision === 'revision_requested' 
+            ? 'Information request sent to applicant.' 
+            : 'Evaluation submitted successfully.';
+
+        return redirect()->route('evaluator.queue')->with('success', $msg);
     }
 
     public function reject($id)
@@ -258,13 +275,22 @@ class EvaluationController extends Controller
             $applicant->first_name = 'Anonymous';
             $applicant->last_name = 'Applicant';
         }
+        
+        $applicant->email = 'hidden@scholarlink.ph';
+        $applicant->phone = '09XX-XXX-XXXX';
 
         if ($profile) {
+            $profile->address = 'Hidden (Blind Mode)';
+            $profile->phone = 'Hidden';
+            $profile->birth_date = null;
+            $profile->gender = 'Hidden';
             $profile->university_name = 'Hidden';
             $profile->course_program = 'Hidden';
             $profile->year_level = null;
             $profile->province = 'Philippines';
             $profile->avatar_url = null;
+            $profile->fb_link = null;
+            $profile->linkedin_link = null;
         }
 
         if (property_exists($applicant, 'avatar_url')) {

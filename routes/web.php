@@ -13,7 +13,8 @@ use App\Http\Controllers\{
     AdminController,
     EvaluatorController,
     EvaluationController,
-    SuperadminController
+    SuperadminController,
+    StaticPageController
 };
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
 
@@ -23,6 +24,19 @@ Public Routes
 Route::controller(PublicController::class)->group(function () {
     Route::get('/', 'landing')->name('landing');
 });
+
+// Static Public Pages
+Route::get('/about', [StaticPageController::class, 'about'])->name('about');
+Route::get('/organizations', [StaticPageController::class, 'organizations'])->name('organizations');
+
+// Legacy/alias redirects
+Route::get('/about.php', fn() => redirect()->route('about'));
+Route::get('/organizations.php', fn() => redirect()->route('organizations'));
+
+// Static Legal Pages
+Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
+Route::get('/privacy', [StaticPageController::class, 'privacy'])->name('privacy');
+Route::get('/data-privacy', [StaticPageController::class, 'dataPrivacy'])->name('data-privacy');
 
 Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships', 'index')->name('scholarships.index');
@@ -42,12 +56,20 @@ Route::middleware(['auth', 'role:applicant'])->group(function () {
 /*
 Applicant Routes (Role: applicant)
 */
-Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
+Route::middleware(['auth', 'verified', 'role:applicant', 'profile.completed'])->group(function () {
 
     // Dashboard & Profile Management
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
+        
+        // Profile Setup Routes
+        Route::get('/applicant/setup', 'setup')->name('profile.setup');
+        Route::post('/applicant/setup/step1', 'setupStep1')->name('profile.setup.step1');
+        Route::post('/applicant/setup/step2', 'setupStep2')->name('profile.setup.step2');
+        Route::post('/applicant/setup/step3', 'setupStep3')->name('profile.setup.step3');
+        Route::post('/applicant/setup/submit', 'setupSubmit')->name('profile.setup.submit');
+
         Route::get('/profile', 'edit')->name('profile.show');
         Route::patch('/profile/update', 'update')->name('profile.update');
         Route::delete('/profile', 'destroy')->name('profile.destroy');

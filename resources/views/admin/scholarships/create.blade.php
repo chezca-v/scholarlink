@@ -9,7 +9,7 @@
             <svg style="width:14px;height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
             Scholarships
         </a>
-        <span style="color:var(--muted);">/</span>
+        <span style="color:var(--slate);font-size:13px;display:flex;align-items:center;gap:4px;">/</span>
         <span style="font-size:13px;color:var(--ink);">Create New</span>
     </div>
     <h1 class="font-display font-bold text-2xl" style="color:var(--ink);">Create Scholarship</h1>
@@ -20,6 +20,17 @@
     <form method="POST" action="{{ route('admin.scholarships.store') }}">
         @csrf
 
+        @if($errors->any())
+        <div class="alert alert-danger mb-6 p-4 rounded-xl" style="background:#FEE2E2; color:#DC2626; border:1px solid #FECACA;">
+            <p class="font-bold text-sm mb-1">Please fix the following errors:</p>
+            <ul class="list-disc pl-5 text-sm">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         {{-- Hidden fields to store dynamic arrays as strings --}}
         <input type="hidden" name="eligibility" :value="eligibility.join('\n')">
         <input type="hidden" name="benefits" :value="benefits.join('\n')">
@@ -28,7 +39,7 @@
         <div class="grid grid-cols-3 gap-6">
             {{-- LEFT COLUMN: Main details --}}
             <div class="col-span-2 space-y-6">
-                
+
                 {{-- Basic Info Card --}}
                 <div class="card p-6">
                     <h2 class="font-display font-bold text-lg mb-5 border-b border-[var(--border)] pb-3" style="color:var(--ink);">Basic Information</h2>
@@ -72,7 +83,7 @@
                                 <input type="url" id="website" name="website" class="input-field" placeholder="https://..." value="{{ old('website') }}">
                             </div>
                         </div>
-                        
+
                         <div>
                             <label class="input-label" for="address">Address</label>
                             <input type="text" id="address" name="address" class="input-field" placeholder="e.g. Manila, NCR or Nationwide" value="{{ old('address') }}">
@@ -84,71 +95,65 @@
                 <div class="card p-6">
                     <h2 class="font-display font-bold text-lg mb-5 border-b border-[var(--border)] pb-3" style="color:var(--ink);">Details & Requirements</h2>
                     <div class="space-y-6">
-                        
+
                         {{-- Eligibility --}}
                         <div>
-                            <label class="input-label flex items-center justify-between">
-                                <span>Eligibility Criteria <span style="color:#DC2626;">*</span></span>
-                            </label>
-                            <div class="space-y-2">
-                                <template x-for="(item, index) in eligibility" :key="'elig'+index">
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <input type="text" class="input-field" x-model="eligibility[index]" placeholder="e.g. Must be a graduating SHS student" required>
-                                        </div>
-                                        <button type="button" @click="eligibility.splice(index, 1)" x-show="eligibility.length > 1" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                        </button>
-                                    </div>
-                                </template>
+                            <label class="input-label">Eligibility Criteria <span style="color:#DC2626;">*</span></label>
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" class="input-field" x-model="newEligibility" placeholder="e.g. Must be a graduating SHS student" @keydown.enter.prevent="if(newEligibility) { eligibility.push(newEligibility); newEligibility=''; }">
+                                <button type="button" @click="if(newEligibility) { eligibility.push(newEligibility); newEligibility=''; }" class="btn-secondary !py-2 px-4 shrink-0">Add</button>
                             </div>
-                            <button type="button" @click="eligibility.push('')" class="mt-2 text-sm font-semibold text-[var(--primary)] hover:underline flex items-center gap-1">
-                                + Add another criteria
-                            </button>
+                            <ul class="space-y-2">
+                                <template x-for="(item, index) in eligibility" :key="'elig'+index">
+                                    <li class="flex items-start gap-2 bg-white border border-[var(--border)] p-2.5 rounded-lg shadow-sm">
+                                        <svg class="w-4 h-4 text-[var(--primary)] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span class="flex-1 text-sm text-[var(--ink)]" x-text="item"></span>
+                                        <button type="button" @click="eligibility.splice(index, 1)" class="text-red-500 hover:bg-red-50 p-1 rounded transition-colors" title="Remove">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
 
                         {{-- Benefits --}}
                         <div>
-                            <label class="input-label flex items-center justify-between">
-                                <span>Benefits Overview <span style="color:#DC2626;">*</span></span>
-                            </label>
-                            <div class="space-y-2">
-                                <template x-for="(item, index) in benefits" :key="'ben'+index">
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <input type="text" class="input-field" x-model="benefits[index]" placeholder="e.g. Full Tuition Coverage" required>
-                                        </div>
-                                        <button type="button" @click="benefits.splice(index, 1)" x-show="benefits.length > 1" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                        </button>
-                                    </div>
-                                </template>
+                            <label class="input-label">Benefits Overview <span style="color:#DC2626;">*</span></label>
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" class="input-field" x-model="newBenefit" placeholder="e.g. Full Tuition Coverage" @keydown.enter.prevent="if(newBenefit) { benefits.push(newBenefit); newBenefit=''; }">
+                                <button type="button" @click="if(newBenefit) { benefits.push(newBenefit); newBenefit=''; }" class="btn-secondary !py-2 px-4 shrink-0">Add</button>
                             </div>
-                            <button type="button" @click="benefits.push('')" class="mt-2 text-sm font-semibold text-[var(--primary)] hover:underline flex items-center gap-1">
-                                + Add another benefit
-                            </button>
+                            <ul class="space-y-2">
+                                <template x-for="(item, index) in benefits" :key="'ben'+index">
+                                    <li class="flex items-start gap-2 bg-white border border-[var(--border)] p-2.5 rounded-lg shadow-sm">
+                                        <svg class="w-4 h-4 text-[var(--primary)] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                        <span class="flex-1 text-sm text-[var(--ink)]" x-text="item"></span>
+                                        <button type="button" @click="benefits.splice(index, 1)" class="text-red-500 hover:bg-red-50 p-1 rounded transition-colors" title="Remove">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
 
                         {{-- Requirements --}}
                         <div>
-                            <label class="input-label flex items-center justify-between">
-                                <span>Document Requirements <span style="color:#DC2626;">*</span></span>
-                            </label>
-                            <div class="space-y-2">
-                                <template x-for="(item, index) in requirements" :key="'req'+index">
-                                    <div class="flex items-center gap-2">
-                                        <div class="flex-1">
-                                            <input type="text" class="input-field" x-model="requirements[index]" placeholder="e.g. Certificate of Good Moral" required>
-                                        </div>
-                                        <button type="button" @click="requirements.splice(index, 1)" x-show="requirements.length > 1" class="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
-                                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                        </button>
-                                    </div>
-                                </template>
+                            <label class="input-label">Document Requirements <span style="color:#DC2626;">*</span></label>
+                            <div class="flex gap-2 mb-3">
+                                <input type="text" class="input-field" x-model="newRequirement" placeholder="e.g. Certificate of Good Moral" @keydown.enter.prevent="if(newRequirement) { requirements.push(newRequirement); newRequirement=''; }">
+                                <button type="button" @click="if(newRequirement) { requirements.push(newRequirement); newRequirement=''; }" class="btn-secondary !py-2 px-4 shrink-0">Add</button>
                             </div>
-                            <button type="button" @click="requirements.push('')" class="mt-2 text-sm font-semibold text-[var(--primary)] hover:underline flex items-center gap-1">
-                                + Add another document
-                            </button>
+                            <ul class="space-y-2">
+                                <template x-for="(item, index) in requirements" :key="'req'+index">
+                                    <li class="flex items-start gap-2 bg-white border border-[var(--border)] p-2.5 rounded-lg shadow-sm">
+                                        <svg class="w-4 h-4 text-[var(--primary)] mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+                                        <span class="flex-1 text-sm text-[var(--ink)]" x-text="item"></span>
+                                        <button type="button" @click="requirements.splice(index, 1)" class="text-red-500 hover:bg-red-50 p-1 rounded transition-colors" title="Remove">
+                                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                        </button>
+                                    </li>
+                                </template>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -166,11 +171,11 @@
                                         <option value="shs">SHS (100 Point)</option>
                                     </select>
                                 </div>
-                                <input type="number" id="gpa_requirement" name="gpa_requirement" class="input-field" 
-                                    :placeholder="gpaScale === 'college' ? 'e.g. 1.5' : 'e.g. 85'" 
-                                    :min="gpaScale === 'college' ? 0 : 70" 
-                                    :max="gpaScale === 'college' ? 5 : 100" 
-                                    :step="gpaScale === 'college' ? '0.01' : '1'" 
+                                <input type="number" id="gpa_requirement" name="gpa_requirement" class="input-field"
+                                    :placeholder="gpaScale === 'college' ? 'e.g. 1.5' : 'e.g. 85'"
+                                    :min="gpaScale === 'college' ? 0 : 70"
+                                    :max="gpaScale === 'college' ? 5 : 100"
+                                    :step="gpaScale === 'college' ? '0.01' : '1'"
                                     value="{{ old('gpa_requirement') }}" required>
                                 <p class="input-hint" x-text="gpaScale === 'college' ? 'Enter the equivalent (e.g. 1.5, 2.0)' : 'Enter grade out of 100'"></p>
                                 @error('gpa_requirement') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
@@ -187,17 +192,17 @@
                                 </select>
                             </div>
                         </div>
-                        
+
                         <div>
                             <label class="input-label mb-2">Eligible Courses</label>
                             <div class="p-4 rounded-xl border border-[var(--border)] bg-gray-50 flex items-center justify-between">
                                 <div class="flex-1">
                                     <div x-show="selectedTags.length > 0 || customTags.length > 0" class="flex flex-wrap gap-2">
                                         <template x-for="(tag, i) in selectedTags" :key="'s'+i">
-                                            <span class="tag-chip shadow-sm"><span x-text="tag"></span> <input type="hidden" name="tags[]" :value="tag"></span>
+                                            <span class="tag-chip shadow-sm"><span x-text="tag"></span> <input type="hidden" name="courses[]" :value="tag"></span>
                                         </template>
                                         <template x-for="(tag, i) in customTags" :key="'c'+i">
-                                            <span class="tag-chip shadow-sm bg-blue-50 text-blue-700"><span x-text="tag"></span> <input type="hidden" name="tags[]" :value="tag"></span>
+                                            <span class="tag-chip shadow-sm bg-blue-50 text-blue-700"><span x-text="tag"></span> <input type="hidden" name="courses[]" :value="tag"></span>
                                         </template>
                                     </div>
                                     <p x-show="selectedTags.length === 0 && customTags.length === 0" class="text-sm text-gray-500">All courses eligible by default.</p>
@@ -330,7 +335,7 @@
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                     </button>
                 </div>
-                
+
                 <div class="p-6 overflow-y-auto flex-1">
                     <div class="grid grid-cols-2 gap-6 mb-6">
                         <div>
@@ -378,7 +383,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="bg-gray-50 p-4 rounded-xl border border-[var(--border)]">
                         <p class="font-bold text-[var(--ink)] text-sm mb-2">Other Courses / Custom Tags</p>
                         <div class="flex flex-wrap gap-2 mb-2">
@@ -409,10 +414,13 @@
 function scholarshipForm() {
     return {
         // Dynamic Fields setup
-        eligibility: {!! json_encode(old('eligibility') ? explode("\n", old('eligibility')) : ['']) !!},
-        benefits: {!! json_encode(old('benefits') ? explode("\n", old('benefits')) : ['']) !!},
-        requirements: {!! json_encode(old('requirements') ? explode("\n", old('requirements')) : ['']) !!},
-        
+        eligibility: {!! json_encode(array_values(array_filter(old('eligibility') ? explode("\n", old('eligibility')) : []))) !!},
+        newEligibility: '',
+        benefits: {!! json_encode(array_values(array_filter(old('benefits') ? explode("\n", old('benefits')) : []))) !!},
+        newBenefit: '',
+        requirements: {!! json_encode(array_values(array_filter(old('requirements') ? explode("\n", old('requirements')) : []))) !!},
+        newRequirement: '',
+
         // GPA Scale
         gpaScale: 'college',
 
@@ -435,15 +443,15 @@ function scholarshipForm() {
             health: ['BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health'],
             arts: ['BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math']
         },
-        selectedTags: {!! json_encode(array_values(array_filter(old('tags', []), function($tag) {
+        selectedTags: {!! json_encode(array_values(array_filter(is_array(old('tags', [])) ? old('tags', []) : [], function($tag) {
             $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return in_array($tag, $standards);
         }))) !!},
-        customTags: {!! json_encode(array_values(array_filter(old('tags', []), function($tag) {
+        customTags: {!! json_encode(array_values(array_filter(is_array(old('tags', [])) ? old('tags', []) : [], function($tag) {
             $standards = ['BS Civil Engineering', 'BS Computer Engineering', 'BS Information Technology', 'BS Computer Science', 'BS Electrical Engineering', 'BS Mechanical Engineering', 'BS Accountancy', 'BS Business Administration', 'BS Economics', 'BS Finance', 'BS Nursing', 'BS Biology', 'BS Pharmacy', 'BS Medical Technology', 'BS Public Health', 'BA Psychology', 'BA Communication', 'BA Political Science', 'BSED English', 'BSED Math'];
             return !in_array($tag, $standards);
         }))) !!},
-        
+
         addCustomTag(value) {
             const v = value.trim().replace(/,$/, '');
             const allStandards = [...this.standardCourses.eng, ...this.standardCourses.biz];

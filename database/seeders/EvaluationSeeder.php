@@ -132,7 +132,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Under scoring review. Awaiting final deliberation.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 11 — App 8 (Angela → Summit) — in progress
@@ -144,7 +144,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Documents verified. Scoring in progress.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 12 — App 14 (Liz → LiftED) — in progress
@@ -156,7 +156,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Financial documents confirmed. Final score pending.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 13 — App 17 (Mark → STEM Forward) — in progress
@@ -168,7 +168,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'STEM qualification verified. Awaiting final score.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 14 — App 22 (Joshua → ExcelEdge) — in progress
@@ -180,7 +180,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Leadership assessment completed. Score pending.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 15 — App 29 (Alex → STEM Forward) — in progress
@@ -192,7 +192,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Strong STEM profile. Scoring near completion.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 16 — App 31 (Sofia → Bagong Alab) — approved
@@ -264,7 +264,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Documents verified. Scoring in progress.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 22 — App 38 (Hannah → Bagong Alab) — in progress
@@ -276,7 +276,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Strong SHS profile. Awaiting final deliberation.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
             // Eval 23 — App 44 (Camille → Talino at Puso) — in progress
@@ -288,7 +288,7 @@ class EvaluationSeeder extends Seeder
                 'final_score'      => null,
                 'decision'         => null,
                 'rejection_reason' => null,
-                'notes'            => 'Outstanding candidate. Final score pending.',
+                'notes'            => null,
                 'evaluated_at'     => null,
             ],
         ];

@@ -144,6 +144,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .card{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:18px 18px 16px;display:flex;flex-direction:column;transition:box-shadow .15s;}
 .card:hover{box-shadow:0 2px 14px rgba(0,0,0,0.07);}
 .card.saved{border-color:var(--amber);border-width:2px;}
+.card.best-match{border-color:var(--teal);border-width:2px;box-shadow:0 4px 16px rgba(15,76,92,0.15);}
 
 .card-skel{background:#fff;border:1.5px solid var(--mist);border-radius:16px;padding:18px 18px 16px;display:flex;flex-direction:column;gap:10px;}
 .sk{background:var(--mist);border-radius:5px;animation:pulse 1.6s ease-in-out infinite;}
@@ -160,6 +161,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 .bdg-closing{background:var(--warn-bg);color:var(--warn-text);border-radius:5px;}
 .bdg-coming{background:var(--violet-bg);color:var(--violet-text);border-radius:20px;}
 .bdg-coming::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--violet-text);margin-right:4px;}
+.bdg-best{background:linear-gradient(135deg, #0F4C5C, #2A8FA0);color:#fff;border-radius:20px;box-shadow:0 2px 8px rgba(15,76,92,0.3);}
+.bdg-match{background:var(--amber);color:var(--ink);border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;text-transform:uppercase;}
 
 .ctitle{font-size:15.5px;font-weight:700;color:var(--ink);line-height:1.35;margin-bottom:5px;letter-spacing:-0.2px;}
 .cmeta{display:flex;align-items:center;gap:4px;font-size:11.5px;color:var(--slate);margin-bottom:10px;}
@@ -215,10 +218,41 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
   .main{padding:20px 18px 28px;}
   .cgrid{grid-template-columns:repeat(2,1fr);}
 }
-@media (max-width: 820px){
-  .sidebar{width:220px;position:sticky;top:56px;height:calc(100vh - 56px);}
-  .main{padding:16px;}
+@media (max-width: 900px){
+  .layout{flex-direction:column;}
+  .sidebar{
+    width:100%;position:fixed;top:auto;bottom:0;left:0;right:0;
+    height:auto;max-height:60vh;z-index:300;
+    border-top:2px solid var(--teal);border-radius:20px 20px 0 0;
+    padding:16px;overflow-y:auto;transform:translateY(calc(100% - 52px));
+    transition:transform .3s ease;
+  }
+  .sidebar.open{transform:translateY(0);}
+  .sidebar::-webkit-scrollbar{width:3px;}
+  .filter-toggle{display:flex;align-items:center;justify-content:center;gap:8px;}
+  .main{padding:16px;padding-bottom:70px;}
   .cgrid{grid-template-columns:1fr;}
+  .sb-hd{margin-bottom:12px;}
+  .fg{border-bottom:1px solid var(--mist);padding-bottom:12px;margin-bottom:12px;}
+  .sb-user{margin-top:12px;margin-bottom:40px;}
+}
+@media (max-width: 820px){
+  .sidebar{position:fixed;transform:translateY(calc(100% - 52px));}
+  .sidebar.open{transform:translateY(0);}
+  .main{padding:16px;padding-bottom:70px;}
+  .cgrid{grid-template-columns:1fr;}
+}
+
+/* Mobile filter toggle button */
+.filter-toggle{
+  display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+  background:var(--teal);color:#fff;border:none;border-radius:30px;
+  padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;
+  z-index:301;box-shadow:0 4px 12px rgba(15,76,92,0.3);
+  gap:8px;align-items:center;
+}
+@media (max-width: 900px){
+  .filter-toggle{display:flex;}
 }
 </style>
 </head>
@@ -233,6 +267,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
   {{--Search form — submits GET to same page --}}
   <form class="nav-search" method="GET" action="{{ route('scholarships.index') }}" id="filter-form">
+    <input type="hidden" name="filter_submitted" value="1">
     <span class="si">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
@@ -240,7 +275,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     </span>
     <input type="text" name="q" id="nav-search"
            value="{{ $filters['q'] ?? '' }}"
-           placeholder="Search scholarships, organizations…"
+           placeholder="Search scholarships, requirements…"
            autocomplete="off">
   </form>
 
@@ -287,6 +322,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 </nav>
 
 {{-- ═══════════════════════════════════════════════════ LAYOUT ═════════════ --}}
+{{-- Mobile filter toggle button --}}
+<button type="button" class="filter-toggle" onclick="toggleFilters()">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+  </svg>
+  <span>Filters</span>
+</button>
+
 <div class="layout">
 
  {{--───────────────────────────────────── SIDEBAR / FILTERS ───────────────--}}
@@ -296,36 +339,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <a href="{{ route('scholarships.index') }}" class="btn-clr">Clear all</a>
     </div>
 
-    {{-- Quick Navigation --}}
-    @auth
-    <div class="fg" style="border-bottom: 1px solid var(--mist); padding-bottom: 12px; margin-bottom: 12px;">
-      <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--teal); font-size: 13px; font-weight: 600; transition: all 0.15s;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        Back to Dashboard
-      </a>
-    </div>
-    @endauth
 
     {{-- Status --}}
     <div class="fg">
       <div class="fgl">Status</div>
       @php
-        $activeStatuses = (array) ($filters['status'] ?? ['open', 'closing_soon', 'coming_soon']);
+        // Only pre-check boxes if the user explicitly submitted the status filter.
+        // If no 'status' in the request, show no boxes as checked (controller uses defaults internally).
+        $activeStatuses = request()->has('status') ? (array) ($filters['status'] ?? []) : [];
       @endphp
       <label class="cbr">
-        <input type="checkbox" name="status[]" value="open"
+        <input type="checkbox" name="status[]" value="open" form="filter-form"
                {{ in_array('open', $activeStatuses) ? 'checked' : '' }}
                onchange="submitFilters()">
         <span class="cbl">Open</span>
       </label>
       <label class="cbr">
-        <input type="checkbox" name="status[]" value="closing_soon"
+        <input type="checkbox" name="status[]" value="closing_soon" form="filter-form"
                {{ in_array('closing_soon', $activeStatuses) ? 'checked' : '' }}
                onchange="submitFilters()">
         <span class="cbl">Closing Soon</span>
       </label>
       <label class="cbr">
-        <input type="checkbox" name="status[]" value="coming_soon"
+        <input type="checkbox" name="status[]" value="coming_soon" form="filter-form"
                {{ in_array('coming_soon', $activeStatuses) ? 'checked' : '' }}
                onchange="submitFilters()">
         <span class="cbl">Coming Soon</span>
@@ -347,7 +383,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       @endphp
       @foreach($categoryOptions as $value => $label)
         <label class="cbr">
-          <input type="checkbox" name="category[]" value="{{ $value }}"
+          <input type="checkbox" name="category[]" value="{{ $value }}" form="filter-form"
                  {{ in_array($value, $activeCategories) ? 'checked' : '' }}
                  onchange="submitFilters()">
           <span class="cbl">{{ $label }}</span>
@@ -400,12 +436,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       <div class="fgl">Income Bracket</div>
       @php
 
-        $activeIncomes = (array) ($filters['income'] ?? ['Below ₱100K/yr', '₱100K–₱250K']);
+        $activeIncomes = request()->has('income') ? (array) ($filters['income'] ?? []) : [];
         $incomeOptions = ['Below ₱100K/yr', '₱100K–₱250K', '₱250K–₱500K', 'Open / Any'];
       @endphp
       @foreach($incomeOptions as $incVal)
         <label class="cbr">
-          <input type="checkbox" name="income[]" value="{{ $incVal }}"
+          <input type="checkbox" name="income[]" value="{{ $incVal }}" form="filter-form"
                  {{ in_array($incVal, $activeIncomes) ? 'checked' : '' }}
                  onchange="submitFilters()">
           <span class="cbl">{{ $incVal }}</span>
@@ -429,7 +465,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           </button>
         @endforeach
         {{-- Hidden input carries the selected value --}}
-        <input type="hidden" name="deadline" id="deadline-val" value="{{ $activeDl }}">
+        <input type="hidden" name="deadline" id="deadline-val" form="filter-form" value="{{ request()->has('deadline') ? $activeDl : '' }}">
       </div>
     </div>
 
@@ -444,7 +480,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           <span class="swc" id="match-d">≥ {{ $matchVal }}%</span>
           <span>100%</span>
         </div>
-        <input type="range" id="match-s" name="match" min="0" max="100" step="5"
+        <input type="range" id="match-s" name="match" form="filter-form" min="0" max="100" step="5"
                value="{{ $matchVal }}"
                oninput="document.getElementById('match-d').textContent='≥ '+this.value+'%';"
                onchange="submitFilters()">
@@ -453,7 +489,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
     @endauth
 
     {{-- Sort (hidden on sidebar, controlled by top bar) --}}
-    <input type="hidden" name="sort" id="sort-val" value="{{ $filters['sort'] ?? 'match' }}">
+    <input type="hidden" name="sort" id="sort-val" form="filter-form" value="{{ $filters['sort'] ?? 'match' }}">
 
     {{-- User profile card (bottom of sidebar) --}}
     @auth
@@ -521,8 +557,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
         scholarship{{ $scholarships->total() !== 1 ? 's' : '' }} match your filters
       </div>
       <div class="rright">
-        <select class="sort-sel" id="sort-sel" onchange="setSort(this.value)">
-          <option value="match"    {{ ($filters['sort'] ?? 'match') === 'match'    ? 'selected' : '' }}>Best Match</option>
+<select class="sort-sel" id="sort-sel" onchange="setSort(this.value)">
+          <option value="ai_match" {{ ($filters['sort'] ?? 'ai_match') === 'ai_match' ? 'selected' : '' }}>★ Best For You</option>
+          <option value="match"    {{ ($filters['sort'] ?? '') === 'match'    ? 'selected' : '' }}>Best Match</option>
           <option value="deadline" {{ ($filters['sort'] ?? '') === 'deadline' ? 'selected' : '' }}>Deadline (Soonest)</option>
           <option value="slots"    {{ ($filters['sort'] ?? '') === 'slots'    ? 'selected' : '' }}>Most Slots</option>
           <option value="alpha"    {{ ($filters['sort'] ?? '') === 'alpha'    ? 'selected' : '' }}>A – Z</option>
@@ -582,14 +619,24 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
           }
         @endphp
 
-        <div class="card {{ $userApplication && $userApplication->status === 'approved' ? 'saved' : '' }}"
+@php
+          $matchScore = isset($aiMatchScores[$scholarship->id]) ? $aiMatchScores[$scholarship->id] : null;
+          $isBestMatch = $topMatchId === $scholarship->id;
+        @endphp
+
+        <div class="card {{ $userApplication && $userApplication->status === 'approved' ? 'saved' : '' }} {{ $isBestMatch ? 'best-match' : '' }}"
              data-id="{{ $scholarship->id }}">
              <div class="card-body">
 
-          {{-- Card top: org name + badges --}}
+{{-- Card top: org name + badges --}}
           <div class="ctop">
             <span class="corg">{{ $scholarship->provider_name }}</span>
             <div class="cbdg">
+              @if($isBestMatch)
+                <span class="bdg bdg-best">★ Best Match</span>
+              @elseif($matchScore !== null)
+                <span class="bdg bdg-match">{{ $matchScore }}% Match</span>
+              @endif
               @if($isNew)
                 <span class="bdg bdg-new">+ New</span>
               @endif
@@ -605,8 +652,13 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
             </div>
           </div>
 
-          {{-- Scholarship name --}}
-          <div class="ctitle">{{ $scholarship->name }}</div>
+          {{-- Scholarship Logo & Name --}}
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:8px;">
+            <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(135deg, #0F4C5C, #1A6B7A); color:#F9D679; display:flex; align-items:center; justify-content:center; font-family:'Fraunces',serif; font-weight:700; font-size:16px; flex-shrink:0; box-shadow:0 3px 8px rgba(15,76,92,0.15);">
+                {{ strtoupper(substr($scholarship->provider_name, 0, 1)) }}
+            </div>
+            <div class="ctitle" style="margin-bottom:0;">{{ $scholarship->name }}</div>
+          </div>
 
           {{-- Deadline + location meta --}}
           <div class="cmeta">
@@ -654,20 +706,27 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 
           <div class="cdiv"></div>
 
-          {{-- Match score (only shown to logged-in users with an AI score) --}}
+{{-- Match score (shown to logged-in users with AI score) --}}
           @auth
             @if($matchScore !== null)
-              <div class="mlbl">Your Match Score</div>
-              <div class="mrow">
+              <div class="mlbl">{{ $isBestMatch ? '★ Best Match For You' : 'Match Score' }}</div>
+              <div class="mrow" style="margin-bottom:8px;">
                 <div class="btrack">
                   <div class="bfill" style="width:{{ $matchScore }}%"></div>
                 </div>
-                <span class="mpct">{{ number_format($matchScore, 0) }}%</span>
+                <span class="mpct">{{ $matchScore }}%</span>
               </div>
-            @else
-              <div class="mlbl" style="margin-bottom:13px;opacity:.6;">Match score not yet computed</div>
+            @elseif(!$userApplication)
+              <div class="mlbl">Login to see match score</div>
             @endif
           @endauth
+
+          <div class="mlbl">Slots Available</div>
+          <div style="font-size:13px; font-weight:700; color:var(--primary); margin-bottom:13px; display:flex; align-items:center; gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--slate)"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            {{ $scholarship->remainingSlots() }} slots left
+            <span style="font-weight:400; color:var(--slate); font-size:11px;">(of {{ $scholarship->slots }})</span>
+          </div>
 
           {{-- Actions --}}
           </div>
@@ -735,6 +794,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Mobile filter toggle ─────────────────────────────────────────────
+function toggleFilters() {
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('open');
+}
+
 // ── View toggle (grid vs list) ─────────────────────────────────────────────
 function setView(mode) {
   const grid = document.getElementById('cgrid');

@@ -323,7 +323,7 @@
           $stages = ['submitted' => 1, 'doc_review' => 2, 'scoring' => 3, 'interview' => 4, 'decided' => 5];
           $currentStage = $stages[$stage] ?? 1;
       @endphp
-      <a href="{{ route('applications.track', $application->id) }}" class="app-item" style="text-decoration:none">
+      <a href="{{ route('applications.show', $application->id) }}" class="app-item" style="text-decoration:none">
         <div class="app-avatar" style="background:#F0FAFA;">{{ $initials }}</div>
         <div class="app-info">
           <div class="app-name">{{ $scholarship->name ?? 'Scholarship' }}</div>
@@ -413,7 +413,7 @@
           $isUrgent = $daysLeft !== null && $daysLeft <= 3;
           $isSoon = $daysLeft !== null && $daysLeft <= 7;
       @endphp
-      <a href="{{ route('applications.track', $application->id) }}" class="deadline-item" style="text-decoration:none">
+      <a href="{{ route('applications.show', $application->id) }}" class="deadline-item" style="text-decoration:none">
         <div class="dl-cal {{ $isUrgent ? 'urgent' : 'normal' }}">
           <div class="dl-day">{{ $deadline ? \Carbon\Carbon::parse($deadline)->format('d') : '--' }}</div>
           <div class="dl-month">{{ $deadline ? \Carbon\Carbon::parse($deadline)->format('M') : '' }}</div>
