@@ -30,4 +30,4 @@ RUN npm install
 RUN npm run build
 
 # Start the Laravel server and run database migrations automatically
-CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
+CMD php artisan migrate --force --seed && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
