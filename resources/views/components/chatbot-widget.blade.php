@@ -1,7 +1,7 @@
 @php
     $unreadCount = $unreadCount ?? 0;
-    $botName = $botName ?? 'Scholar AI';
-    $botAvatar = $botAvatar ?? null;
+    $botName = $botName ?? 'Soro AI';
+    $botAvatar = $botAvatar ?? asset('soro.png');
     $chips = $chips ?? [
         ['icon' => '📅', 'label' => 'Show deadlines'],
         ['icon' => '📊', 'label' => 'My app status'],
@@ -158,7 +158,7 @@
                 >
                 <button class="chat-window__send-btn" type="button" aria-label="Send message" onclick="ChatWidget.sendMessage()">➤</button>
             </div>
-            <p class="chat-window__disclaimer">Scholar AI · Responses may not be 100% accurate</p>
+            <p class="chat-window__disclaimer">Soro AI · Responses may not be 100% accurate</p>
         </div>
     </section>
 </div>
