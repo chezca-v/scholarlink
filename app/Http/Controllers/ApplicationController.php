@@ -350,4 +350,26 @@ class ApplicationController extends Controller
     {
         return view('applicant.applications.track', compact('id'));
     }
+
+    public function respondToOffer(Request $request, $id)
+    {
+        $request->validate([
+            'action' => 'required|in:accept,reject'
+        ]);
+
+        $application = Application::where('applicant_id', auth()->id())
+            ->where('status', 'approved')
+            ->where('offer_status', 'pending')
+            ->findOrFail($id);
+
+        if ($request->action === 'accept') {
+            $application->offer_status = 'accepted';
+            $application->save();
+            return redirect()->route('dashboard')->with('success', 'Congratulations! You have accepted the scholarship offer.');
+        } else {
+            $application->offer_status = 'rejected';
+            $application->save();
+            return redirect()->route('dashboard')->with('success', 'You have declined the scholarship offer.');
+        }
+    }
 }

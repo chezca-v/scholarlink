@@ -608,9 +608,10 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
             <span class="msc-open {{ $scholarship->status === 'closing' ? 'warn' : '' }}">{{ ucfirst($scholarship->status) }}</span>
           </div>
           <div class="msc-title">{{ Str::limit($scholarship->name, 40) }}</div>
-          <div class="msc-match">{{ $scholarship->slots }}</div>
-          <div class="msc-match-label">Available Slots</div>
-          <div class="msc-bar"><div class="msc-bar-fill" data-width="75"></div></div>
+          @php $benefitAmount = $scholarship->benefit_snippet_1 ? (int) preg_replace('/[^0-9]/', '', $scholarship->benefit_snippet_1) : 0; @endphp
+          <div class="msc-match">₱{{ $benefitAmount > 0 ? number_format($benefitAmount) : 'Varies' }}</div>
+          <div class="msc-match-label">Amount Benefited</div>
+          <div class="msc-bar"><div class="msc-bar-fill" data-width="100"></div></div>
         </div>
       @empty
         <div class="mini-schol-card">
@@ -673,11 +674,11 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
         <h2 class="section-title" style="margin-bottom:0;font-size:clamp(28px,3vw,42px);">Find yours today.</h2>
       </div>
       <div class="filters">
-        <button class="filter active">All</button>
-        <button class="filter">Merit-Based</button>
-        <button class="filter">Need-Based</button>
-        <button class="filter">STEM</button>
-        <button class="filter">Arts</button>
+        <a href="{{ route('scholarships.index') }}" class="filter active" style="text-decoration:none;display:inline-block;">All</a>
+        <a href="{{ route('scholarships.index', ['category' => ['Merit-Based']]) }}" class="filter" style="text-decoration:none;display:inline-block;">Merit-Based</a>
+        <a href="{{ route('scholarships.index', ['category' => ['Need-Based']]) }}" class="filter" style="text-decoration:none;display:inline-block;">Need-Based</a>
+        <a href="{{ route('scholarships.index', ['category' => ['STEM']]) }}" class="filter" style="text-decoration:none;display:inline-block;">STEM</a>
+        <a href="{{ route('scholarships.index', ['category' => ['Arts & Humanities']]) }}" class="filter" style="text-decoration:none;display:inline-block;">Arts & Humanities</a>
       </div>
     </div>
     <div class="s-grid" id="s-grid">
@@ -695,10 +696,11 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
           </div>
           <div class="sc-match">
             <div class="sc-match-row">
-              <span class="sc-match-label">Available Slots</span>
-              <span class="sc-match-pct">{{ $scholarship->slots }}</span>
+              <span class="sc-match-label">Amount Benefited</span>
+              @php $benefitAmount = $scholarship->benefit_snippet_1 ? (int) preg_replace('/[^0-9]/', '', $scholarship->benefit_snippet_1) : 0; @endphp
+              <span class="sc-match-pct">₱{{ $benefitAmount > 0 ? number_format($benefitAmount) : 'Varies' }}</span>
             </div>
-            <div class="sc-bar-bg"><div class="sc-bar-fill" data-width="75"></div></div>
+            <div class="sc-bar-bg"><div class="sc-bar-fill" data-width="100"></div></div>
           </div>
         </div>
       @empty

@@ -45,10 +45,28 @@ class ScholarshipController extends Controller
             $query->whereIn('income_bracket', $request->income);
         }
 
-        // Apply GPA filter (minimum requirement)
-        if ($request->filled('gpa')) {
-            $gpa = (float) $request->gpa;
-            $query->where('gpa_requirement', '<=', $gpa);
+        // Apply GWA filter (Philippines 1.0 to 5.0 system where lower is better)
+        // If an applicant has a GWA of 2.0, they can apply to scholarships requiring 2.0, 2.25, 2.5...
+        // So we want scholarships where gpa_requirement >= applicant_gwa
+        if ($request->filled('gwa')) {
+            $gwa = (float) $request->gwa;
+            $query->where(function($q) use ($gwa) {
+                // Assuming GWA is <= 5.0
+                $q->where('gpa_requirement', '>=', $gwa)
+                  ->where('gpa_requirement', '<=', 5.0);
+            });
+        }
+
+        // Apply Percentage filter (70 to 100 system where higher is better)
+        // If an applicant has 85%, they can apply to scholarships requiring 85%, 80%, 75%...
+        // So we want scholarships where gpa_requirement <= applicant_percentage
+        if ($request->filled('percentage')) {
+            $percentage = (float) $request->percentage;
+            $query->where(function($q) use ($percentage) {
+                // Assuming Percentage is > 5.0 to distinguish from GWA
+                $q->where('gpa_requirement', '<=', $percentage)
+                  ->where('gpa_requirement', '>', 5.0);
+            });
         }
 
         // Apply deadline filter (relative to now)

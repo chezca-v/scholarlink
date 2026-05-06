@@ -21,11 +21,14 @@ class Application extends Model
         'conflict_flag',
         'submitted_at',
         'decided_at',
+        'offer_status',
+        'offer_expires_at',
     ];
 
     protected $casts = [
         'submitted_at'    => 'datetime',
         'decided_at'      => 'datetime',
+        'offer_expires_at'=> 'datetime',
         'ai_match_score'  => 'decimal:2',
         'conflict_flag'   => 'boolean',
     ];

@@ -73,6 +73,7 @@ Route::middleware(['auth', 'verified', 'role:applicant'])->group(function () {
         Route::post('/apply/{id}', 'store')->name('applications.store');
         Route::get('/applicant/applications/{id}', 'show')->name('applications.show');
         Route::get('/applicant/applications/{id}/track', 'track')->name('applications.track');
+        Route::post('/applicant/applications/{id}/offer', 'respondToOffer')->name('applicant.offer.respond');
     });
 
     // Saved Scholarships & Notifications

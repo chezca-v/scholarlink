@@ -71,19 +71,19 @@ class EvaluationController extends Controller
 
         $application = Application::query()->findOrFail($id);
 
+        // Check evaluator is assigned to this scholarship
+        $isAssigned = $evaluator->evaluatorAssignments()
+            ->where('scholarship_id', $application->scholarship_id)
+            ->exists();
+
+        abort_if(!$isAssigned, 403, 'You are not assigned to this scholarship.');
+
         $request->validate([
-<<<<<<< Updated upstream
-            'gpa_score'    => ['required', 'numeric', 'min:0', 'max:100'],
-            'income_score' => ['required', 'numeric', 'min:0', 'max:100'],
-            'notes'        => ['nullable', 'string', 'max:1000'],
-            'decision'     => ['required', 'in:approved,rejected,revision_requested'],
-=======
             'notes'        => ['nullable', 'string', 'max:1000'],
             'decision'     => ['required', 'in:approved,rejected,revision_requested,save_draft'],
             'documents'    => ['nullable', 'array'],
             'documents.*.status' => ['in:pending,approved,rejected,revision_requested'],
             'documents.*.notes' => ['nullable', 'string', 'max:500'],
->>>>>>> Stashed changes
         ]);
 
         $scholarship = $application->scholarship;

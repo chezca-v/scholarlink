@@ -355,21 +355,44 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;heigh
       @endforeach
     </div>
 
-    {{-- GPA / QPI slider --}}
+    {{-- Grade scale filter --}}
     <div class="fg">
-      <div class="fgl">Minimum GPA / QPI</div>
-      <div class="sw">
-        @php $gpaVal = $filters['gpa'] ?? 1.75; @endphp
+      <div class="fgl">Your Grade</div>
+      <select id="grade-scale-sel" style="font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; color:var(--ink); padding:6px 8px; border-radius:6px; border:1px solid var(--mist); outline:none; background:#fff; cursor:pointer;" onchange="toggleGradeScale()">
+        <option value="none" {{ empty($filters['gwa']) && empty($filters['percentage']) ? 'selected' : '' }}>Any Grade</option>
+        <option value="gwa" {{ isset($filters['gwa']) ? 'selected' : '' }}>GWA (1.0 - 5.0)</option>
+        <option value="percentage" {{ isset($filters['percentage']) ? 'selected' : '' }}>Percentage (70 - 100)</option>
+      </select>
+
+      <div class="sw" id="gwa-wrapper" style="display: {{ isset($filters['gwa']) ? 'flex' : 'none' }}; margin-top: 8px;">
+        @php $gwaVal = $filters['gwa'] ?? 2.0; @endphp
         <div class="swr">
-          <span>1.00</span>
-          <span class="swc" id="gpa-d">≥ {{ number_format($gpaVal, 2) }}</span>
-          <span>5.00</span>
+          <span>1.0</span>
+          <span class="swc" id="gwa-d">≤ {{ number_format($gwaVal, 2) }}</span>
+          <span>5.0</span>
         </div>
-        <input type="range" id="gpa-s" name="gpa" min="1" max="5" step="0.25"
-               value="{{ $gpaVal }}"
-               oninput="document.getElementById('gpa-d').textContent='≥ '+parseFloat(this.value).toFixed(2);"
-               onchange="submitFilters()">
+        <input type="range" id="gwa-s" min="1" max="5" step="0.25"
+               value="{{ $gwaVal }}"
+               oninput="document.getElementById('gwa-d').textContent='≤ '+parseFloat(this.value).toFixed(2);"
+               onchange="updateGradeInput()">
       </div>
+
+      <div class="sw" id="perc-wrapper" style="display: {{ isset($filters['percentage']) ? 'flex' : 'none' }}; margin-top: 8px;">
+        @php $percVal = $filters['percentage'] ?? 85; @endphp
+        <div class="swr">
+          <span>70%</span>
+          <span class="swc" id="perc-d">≥ {{ $percVal }}%</span>
+          <span>100%</span>
+        </div>
+        <input type="range" id="perc-s" min="70" max="100" step="1"
+               value="{{ $percVal }}"
+               oninput="document.getElementById('perc-d').textContent='≥ '+this.value+'%';"
+               onchange="updateGradeInput()">
+      </div>
+
+      <!-- Hidden inputs -->
+      <input type="hidden" name="gwa" id="gwa-input" value="{{ $filters['gwa'] ?? '' }}" {{ isset($filters['gwa']) ? '' : 'disabled' }}>
+      <input type="hidden" name="percentage" id="perc-input" value="{{ $filters['percentage'] ?? '' }}" {{ isset($filters['percentage']) ? '' : 'disabled' }}>
     </div>
 
     {{-- Income bracket --}}
@@ -739,6 +762,45 @@ function setPill(group, value) {
   document.querySelectorAll(`.pill[data-g="${group}"]`).forEach(p => p.classList.remove('active'));
   event.currentTarget.classList.add('active');
   document.getElementById('deadline-val').value = value;
+  submitFilters();
+}
+
+// ── Grade Scale toggle ───────────────────────────────────────────────────────
+function toggleGradeScale() {
+  const scale = document.getElementById('grade-scale-sel').value;
+  const gwaWrap = document.getElementById('gwa-wrapper');
+  const percWrap = document.getElementById('perc-wrapper');
+  const gwaInput = document.getElementById('gwa-input');
+  const percInput = document.getElementById('perc-input');
+
+  if (scale === 'gwa') {
+    gwaWrap.style.display = 'flex';
+    percWrap.style.display = 'none';
+    gwaInput.disabled = false;
+    percInput.disabled = true;
+    updateGradeInput();
+  } else if (scale === 'percentage') {
+    gwaWrap.style.display = 'none';
+    percWrap.style.display = 'flex';
+    gwaInput.disabled = true;
+    percInput.disabled = false;
+    updateGradeInput();
+  } else {
+    gwaWrap.style.display = 'none';
+    percWrap.style.display = 'none';
+    gwaInput.disabled = true;
+    percInput.disabled = true;
+    submitFilters();
+  }
+}
+
+function updateGradeInput() {
+  const scale = document.getElementById('grade-scale-sel').value;
+  if (scale === 'gwa') {
+    document.getElementById('gwa-input').value = document.getElementById('gwa-s').value;
+  } else if (scale === 'percentage') {
+    document.getElementById('perc-input').value = document.getElementById('perc-s').value;
+  }
   submitFilters();
 }
 

@@ -74,6 +74,13 @@ class ProfileController extends Controller
             ->where('is_read', false)
             ->count();
 
+        $pendingOffers = Application::query()
+            ->with('scholarship')
+            ->where('applicant_id', $user->id)
+            ->where('status', 'approved')
+            ->where('offer_status', 'pending')
+            ->get();
+
         $stats = [
             'active_applications' => (clone $applicationBaseQuery)
                 ->whereIn('status', ['pending', 'under_review', 'revision'])
@@ -123,7 +130,8 @@ class ProfileController extends Controller
             'upcomingDeadlines',
             'notifications',
             'profileCompleteness',
-            'unreadNotifications'
+            'unreadNotifications',
+            'pendingOffers'
         ));
     }
 

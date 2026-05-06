@@ -189,6 +189,36 @@
   </div>
 </div>
 
+<!-- PENDING OFFERS -->
+@if($pendingOffers->count() > 0)
+@foreach($pendingOffers as $offer)
+<div class="section" style="background:#FEFCE8;border:1.5px solid #FDE047;border-radius:16px;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 4px 12px rgba(234,179,8,0.15);">
+  <div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <span style="background:#EAB308;color:#FFF;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;text-transform:uppercase;letter-spacing:0.5px;">Offer Pending</span>
+      <span style="font-size:12px;color:#A16207;font-weight:600;">Expires: {{ \Carbon\Carbon::parse($offer->offer_expires_at)->format('M d, Y h:i A') }}</span>
+    </div>
+    <div style="font-family:'Fraunces',serif;font-size:22px;font-weight:700;color:#854D0E;margin-bottom:4px;">Congratulations! You've been selected.</div>
+    <div style="font-size:13.5px;color:#713F12;line-height:1.4;">
+      You have received a scholarship offer for <strong>{{ $offer->scholarship->name }}</strong> from <strong>{{ $offer->scholarship->provider_name }}</strong>. Please accept or decline this offer.
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0;min-width:140px;">
+    <form action="{{ route('applicant.offer.respond', $offer->id) }}" method="POST">
+      @csrf
+      <input type="hidden" name="action" value="accept">
+      <button type="submit" class="btn-ai" style="width:100%;justify-content:center;background:linear-gradient(135deg, #22C55E, #16A34A);color:#FFF;padding:12px;">Accept Offer</button>
+    </form>
+    <form action="{{ route('applicant.offer.respond', $offer->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to decline this scholarship offer? This action cannot be undone.');">
+      @csrf
+      <input type="hidden" name="action" value="reject">
+      <button type="submit" style="width:100%;background:none;border:none;color:#A16207;font-size:12.5px;font-weight:600;cursor:pointer;padding:4px;text-decoration:underline;">Decline Offer</button>
+    </form>
+  </div>
+</div>
+@endforeach
+@endif
+
 <!-- STATS -->
 <div class="stat-row section">
   <div class="stat-card">
