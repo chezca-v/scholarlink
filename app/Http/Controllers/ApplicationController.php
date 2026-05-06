@@ -214,7 +214,7 @@ class ApplicationController extends Controller
         $endorsementSlot = [
             'slug' => 'endorsement-letter',
             'groupTitle' => 'Endorsement',
-            'document_type' => 'Letter of Recommendation',
+            'document_type' => 'Endorsement Letter',
             'label' => 'Endorsement Letter',
             'smallNote' => 'From Dean or Guidance Counselor',
             'optional' => false,
@@ -312,7 +312,7 @@ class ApplicationController extends Controller
             'affidavit-of-need'   => 'Affidavit of Financial Need',
             'recommendation-letter' => 'Letter of Recommendation',
             'birth-certificate'   => 'PSA Birth Certificate',
-            'endorsement-letter'  => 'Letter of Recommendation',
+            'endorsement-letter'  => 'Endorsement Letter',
         ];
 
         foreach ($uploads as $slug => $file) {

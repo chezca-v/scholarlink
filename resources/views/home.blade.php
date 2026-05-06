@@ -602,7 +602,7 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
   <div class="hero-visual" id="hero-visual">
     <div class="cards-row">
       @forelse($scholarships->slice(0, 3) as $scholarship)
-        <div class="mini-schol-card" data-tilt>
+        <div class="mini-schol-card" data-tilt onclick="window.location.href='{{ route('scholarships.index') }}'">
           <div class="msc-top">
             <span class="msc-org">{{ Str::limit($scholarship->provider_name, 15) }}</span>
             <span class="msc-open {{ $scholarship->status === 'closing' ? 'warn' : '' }}">{{ ucfirst($scholarship->status) }}</span>

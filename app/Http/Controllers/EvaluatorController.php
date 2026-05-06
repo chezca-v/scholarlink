@@ -64,9 +64,10 @@ class EvaluatorController extends Controller
         ));
     }
 
-    // -------------------------------------------------------------------------
-    // ORGANIZATIONS — Full CRUD
-    // -------------------------------------------------------------------------
+    public function queue()
+    {
+        $user = Auth::user();
+        $assignedScholarshipIds = $user->evaluatorAssignments()->pluck('scholarship_id');
 
         $applications = Application::with('scholarship')
             ->whereIn('scholarship_id', $assignedScholarshipIds)

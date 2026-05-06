@@ -30,27 +30,27 @@ class ProfileController extends Controller
             ->limit(5)
             ->get();
 
-        $recommendedScholarships = (clone $applicationBaseQuery)
-            ->whereNotNull('ai_match_score')
-            ->orderByDesc('ai_match_score')
-            ->limit(5)
-            ->get()
-            ->map(function (Application $application) {
-                $application->setAttribute('match_score', (float) $application->ai_match_score);
-                return $application;
-            });
+        // Retrieve all open scholarships the user hasn't applied to yet
+        $appliedScholarshipIds = (clone $applicationBaseQuery)->pluck('scholarship_id');
+        $availableScholarships = Scholarship::where('status', 'open')
+            ->whereNotIn('id', $appliedScholarshipIds)
+            ->get();
 
-        if ($recommendedScholarships->isEmpty()) {
-            $recommendedScholarships = Scholarship::query()
-                ->where('status', 'open')
-                ->where('ai_match_enabled', true)
-                ->orderBy('deadline')
-                ->limit(5)
-                ->get()
-                ->map(function (Scholarship $scholarship) {
-                    $scholarship->setAttribute('match_score', null);
-                    return $scholarship;
-                });
+        if ($profile && $availableScholarships->isNotEmpty()) {
+            // Calculate local scores (zero API calls)
+            $aiController = new \App\Http\Controllers\AIController();
+            
+            $scholarshipController = new \App\Http\Controllers\ScholarshipController();
+            $recommendedScholarships = $availableScholarships->map(function ($scholarship) use ($profile) {
+                $score = app(\App\Http\Controllers\ScholarshipController::class)->calculateMatchScores($profile, [$scholarship])[$scholarship->id] ?? 0;
+                $scholarship->setAttribute('match_score', $score);
+                return $scholarship;
+            })->sortByDesc('match_score')->take(5)->values();
+        } else {
+            $recommendedScholarships = $availableScholarships->sortBy('deadline')->take(5)->map(function ($scholarship) {
+                $scholarship->setAttribute('match_score', null);
+                return $scholarship;
+            })->values();
         }
 
         $upcomingDeadlines = (clone $applicationBaseQuery)
@@ -154,20 +154,24 @@ class ProfileController extends Controller
             'city' => ['required', 'string', 'max:100'],
             'province' => ['required', 'string', 'max:100'],
             'zip_code' => ['required', 'string', 'max:10'],
-            'mobile_number' => ['required', 'string', 'max:20'],
+            'mobile_number' => ['required', 'string', 'size:11', 'regex:/^[0-9]{11}$/'],
         ]);
+
+        $profile = ApplicantProfile::where('user_id', $request->user()->id)->first();
+        $defaults = $profile ? [] : [
+            'university_name' => '',
+            'university_address' => '',
+            'course_program' => '',
+            'student_number' => '',
+            'year_level' => '',
+            'semester' => '',
+            'academic_year' => '',
+        ];
 
         ApplicantProfile::updateOrCreate(
             ['user_id' => $request->user()->id],
-            array_merge([
-                'university_name' => '',
-                'university_address' => '',
-                'course_program' => '',
-                'student_number' => '',
-                'year_level' => '',
-                'semester' => '',
-                'academic_year' => '',
-            ], $validated)             );
+            array_merge($defaults, $validated)
+        );
 
         return redirect()->route('profile.setup', ['step' => 2]);
     }

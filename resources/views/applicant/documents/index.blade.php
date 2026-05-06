@@ -535,7 +535,7 @@
               </svg>
             </div>
             <div class="doc-file__info">
-              <div class="doc-file__name">{{ basename($doc->file_url) }}</div>
+              <div class="doc-file__name">{{ preg_replace('/^\d+_/', '', basename($doc->file_url)) }}</div>
               <div class="doc-file__meta">— · Uploaded {{ $doc->updated_at->diffForHumans() }}</div>
             </div>
           </div>
@@ -619,6 +619,13 @@
                 id="upload-{{ $typeKey }}">
             @csrf
             <input type="hidden" name="document_type" value="{{ $typeLabel }}">
+
+            @if($typeLabel === 'Other')
+              <div style="margin-bottom: 12px; padding: 0 20px;">
+                <label for="custom-type-{{ $typeKey }}" style="font-size:12px; font-weight:600; color:var(--ink); display:block; margin-bottom:4px; text-align:left;">Specify Document Type:</label>
+                <input type="text" name="custom_document_type" id="custom-type-{{ $typeKey }}" style="width:100%; border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:13px; outline:none;" placeholder="e.g. Portfolio" required>
+              </div>
+            @endif
 
             <label class="doc-drop"
                    for="file-upload-{{ $typeKey }}"

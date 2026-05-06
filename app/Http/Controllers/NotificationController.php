@@ -21,9 +21,14 @@ class NotificationController extends Controller
         return view('applicant.notifications', compact('user', 'profile', 'notifications')); 
     }
     
-    public function markRead($id) { 
+    public function markRead(Request $request, $id) { 
         $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
         $notification->markAsRead();
+        // If a redirect URL was provided (from the notification View button), go there
+        if ($request->has('redirect') && filter_var($request->redirect, FILTER_VALIDATE_URL) === false) {
+            // Only allow relative/internal URLs (no external redirects)
+            return redirect($request->redirect);
+        }
         return back();
     }
     

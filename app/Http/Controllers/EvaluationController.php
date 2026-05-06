@@ -124,19 +124,9 @@ class EvaluationController extends Controller
             'evaluator_id'   => $evaluator->id,
         ]);
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        $evaluation->gpa_score    = $request->gpa_score;
-        $evaluation->income_score = $request->income_score;
-=======
-        // Only attribute score if documents are approved
+        // Only attribute score if all documents are verified/approved
         $evaluation->gpa_score    = $allDocsApproved ? $gpaScore : 0;
         $evaluation->income_score = $allDocsApproved ? $incomeScore : 0;
->>>>>>> Stashed changes
-=======
-        $evaluation->gpa_score    = $request->gpa_score ?? 0;
-        $evaluation->income_score = $request->income_score ?? 0;
->>>>>>> main
         $evaluation->notes        = $request->notes;
         $evaluation->decision     = ($request->decision === 'save_draft') ? null : $request->decision;
         $evaluation->final_score  = $evaluation->computeFinalScore(
@@ -146,9 +136,7 @@ class EvaluationController extends Controller
         $evaluation->evaluated_at = Carbon::now();
         $evaluation->save();
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
+        // Validate approval prerequisites AFTER saving draft score
         if ($request->decision === 'approved') {
             if (!$allDocsApproved) {
                 return redirect()->back()->withErrors(['decision' => 'All documents must be approved before marking the application as Approved.'])->withInput();
@@ -158,16 +146,10 @@ class EvaluationController extends Controller
             }
         }
 
-=======
->>>>>>> main
         if ($request->decision === 'save_draft') {
             return redirect()->back()->with('success', 'Progress saved successfully.');
         }
 
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
->>>>>>> main
         // Update application status and stage
         $application->status     = match($request->decision) {
             'approved'            => 'approved',

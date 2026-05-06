@@ -93,7 +93,11 @@ class DocumentController extends Controller
             'document_type'  => [
                 'required',
                 'string',
-                'in:' . implode(',', self::DOCUMENT_TYPES),
+            ],
+            'custom_document_type' => [
+                'nullable',
+                'string',
+                'max:255'
             ],
             'file'           => [
                 'required',
@@ -103,16 +107,24 @@ class DocumentController extends Controller
             'application_id' => ['nullable', 'exists:applications,id'],
         ]);
 
-        // Store file per user folder — matches mock data format
-        $filePath = $request->file('file')->store(
+        $file = $request->file('file');
+        // Prepend timestamp to avoid collision while retaining original filename
+        $fileName = time() . '_' . preg_replace('/[^a-zA-Z0-9_.-]/', '_', $file->getClientOriginalName());
+        $filePath = $file->storeAs(
             'documents/user_' . Auth::id(),
+            $fileName,
             'public'
         );
+
+        $docType = $request->document_type;
+        if ($docType === 'Other' && $request->filled('custom_document_type')) {
+            $docType = 'Other: ' . $request->custom_document_type;
+        }
 
         // Create document record
         $document = Document::create([
             'user_id'       => Auth::id(),
-            'document_type' => $request->document_type,
+            'document_type' => $docType,
             'file_url'      => $filePath,
             'status'        => 'pending',
             'expiry_date'   => $request->expiry_date,

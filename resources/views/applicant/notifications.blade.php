@@ -175,35 +175,35 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 .n-item {
     display: flex;
     align-items: flex-start;
-    padding: 20px 0;
+    padding: 18px 20px;
     border-bottom: 1px solid var(--mist);
+    border-radius: 10px;
+    margin-bottom: 4px;
     position: relative;
+    transition: background 0.15s;
 }
 
 .n-item:last-child {
     border-bottom: none;
+    margin-bottom: 0;
 }
 
-.n-item.unread::before {
-    content: '';
-    position: absolute;
-    left: -30px;
-    top: 20px;
-    bottom: 20px;
-    width: 3px;
-    background: var(--teal);
-    border-radius: 0 4px 4px 0;
-}
-
-/* For inner layout where we want the border inside the padding */
 .n-item.unread {
-    border-left: 3px solid var(--teal);
-    padding-left: 17px;
-    margin-left: -20px;
+    background: #f0fafa;
+    border-left: 4px solid var(--teal);
+    padding-left: 16px;
 }
+
 .n-item.read {
-    padding-left: 20px;
-    margin-left: -20px;
+    background: #fff;
+    border-left: 4px solid transparent;
+    padding-left: 16px;
+    opacity: 0.85;
+}
+
+.n-item:hover {
+    background: #e8f5f5;
+    opacity: 1;
 }
 
 .n-icon {
@@ -344,7 +344,6 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
             <button type="button" class="filter-pill active" data-filter="all">All ({{ $counts['all'] }})</button>
             <button type="button" class="filter-pill" data-filter="applications">Applications ({{ $counts['apps'] }})</button>
             <button type="button" class="filter-pill" data-filter="documents">Documents ({{ $counts['docs'] }})</button>
-            <button type="button" class="filter-pill" data-filter="sms">SMS ({{ $counts['sms'] }})</button>
             <button type="button" class="filter-pill" data-filter="matches">Matches ({{ $counts['matches'] }})</button>
         </div>
 
@@ -391,7 +390,21 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                     }
                 @endphp
 
-                <div class="n-item {{ $isUnread ? 'unread' : 'read' }}">
+                @php
+                    // Determine context URL for this notification
+                    $contextUrl = null;
+                    if ($notif->related_id) {
+                        if (str_contains($titleLower, 'application') || str_contains($titleLower, 'approved') || str_contains($titleLower, 'rejected') || str_contains($titleLower, 'revision') || str_contains($titleLower, 'review')) {
+                            $contextUrl = route('applications.track', $notif->related_id);
+                        } elseif (str_contains($titleLower, 'document') || str_contains($titleLower, 'expiring')) {
+                            $contextUrl = route('applicant.documents.index');
+                        } elseif (str_contains($titleLower, 'match') || str_contains($titleLower, 'congratulations')) {
+                            $contextUrl = route('scholarships.index');
+                        }
+                    }
+                    $markReadUrl = route('notifications.markRead', $notif->id);
+                @endphp
+                <div class="n-item {{ $isUnread ? 'unread' : 'read' }}" data-filter-type="{{ str_contains($titleLower, 'application') || str_contains($titleLower, 'approved') || str_contains($titleLower, 'rejected') ? 'applications' : (str_contains($titleLower, 'document') ? 'documents' : (str_contains($titleLower, 'match') || str_contains($titleLower, 'congratulations') ? 'matches' : 'other')) }}">
                     <div class="n-icon {{ $iconColor }}">
                         {!! $iconSvg !!}
                     </div>
@@ -405,8 +418,17 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                             @endif
                         </div>
                     </div>
-                    <div class="n-action">
-                        <button @click="showNotif('{{ addslashes($notif->title) }}', '{{ addslashes($notif->body) }}', '{{ $notif->created_at->diffForHumans() }}')" class="btn-action {{ $btnClass }}">{{ $actionText }}</button>
+                    <div class="n-action" style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+                        @if($contextUrl)
+                            {{-- Mark read + navigate in one click --}}
+                            <form action="{{ $markReadUrl }}" method="POST" style="display:inline;">
+                                @csrf
+                                <input type="hidden" name="redirect" value="{{ $contextUrl }}">
+                                <button type="submit" class="btn-action {{ $btnClass }}">{{ $actionText }}</button>
+                            </form>
+                        @else
+                            <button onclick="markAndShow('{{ $markReadUrl }}', '{{ addslashes($notif->title) }}', '{{ addslashes($notif->body) }}', '{{ $notif->created_at->diffForHumans() }}')" class="btn-action {{ $btnClass }}">{{ $actionText }}</button>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -446,13 +468,30 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 
 
   <script>
+      // Open modal and optionally mark read (for notifications without a context URL)
+      function markAndShow(markReadUrl, title, body, time) {
+          // Fire mark-read in background
+          fetch(markReadUrl, {
+              method: 'POST',
+              headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content, 'Content-Type': 'application/json' }
+          }).catch(() => {}); // best-effort
+
+          // Show the Alpine modal
+          const notifList = document.querySelector('[x-data]');
+          if (notifList && notifList.__x) {
+              notifList.__x.$data.showNotif(title, body, time);
+          } else {
+              // Fallback: dispatch a custom event picked up by Alpine
+              document.dispatchEvent(new CustomEvent('open-notif-modal', { detail: { title, body, time } }));
+          }
+      }
+
       document.addEventListener('DOMContentLoaded', function() {
           const filters = document.querySelectorAll('#notif-filters .filter-pill');
-          const items = document.querySelectorAll('.n-item');
+          const items = document.querySelectorAll('.n-item[data-filter-type]');
 
           filters.forEach(filter => {
               filter.addEventListener('click', function() {
-                  // Update active state
                   filters.forEach(f => f.classList.remove('active'));
                   this.classList.add('active');
 
@@ -463,16 +502,7 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
                           item.style.display = 'flex';
                           return;
                       }
-
-                      const title = item.querySelector('.n-title')?.textContent.toLowerCase() || '';
-                      let show = false;
-
-                      if (type === 'applications' && title.includes('application')) show = true;
-                      if (type === 'documents' && (title.includes('document') || title.includes('action required'))) show = true;
-                      if (type === 'sms' && item.querySelector('.n-icon.blue')) show = true; // Assuming SMS uses blue icon
-                      if (type === 'matches' && (title.includes('match') || title.includes('congratulations'))) show = true;
-
-                      item.style.display = show ? 'flex' : 'none';
+                      item.style.display = (item.dataset.filterType === type) ? 'flex' : 'none';
                   });
               });
           });

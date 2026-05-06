@@ -327,7 +327,7 @@
 
                     <div class="field-group">
                         <label class="field-label" for="mobile_number">Mobile Number <span class="field-req">*</span></label>
-                        <input type="text" id="mobile_number" name="mobile_number" class="form-input" value="{{ old('mobile_number', $profile->mobile_number) }}" placeholder="e.g. 09123456789" required>
+                        <input type="text" id="mobile_number" name="mobile_number" class="form-input" value="{{ old('mobile_number', $profile->mobile_number) }}" placeholder="e.g. 09123456789" required maxlength="11" pattern="\d{11}" title="Mobile number must be exactly 11 digits (e.g. 09123456789)">
                         @error('mobile_number') <span class="error-msg">{{ $message }}</span> @enderror
                     </div>
                 </div>

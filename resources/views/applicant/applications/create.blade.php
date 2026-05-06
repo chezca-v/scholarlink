@@ -198,14 +198,20 @@
         </div>
         @endif
         @php
+          $failedCount = collect($eligibility)->filter(fn($e) => $e['pass'] === false)->count();
           $pendingCount = collect($eligibility)->filter(fn($e) => $e['pass'] === null)->count();
         @endphp
-        @if($pendingCount > 0)
+        @if($failedCount > 0)
+        <div class="alert" style="background:#fee2e2;color:#b91c1c;">
+          <span class="alert-dot"></span>
+          <span>You do not meet all eligibility criteria. You cannot proceed with this application.</span>
+        </div>
+        @elseif($pendingCount > 0)
         <div class="alert alert-gold">
           <span class="alert-dot"></span>
           <span>
             {{ $pendingCount }} eligibility item{{ $pendingCount > 1 ? 's' : '' }}
-            need{{ $pendingCount === 1 ? 's' : '' }} attention — you may still proceed.
+            need{{ $pendingCount === 1 ? 's' : '' }} attention — please certify below to proceed.
           </span>
         </div>
         @endif
@@ -343,12 +349,12 @@
               @endphp
               <div
                 class="doc-file"
-                onclick="selectDoc('{{ $slug }}', {{ $doc->id }}, '{{ basename($doc->file_url) }}', this)"
+                onclick="selectDoc('{{ $slug }}', {{ $doc->id }}, '{{ preg_replace('/^\d+_/', '', basename($doc->file_url)) }}', this)"
                 data-doc-id="{{ $doc->id }}"
               >
                 <div class="file-icon {{ $isImg ? 'img' : '' }}">{{ substr($ext,0,3) }}</div>
                 <div class="file-meta">
-                  <div class="file-name">{{ basename($doc->file_url) }}</div>
+                  <div class="file-name">{{ preg_replace('/^\d+_/', '', basename($doc->file_url)) }}</div>
                   <div class="file-size" style="color:{{ $statusColor }}">{{ ucfirst($doc->status) }}</div>
                 </div>
                 <div class="radio {{ $isPre ? 'sel' : '' }}" id="radio-{{ $doc->id }}"></div>
@@ -386,12 +392,51 @@
           @endforeach
         </div>
 
-        {{-- Endorsement letter — separate row below the 3-col grid --}}
-        @php $endorseSlug = $endorsementSlot['slug']; @endphp
+        {{-- Endorsement letter --}}
+        @php 
+          $endorseSlug = $endorsementSlot['slug']; 
+          $endorseMatches = $savedDocuments->whereIn('document_type', ['Endorsement Letter', 'Letter of Recommendation']);
+          $endorsePre = $endorseMatches->firstWhere('status', 'verified') ?? $endorseMatches->firstWhere('status', 'pending');
+        @endphp
         <div class="doc-endorsement">
           <div class="doc-group-title">{{ $endorsementSlot['groupTitle'] }}</div>
           <div class="doc-subcard">
             <div class="doc-card-label">{{ $endorsementSlot['label'] }}</div>
+            
+            {{-- Saved documents from the vault --}}
+            @foreach($endorseMatches as $doc)
+            @php
+              $ext   = strtoupper(pathinfo($doc->file_url, PATHINFO_EXTENSION));
+              $isImg = in_array($ext, ['PNG','JPG','JPEG']);
+              $isPre = $endorsePre && $endorsePre->id === $doc->id;
+              $statusColor = match($doc->status) {
+                'verified' => 'var(--green)',
+                'pending'  => '#92700a',
+                default    => 'var(--red)',
+              };
+            @endphp
+            <div
+              class="doc-file"
+              onclick="selectDoc('{{ $endorseSlug }}', {{ $doc->id }}, '{{ preg_replace('/^\d+_/', '', basename($doc->file_url)) }}', this)"
+              data-doc-id="{{ $doc->id }}"
+            >
+              <div class="file-icon {{ $isImg ? 'img' : '' }}">{{ substr($ext,0,3) }}</div>
+              <div class="file-meta">
+                <div class="file-name">{{ preg_replace('/^\d+_/', '', basename($doc->file_url)) }}</div>
+                <div class="file-size" style="color:{{ $statusColor }}">{{ ucfirst($doc->status) }}</div>
+              </div>
+              <div class="radio {{ $isPre ? 'sel' : '' }}" id="radio-{{ $doc->id }}"></div>
+              <input
+                type="radio"
+                name="documents[{{ $endorseSlug }}]"
+                value="{{ $doc->id }}"
+                style="display:none"
+                id="doc-radio-{{ $doc->id }}"
+                {{ $isPre ? 'checked' : '' }}
+              >
+            </div>
+            @endforeach
+
             <label for="endorsement-file-input" class="upload-trigger" id="upload-trigger-{{ $endorseSlug }}" style="cursor:pointer;">
               <div class="upload-icon-box">↑</div>
               <div class="upload-text" id="upload-text-{{ $endorseSlug }}">
@@ -636,6 +681,11 @@ function updateConfirm(slug, fileName) {
 
 function goTo(step) {
   if (step > 1) {
+    @if(collect($eligibility)->filter(fn($e) => $e['pass'] === false)->count() > 0)
+      alert('You do not meet all the required eligibility criteria for this scholarship. You cannot proceed with this application.');
+      return;
+    @endif
+
     const okChecks = document.querySelectorAll('#panel-1 .req-check.ok');
     if (okChecks.length === 0) {
       alert('Please certify at least one requirement before proceeding.');
@@ -693,14 +743,14 @@ function guardSubmit() {
   const cb  = document.getElementById('certify');
   const lbl = document.getElementById('certify-label');
 
-  // Check required documents dynamically
+  // Check required documents
   const requiredSlugs = [
-    @foreach($documentGroups as $group)
-      @foreach($group['slots'] as $slot)
-        @if(!$slot['optional']) '{{ $slot['slug'] }}', @endif
-      @endforeach
-    @endforeach
-    @if(!$endorsementSlot['optional']) '{{ $endorsementSlot['slug'] }}', @endif
+    'proof-of-enrollment-acceptance-letter',
+    'latest-report-card-tor',
+    '2x2-id-photo',
+    'income-tax-return-certificate-of-non-filing',
+    'barangay-certificate-of-indigency',
+    'endorsement-letter'
   ];
   let missing = false;
 

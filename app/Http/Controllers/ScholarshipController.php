@@ -219,7 +219,7 @@ $applicationCount = 0;
     /**
      * Calculate AI match scores for scholarships based on user profile.
      */
-    private function calculateMatchScores(ApplicantProfile $profile, array $scholarships): array
+    public function calculateMatchScores(ApplicantProfile $profile, array $scholarships): array
     {
         $scores = [];
         $gwa = $profile->gwa;
