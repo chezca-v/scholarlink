@@ -37,14 +37,19 @@
   </div>
 </div>
 
+@php
+  $hasBlind = $applications->contains(function($app) { return $app->scholarship->blind_screening; });
+@endphp
+@if($hasBlind)
 <!-- BLIND SCREENING NOTICE -->
 <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;border-radius:12px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;gap:10px">
   <span style="font-size:18px">🔒</span>
   <div>
     <div style="font-size:13px;font-weight:600;color:#1D4ED8">Blind Screening Mode is ON</div>
-    <div style="font-size:12px;color:#3B82F6">Applicant names and schools are hidden. You are evaluating based on merit only.</div>
+    <div style="font-size:12px;color:#3B82F6">Applicant names and schools are hidden for some scholarships. You are evaluating based on merit only.</div>
   </div>
 </div>
+@endif
 
 <!-- QUEUE TABLE -->
 <div class="card" style="padding:0">
@@ -71,6 +76,11 @@
           <td>
             <div style="font-size:13px;font-weight:500">{{ $app->scholarship->name ?? 'Unknown' }}</div>
             <div style="font-size:11px;color:var(--slate)">GPA: {{ $app->applicant->applicantProfile->gwa ?? 'N/A' }} · Income: ₱{{ number_format(($app->applicant->applicantProfile->monthly_household_income ?? 0) * 12) }}/yr</div>
+            @if(!$app->scholarship->blind_screening)
+            <div style="font-size:11px;color:var(--slate);margin-top:4px">
+              <strong>Applicant:</strong> {{ $app->applicant->first_name ?? '—' }} {{ $app->applicant->last_name ?? '' }} ({{ $app->applicant->email ?? '' }})
+            </div>
+            @endif
           </td>
           <td style="color:var(--slate);font-size:12px">{{ $app->submitted_at ? $app->submitted_at->format('M d, Y g:i A') : 'N/A' }}</td>
           <td>

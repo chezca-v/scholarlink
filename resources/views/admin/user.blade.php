@@ -14,9 +14,9 @@
             <h1 class="font-display font-bold text-2xl" style="color:var(--ink);">User Management</h1>
             <p style="color:var(--slate);font-size:14px;margin-top:4px;">Manage platform access, roles, and user accounts.</p>
         </div>
-        <button class="btn-primary flex items-center gap-2">
-            <svg style="width:16px;height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
-            Add New User
+        <button onclick="document.getElementById('addEvaluatorModal').classList.remove('hidden')" class="btn-primary flex items-center gap-2 px-4 py-2 rounded-lg" style="background: var(--primary); color: white;">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Evaluator
         </button>
     </div>
 </div>
@@ -123,6 +123,50 @@
                 <button class="px-3 py-1 text-sm border border-gray-200 rounded text-gray-600 hover:bg-gray-50">Next</button>
             </div>
         </div>
+    </div>
+</div>
+
+{{-- Add Evaluator Modal --}}
+<div id="addEvaluatorModal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/50">
+    <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+        <div class="px-6 py-4 border-b flex items-center justify-between">
+            <h3 class="font-bold text-lg">Add Evaluator</h3>
+            <button onclick="document.getElementById('addEvaluatorModal').classList.add('hidden')" class="text-gray-400 hover:text-gray-600">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+        </div>
+        <form action="{{ route('admin.users.create') }}" method="POST" class="p-6">
+            @csrf
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                        <input type="text" name="first_name" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-[var(--primary)] focus:ring-[var(--primary)] p-2 border">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                        <input type="text" name="last_name" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-[var(--primary)] focus:ring-[var(--primary)] p-2 border">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                    <input type="email" name="email" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-[var(--primary)] focus:ring-[var(--primary)] p-2 border">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Assign to Scholarship</label>
+                    <select name="scholarship_id" required class="w-full border-gray-300 rounded-lg shadow-sm focus:border-[var(--primary)] focus:ring-[var(--primary)] p-2 border">
+                        <option value="">Select a scholarship</option>
+                        @foreach($scholarships as $scholarship)
+                            <option value="{{ $scholarship->id }}">{{ $scholarship->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="pt-4 flex gap-3 justify-end">
+                    <button type="button" onclick="document.getElementById('addEvaluatorModal').classList.add('hidden')" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-lg text-white" style="background: var(--primary);">Create Evaluator</button>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
 @endsection

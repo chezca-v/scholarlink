@@ -39,6 +39,16 @@ class EvaluationController extends Controller
         // Blind screening — mask applicant info if enabled
         $blindScreening = $application->scholarship->blind_screening;
 
+        // Precompute scores for the view
+        $gpaScore = $evaluation ? $evaluation->gpa_score : 0;
+        $incomeScore = $evaluation ? $evaluation->income_score : 0;
+        
+        if (!$evaluation || ($gpaScore == 0 && $incomeScore == 0)) {
+            $profile = $application->applicant->applicantProfile;
+            $gpaScore = $this->calculateAutomatedGpaScore($profile->gwa, $application->scholarship->gpa_requirement);
+            $incomeScore = $this->calculateAutomatedIncomeScore($profile->monthly_household_income, $application->scholarship->income_bracket);
+        }
+
         // Alternative scholarships for suggestion
         $alternatives = Scholarship::query()
             ->where('status', 'open')
@@ -50,6 +60,8 @@ class EvaluationController extends Controller
             'evaluation'     => $evaluation,
             'blindScreening' => $blindScreening,
             'alternatives'   => $alternatives,
+            'precomputedGpa' => $gpaScore,
+            'precomputedIncome' => $incomeScore,
         ]);
     }
 
@@ -60,22 +72,63 @@ class EvaluationController extends Controller
         $application = Application::query()->findOrFail($id);
 
         $request->validate([
+<<<<<<< Updated upstream
             'gpa_score'    => ['required', 'numeric', 'min:0', 'max:100'],
             'income_score' => ['required', 'numeric', 'min:0', 'max:100'],
             'notes'        => ['nullable', 'string', 'max:1000'],
             'decision'     => ['required', 'in:approved,rejected,revision_requested'],
+=======
+            'notes'        => ['nullable', 'string', 'max:1000'],
+            'decision'     => ['required', 'in:approved,rejected,revision_requested,save_draft'],
+            'documents'    => ['nullable', 'array'],
+            'documents.*.status' => ['in:pending,approved,rejected,revision_requested'],
+            'documents.*.notes' => ['nullable', 'string', 'max:500'],
+>>>>>>> Stashed changes
         ]);
 
         $scholarship = $application->scholarship;
+        $profile = $application->applicant->applicantProfile;
 
-        // Compute final score using scholarship weights
+        // Process document verification
+        $allDocsApproved = true;
+        if ($request->has('documents')) {
+            foreach ($request->documents as $docId => $docData) {
+                $appDoc = \App\Models\ApplicationDocument::where('application_id', $id)
+                    ->where('id', $docId)->first();
+                if ($appDoc) {
+                    $appDoc->status = $docData['status'];
+                    $appDoc->evaluator_notes = $docData['notes'] ?? null;
+                    $appDoc->save();
+                    
+                    if ($appDoc->status !== 'approved') {
+                        $allDocsApproved = false;
+                    }
+                }
+            }
+        } else {
+            // If there are no documents submitted, we might still proceed, but if there are, and they weren't submitted in form, it's false.
+            if ($application->applicationDocuments()->count() > 0) {
+                $allDocsApproved = false;
+            }
+        }
+
+        // Compute automated scores
+        $gpaScore = $this->calculateAutomatedGpaScore($profile->gwa, $scholarship->gpa_requirement);
+        $incomeScore = $this->calculateAutomatedIncomeScore($profile->monthly_household_income, $scholarship->income_bracket);
+
         $evaluation = Evaluation::query()->firstOrNew([
             'application_id' => $id,
             'evaluator_id'   => $evaluator->id,
         ]);
 
+<<<<<<< Updated upstream
         $evaluation->gpa_score    = $request->gpa_score;
         $evaluation->income_score = $request->income_score;
+=======
+        // Only attribute score if documents are approved
+        $evaluation->gpa_score    = $allDocsApproved ? $gpaScore : 0;
+        $evaluation->income_score = $allDocsApproved ? $incomeScore : 0;
+>>>>>>> Stashed changes
         $evaluation->notes        = $request->notes;
         $evaluation->decision     = $request->decision;
         $evaluation->final_score  = $evaluation->computeFinalScore(
@@ -85,6 +138,22 @@ class EvaluationController extends Controller
         $evaluation->evaluated_at = Carbon::now();
         $evaluation->save();
 
+<<<<<<< Updated upstream
+=======
+        if ($request->decision === 'approved') {
+            if (!$allDocsApproved) {
+                return redirect()->back()->withErrors(['decision' => 'All documents must be approved before marking the application as Approved.'])->withInput();
+            }
+            if ($evaluation->final_score < 65) {
+                return redirect()->back()->withErrors(['decision' => 'Application final score must be at least 65 to be Approved.'])->withInput();
+            }
+        }
+
+        if ($request->decision === 'save_draft') {
+            return redirect()->back()->with('success', 'Progress saved successfully.');
+        }
+
+>>>>>>> Stashed changes
         // Update application status and stage
         $application->status     = match($request->decision) {
             'approved'            => 'approved',
@@ -93,6 +162,12 @@ class EvaluationController extends Controller
         };
         $application->stage      = $request->decision === 'revision_requested' ? 'doc_review' : 'decided';
         $application->decided_at = $request->decision !== 'revision_requested' ? Carbon::now() : null;
+        
+        if ($request->decision === 'approved') {
+            $application->offer_status = 'pending';
+            $application->offer_expires_at = Carbon::now()->addDays(7);
+        }
+        
         $application->save();
 
         if ($request->decision === 'rejected') {
@@ -197,5 +272,44 @@ class EvaluationController extends Controller
         }
 
         return $applicant;
+    }
+
+    private function calculateAutomatedGpaScore($profileGpa, $requirement): int
+    {
+        if (blank($requirement) || blank($profileGpa)) {
+            return blank($profileGpa) ? 50 : 100;
+        }
+
+        $profileGpa = floatval($profileGpa);
+        $requirement = floatval($requirement);
+
+        if ($profileGpa <= $requirement) {
+            return 100;
+        }
+
+        $diff = max(0, $profileGpa - $requirement);
+        return max(0, 100 - (int) round($diff * 30));
+    }
+
+    private function calculateAutomatedIncomeScore($monthlyIncome, $bracket): int
+    {
+        if (blank($bracket)) {
+            return 100;
+        }
+
+        if (is_null($monthlyIncome)) {
+            return 50;
+        }
+
+        $annualIncome = floatval($monthlyIncome) * 12;
+
+        if (preg_match_all('/\d+[\d,]*/', (string) $bracket, $matches)) {
+            $numbers = array_map(fn($v) => (int) str_replace(',', '', $v), $matches[0]);
+            if (!empty($numbers)) {
+                $threshold = max($numbers);
+                return $annualIncome <= $threshold ? 100 : 20;
+            }
+        }
+        return 50;
     }
 }

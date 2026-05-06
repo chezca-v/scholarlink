@@ -13,26 +13,35 @@ class AdminController extends Controller
 {
     public function dashboard()
     {
-       $now = Carbon::now();
+        $now = Carbon::now();
         $startOfMonth = $now->copy()->startOfMonth();
         $previousMonthStart = $now->copy()->subMonthNoOverflow()->startOfMonth();
         $previousMonthEnd = $now->copy()->subMonthNoOverflow()->endOfMonth();
+        
+        $adminId = auth()->id();
 
-        $openScholarships = Scholarship::query()->where('status', 'open')->count();
-        $draftScholarships = Scholarship::query()->where('status', 'draft')->count();
-        $newScholarships = Scholarship::query()->where('created_at', '>=', $now->copy()->subDays(7))->count();
+        $openScholarships = Scholarship::query()->where('created_by', $adminId)->where('status', 'open')->count();
+        $draftScholarships = Scholarship::query()->where('created_by', $adminId)->where('status', 'draft')->count();
+        $newScholarships = Scholarship::query()->where('created_by', $adminId)->where('created_at', '>=', $now->copy()->subDays(7))->count();
         $closingSoonScholarships = Scholarship::query()
+            ->where('created_by', $adminId)
             ->where('status', 'open')
             ->whereDate('deadline', '>=', $now->toDateString())
             ->whereDate('deadline', '<=', $now->copy()->addDays(7)->toDateString())
             ->count();
 
-        $pendingReviews = Application::query()->whereIn('status', ['pending', 'under_review'])->count();
-        $pendingToday = Application::query()
+        $applicationsQuery = function() use ($adminId) {
+            return Application::whereHas('scholarship', function($q) use ($adminId) {
+                $q->where('created_by', $adminId);
+            });
+        };
+
+        $pendingReviews = $applicationsQuery()->whereIn('status', ['pending', 'under_review'])->count();
+        $pendingToday = $applicationsQuery()
             ->whereIn('status', ['pending', 'under_review'])
             ->whereDate('created_at', $now->toDateString())
             ->count();
-        $oldestPendingApplication = Application::query()
+        $oldestPendingApplication = $applicationsQuery()
             ->whereIn('status', ['pending', 'under_review'])
             ->oldest('created_at')
             ->first();
@@ -40,48 +49,53 @@ class AdminController extends Controller
             ? (int) $oldestPendingApplication->created_at->diffInDays($now)
             : 0;
 
-        $totalApplications = Application::query()->count();
-        $currentMonthApplications = Application::query()->whereBetween('created_at', [$startOfMonth, $now])->count();
-        $previousMonthApplications = Application::query()->whereBetween('created_at', [$previousMonthStart, $previousMonthEnd])->count();
+        $totalApplications = $applicationsQuery()->count();
+        $currentMonthApplications = $applicationsQuery()->whereBetween('created_at', [$startOfMonth, $now])->count();
+        $previousMonthApplications = $applicationsQuery()->whereBetween('created_at', [$previousMonthStart, $previousMonthEnd])->count();
         $applicationsGrowth = $previousMonthApplications > 0
             ? round((($currentMonthApplications - $previousMonthApplications) / $previousMonthApplications) * 100)
             : ($currentMonthApplications > 0 ? 100 : 0);
 
-        $approvedAwarded = Application::query()->where('status', 'approved')->count();
+        $approvedAwarded = $applicationsQuery()->where('status', 'approved')->count();
         $approvalRate = $totalApplications > 0 ? round(($approvedAwarded / $totalApplications) * 100, 1) : 0;
 
-        $unassignedApplications = Application::query()
+        $unassignedApplications = $applicationsQuery()
             ->whereIn('status', ['pending', 'under_review'])
             ->where('created_at', '<=', $now->copy()->subDays(4))
             ->doesntHave('evaluations')
             ->count();
-        $incompleteDocsApplications = Application::query()
+        $incompleteDocsApplications = $applicationsQuery()
             ->whereIn('status', ['pending', 'under_review'])
             ->doesntHave('applicationDocuments')
             ->count();
-        $awaitingApprovalScholarships = Scholarship::query()->where('status', 'draft')->count();
+        $awaitingApprovalScholarships = Scholarship::query()->where('created_by', $adminId)->where('status', 'draft')->count();
 
         $statusCounts = [
-            'pending' => Application::query()->where('status', 'pending')->count(),
-            'under_review' => Application::query()->where('status', 'under_review')->count(),
-            'revision' => Application::query()->where('status', 'revision')->count(),
-            'approved' => Application::query()->where('status', 'approved')->count(),
-            'rejected' => Application::query()->where('status', 'rejected')->count(),
+            'pending' => $applicationsQuery()->where('status', 'pending')->count(),
+            'under_review' => $applicationsQuery()->where('status', 'under_review')->count(),
+            'revision' => $applicationsQuery()->where('status', 'revision')->count(),
+            'approved' => $applicationsQuery()->where('status', 'approved')->count(),
+            'rejected' => $applicationsQuery()->where('status', 'rejected')->count(),
         ];
 
         $recentActivity = ActivityLog::query()
+            ->whereHas('scholarship', function($q) use ($adminId) {
+                $q->where('created_by', $adminId);
+            })
             ->with('user')
             ->latest('created_at')
             ->take(6)
             ->get();
 
         $scholarshipOverview = Scholarship::query()
+            ->where('created_by', $adminId)
             ->withCount('applications')
             ->orderByDesc('created_at')
             ->take(5)
             ->get();
 
         $upcomingDeadlines = Scholarship::query()
+            ->where('created_by', $adminId)
             ->whereNotNull('deadline')
             ->whereDate('deadline', '>=', $now->toDateString())
             ->orderBy('deadline')
@@ -246,13 +260,50 @@ class AdminController extends Controller
 
     public function users()
     {
-        $users = User::latest()->get();
-        return view('admin.user', compact('users'));
+        $adminId = auth()->id();
+        $scholarships = Scholarship::where('created_by', $adminId)->get();
+        $scholarshipIds = $scholarships->pluck('id');
+
+        $evaluatorIds = \Illuminate\Support\Facades\DB::table('evaluator_assignments')
+                            ->whereIn('scholarship_id', $scholarshipIds)
+                            ->pluck('evaluator_id');
+
+        $users = User::whereIn('id', $evaluatorIds)->where('role', 'evaluator')->latest()->get();
+        return view('admin.user', compact('users', 'scholarships'));
     }
 
     public function createUser(Request $request)
     {
-        // Logic to create a new user with specific roles
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'scholarship_id' => 'required|exists:scholarships,id',
+        ]);
+
+        // Verify the admin owns this scholarship
+        $scholarship = Scholarship::where('id', $request->scholarship_id)
+            ->where('created_by', auth()->id())
+            ->firstOrFail();
+
+        $user = User::create([
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'), // default password
+            'role' => 'evaluator',
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('evaluator_assignments')->insert([
+            'evaluator_id' => $user->id,
+            'scholarship_id' => $scholarship->id,
+            'assigned_by' => auth()->id(),
+            'assigned_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Evaluator created and assigned successfully. Default password is: password123');
     }
 
     public function deactivateUser($id)
@@ -263,23 +314,31 @@ class AdminController extends Controller
 
     public function analytics()
     {
+        $adminId = auth()->id();
+        
+        $applicationsQuery = function() use ($adminId) {
+            return Application::whereHas('scholarship', function($q) use ($adminId) {
+                $q->where('created_by', $adminId);
+            });
+        };
+
         $stats = [
-            'total_applications' => Application::count() ?? 1420,
-            'apps_change' => '+12%',
-            'approval_rate' => 24,
-            'approval_change' => '+2.1%',
-            'avg_review_days' => 4.5,
-            'review_change' => '-1.2d',
-            'active_scholarships' => Scholarship::where('status', 'open')->count() ?? 12,
-            'active_change' => '+3',
+            'total_applications' => $applicationsQuery()->count(),
+            'apps_change' => '+0%',
+            'approval_rate' => $applicationsQuery()->count() > 0 ? round(($applicationsQuery()->where('status', 'approved')->count() / $applicationsQuery()->count()) * 100) : 0,
+            'approval_change' => '+0%',
+            'avg_review_days' => 0,
+            'review_change' => '0',
+            'active_scholarships' => Scholarship::where('created_by', $adminId)->where('status', 'open')->count(),
+            'active_change' => '+0',
         ];
 
         $funnel = [
-            'viewed' => 5400,
-            'started' => 3200,
-            'submitted' => 1420,
-            'under_review' => 950,
-            'approved' => 340,
+            'viewed' => $stats['total_applications'] * 3,
+            'started' => $stats['total_applications'] * 2,
+            'submitted' => $stats['total_applications'],
+            'under_review' => $applicationsQuery()->where('status', 'under_review')->count(),
+            'approved' => $applicationsQuery()->where('status', 'approved')->count(),
         ];
 
         return view('admin.analytics', compact('stats', 'funnel'));
@@ -297,6 +356,7 @@ class AdminController extends Controller
         $nextMonth = $currentMonth->copy()->addMonth();
 
         $scholarships = \App\Models\Scholarship::whereNotNull('deadline')
+                        ->where('created_by', auth()->id())
                         ->where('status', '!=', 'draft')
                         ->get();
 
@@ -398,13 +458,23 @@ class AdminController extends Controller
 
     public function applications()
     {
-        $applications = Application::with('applicant', 'scholarship')->latest()->paginate(15);
+        $adminId = auth()->id();
+        $applications = Application::with('applicant', 'scholarship')
+            ->whereHas('scholarship', function($q) use ($adminId) {
+                $q->where('created_by', $adminId);
+            })
+            ->latest()->paginate(15);
         return view('admin.applications', compact('applications'));
     }
 
     public function reviews()
     {
-        $reviews = Application::with('applicant', 'scholarship')->whereIn('status', ['pending', 'under_review'])->latest()->paginate(15);
+        $adminId = auth()->id();
+        $reviews = Application::with('applicant', 'scholarship')
+            ->whereHas('scholarship', function($q) use ($adminId) {
+                $q->where('created_by', $adminId);
+            })
+            ->whereIn('status', ['pending', 'under_review'])->latest()->paginate(15);
         return view('admin.reviews', compact('reviews'));
     }
 

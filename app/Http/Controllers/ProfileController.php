@@ -25,8 +25,7 @@ class ProfileController extends Controller
             ->with('scholarship')
             ->where('applicant_id', $user->id);
 
-        $activeApplications = (clone $applicationBaseQuery)
-            ->whereIn('status', ['pending', 'under_review', 'revision'])
+        $recentApplications = (clone $applicationBaseQuery)
             ->orderByDesc('submitted_at')
             ->limit(5)
             ->get();
@@ -119,7 +118,7 @@ class ProfileController extends Controller
             'user',
             'profile',
             'stats',
-            'activeApplications',
+            'recentApplications',
             'recommendedScholarships',
             'upcomingDeadlines',
             'notifications',

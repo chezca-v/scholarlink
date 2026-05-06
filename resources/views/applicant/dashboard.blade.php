@@ -276,15 +276,15 @@
 <!-- BOTTOM GRID -->
 <div class="bottom-grid">
 
-  <!-- LEFT: Active Applications -->
+  <!-- LEFT: Recent Applications -->
   <div>
     <div class="panel section">
       <div class="sec-hd" style="margin-bottom:10px;">
-        <div class="sec-title">Active Applications</div>
+        <div class="sec-title">Recent Applications</div>
         <a class="see-all" href="{{ route('applications.index') }}">View all →</a>
       </div>
 
-      @forelse($activeApplications as $application)
+      @forelse($recentApplications as $application)
       @php
           $scholarship = $application->scholarship;
           $initials = strtoupper(substr($scholarship->name ?? 'S', 0, 2));
@@ -316,6 +316,22 @@
           @endif
         </div>
       </a>
+      @if($status === 'rejected')
+      @php
+        $rejectionReason = $application->evaluations()->whereNotNull('rejection_reason')->first()?->rejection_reason;
+        $reasonText = match($rejectionReason) {
+            'gpa' => 'GPA requirement not met',
+            'income_bracket' => 'Income exceeds bracket limits',
+            'docs' => 'Incomplete or invalid documents',
+            'mismatch' => 'Course mismatch',
+            'other' => 'Other reasons',
+            default => 'Not specified'
+        };
+      @endphp
+      <div style="background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:8px 12px;margin:4px 0 16px 0;font-size:11.5px;color:#DC2626;">
+        <strong>Rejection Reason:</strong> {{ $reasonText }}
+      </div>
+      @endif
       @empty
       <div class="app-item">
         <div class="app-info">

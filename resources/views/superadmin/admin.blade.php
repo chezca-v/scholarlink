@@ -129,10 +129,8 @@
                 @if($admin->status === 'active')
                   <a href="#"
                      class="btn btn-ghost btn-sm">✏️</a>
-                  <button class="btn btn-outline btn-sm"
-                          onclick="openReassignModal({{ $admin->id }}, '{{ $admin->full_name }}')">
-                    🔄 Reassign
-                  </button>
+                  <a href="#"
+                     class="btn btn-ghost btn-sm">✏️</a>
                   <form method="POST" action="{{ route('superadmin.admins.deactivate', $admin->id) }}"
                         style="display: inline;"
                         onsubmit="return confirm('Deactivate {{ $admin->full_name }}?')">
@@ -147,10 +145,7 @@
                     @method('PATCH')
                     <button type="submit" class="btn btn-outline btn-sm">↩ Restore</button>
                   </form>
-                  <button class="btn btn-outline btn-sm"
-                          onclick="openReassignModal({{ $admin->id }}, '{{ $admin->full_name }}')">
-                    🔄 Reassign
-                  </button>
+
                 @endif
               </div>
             </td>
@@ -210,7 +205,7 @@
                  placeholder="juan@organization.gov.ph" required>
         </div>
         <div class="form-group">
-          <label class="form-label">Assign to Organization <span class="req">*</span></label>
+          <label class="form-label">Assign to Scholarship Name <span class="req">*</span></label>
           <select class="form-select" name="organization_id" required>
             <option value="">— Select organization —</option>
             @foreach($organizations as $org)
@@ -239,54 +234,9 @@
     </div>
   </div>
 
-  <!-- Reassign Admin Modal -->
-  <div id="reassignAdminModal" class="modal-overlay"
-       onclick="if(event.target===this) this.classList.remove('open')">
-    <div class="modal">
-      <div class="modal-header">
-        <div class="modal-title">Reassign Admin</div>
-        <button class="modal-close"
-                onclick="document.getElementById('reassignAdminModal').classList.remove('open')">✕</button>
-      </div>
-      <form method="POST" action="" id="reassignAdminForm">
-        @csrf
-        @method('PATCH')
-        <input type="hidden" name="admin_id" id="reassignAdminId">
-        <div style="background: var(--page-bg); border-radius: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid var(--border);">
-          <div style="font-size: 11px; font-weight: 600; color: var(--slate); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px;">Reassigning</div>
-          <div style="font-weight: 600; font-size: 14px;" id="reassignAdminName">—</div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">New Organization <span class="req">*</span></label>
-          <select class="form-select" name="organization_id" required>
-            <option value="">— Select organization —</option>
-            @foreach($organizations as $org)
-              <option value="{{ $org->id }}">{{ $org->name }}</option>
-            @endforeach
-          </select>
-        </div>
-        <div style="background: var(--yellow-bg); border-radius: 10px; padding: 10px 12px; font-size: 12px; color: var(--yellow); border: 1px solid rgba(217,119,6,.2); margin-bottom: 4px;">
-          ⚠️ Previous organization will become unassigned.
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline"
-                  onclick="document.getElementById('reassignAdminModal').classList.remove('open')">
-            Cancel
-          </button>
-          <button type="submit" class="btn btn-primary">Confirm Reassignment</button>
-        </div>
-      </form>
-    </div>
-  </div>
+
 @endsection
 
 @push('scripts')
-<script>
-  function openReassignModal(adminId, adminName) {
-    document.getElementById('reassignAdminId').value = adminId;
-    document.getElementById('reassignAdminName').textContent = adminName;
-    document.getElementById('reassignAdminForm').action = '/superadmin/admins/' + adminId + '/reassign';
-    document.getElementById('reassignAdminModal').classList.add('open');
-  }
-</script>
+
 @endpush

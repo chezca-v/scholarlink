@@ -778,18 +778,7 @@
                     @error('password') <span class="field-error-rp">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="field-group-rp">
-                    <label for="role" class="field-label-rp">Role <span class="req">*</span></label>
-                    <select id="role" name="role" class="form-select-rp" required>
-                        <option value="" disabled {{ old('role') ? '' : 'selected' }}>Select your role</option>
-                        @foreach ($roles ?? ['applicant' => 'Applicant', 'evaluator' => 'Evaluator', 'admin' => 'Admin'] as $val => $label)
-                            <option value="{{ $val }}" {{ old('role') === $val ? 'selected' : '' }}>
-                                {{ $label }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('role') <span class="field-error-rp">{{ $message }}</span> @enderror
-                </div>
+                <input type="hidden" name="role" value="applicant">
 
                 <div class="terms-row">
                     <input type="checkbox" id="terms" name="terms" required {{ old('terms') ? 'checked' : '' }} />

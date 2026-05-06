@@ -13,8 +13,9 @@ class ScholarshipController extends Controller
 {
     public function index(Request $request)
     {
-        $scholarships = Scholarship::withCount('applications')->orderByDesc('created_at')->paginate(12);
-        $scholarshipCount = Scholarship::count();
+        $adminId = auth()->id();
+        $scholarships = Scholarship::where('created_by', $adminId)->withCount('applications')->orderByDesc('created_at')->paginate(12);
+        $scholarshipCount = Scholarship::where('created_by', $adminId)->count();
         return view('admin.scholarships.index', compact('scholarships', 'scholarshipCount'));
     }
 
@@ -61,7 +62,7 @@ class ScholarshipController extends Controller
 
     public function show($id, Request $request)
     {
-        $scholarship = Scholarship::withCount('applications')->findOrFail($id);
+        $scholarship = Scholarship::where('created_by', auth()->id())->withCount('applications')->findOrFail($id);
         
         $query = Application::where('scholarship_id', $id)->with(['applicant']);
         
@@ -98,14 +99,14 @@ class ScholarshipController extends Controller
 
     public function edit($id)
     {
-        $scholarship = Scholarship::findOrFail($id);
+        $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
         $organizations = Organization::all();
         return view('admin.scholarships.edit', compact('scholarship', 'organizations'));
     }
 
     public function update(Request $request, $id)
     {
-        $scholarship = Scholarship::findOrFail($id);
+        $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -139,14 +140,14 @@ class ScholarshipController extends Controller
 
     public function destroy($id)
     {
-        $scholarship = Scholarship::findOrFail($id);
+        $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
         $scholarship->delete();
         return redirect()->route('admin.scholarships.index')->with('success', 'Scholarship deleted.');
     }
 
     public function toggle($id)
     {
-        $scholarship = Scholarship::findOrFail($id);
+        $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
         $scholarship->status = 'closed';
         $scholarship->save();
         return back()->with('success', 'Scholarship closed.');
@@ -154,7 +155,43 @@ class ScholarshipController extends Controller
 
     public function exportApplications($id)
     {
-        return back()->with('success', 'Applications exported successfully.');
+        $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
+        $applications = Application::where('scholarship_id', $id)
+            ->with(['applicant.applicantProfile'])
+            ->get();
+
+        $filename = "applications_" . Str::slug($scholarship->name) . "_" . now()->format('Y-m-d') . ".csv";
+        $headers = [
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$filename",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        ];
+
+        $columns = ['Ref Code', 'Applicant', 'Email', 'GPA', 'Course', 'Status', 'Submitted At'];
+
+        $callback = function() use($applications, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($applications as $app) {
+                $profile = $app->applicant->applicantProfile;
+                fputcsv($file, [
+                    $app->reference_code,
+                    $app->applicant->first_name . ' ' . $app->applicant->last_name,
+                    $app->applicant->email,
+                    $profile->gpa ?? 'N/A',
+                    $profile->course_program ?? 'N/A',
+                    $app->status,
+                    $app->submitted_at ? $app->submitted_at->format('Y-m-d') : 'N/A',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     public function extendDeadline(Request $request, $id)
@@ -162,8 +199,8 @@ class ScholarshipController extends Controller
         $request->validate([
             'deadline_date' => 'required|date'
         ]);
-        $scholarship = Scholarship::findOrFail($id);
-        $scholarship->deadline_date = $request->deadline_date;
+        $scholarship = Scholarship::where('created_by', auth()->id())->findOrFail($id);
+        $scholarship->deadline = $request->deadline;
         $scholarship->save();
         return back()->with('success', 'Deadline extended.');
     }

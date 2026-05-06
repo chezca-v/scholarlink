@@ -21,9 +21,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): View
     {
-        return view('auth.login', [
-            'roles' => ['applicant' => 'Applicant', 'evaluator' => 'Evaluator', 'admin' => 'Admin'],
-        ]);
+        return view('auth.login');
     }
 
     /**
@@ -38,7 +36,7 @@ class RegisteredUserController extends Controller
             'last_name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:applicant,evaluator,admin'],
+            'role' => ['required', 'string', 'in:applicant'],
             'terms' => ['accepted'],
         ]);
 

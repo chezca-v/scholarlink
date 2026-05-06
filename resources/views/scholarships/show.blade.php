@@ -193,6 +193,44 @@
                     @endif
                 </div>
 
+                {{-- AI Insight (Lazy Loaded) --}}
+                @auth
+                <div x-data="{ 
+                        insight: null, 
+                        loading: true,
+                        fetchInsight() {
+                            fetch('{{ route('scholarships.ai-insight', $scholarship->id) }}')
+                                .then(response => response.json())
+                                .then(data => {
+                                    this.insight = data.message;
+                                    this.loading = false;
+                                })
+                                .catch(() => {
+                                    this.insight = 'AI insights are currently resting, but you\'re a great fit!';
+                                    this.loading = false;
+                                });
+                        }
+                    }" 
+                    x-init="fetchInsight()"
+                    class="mb-10 p-5 rounded-[16px] border border-[#C8E8E4]" style="background: linear-gradient(135deg, #F0FAFA 0%, #FFFFFF 100%);">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, #E8A838, #F9D679); color: #0F4C5C;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-[15px] mb-1" style="color: #0F4C5C;">Scholar AI Insight</h3>
+                            <div x-show="loading" class="animate-pulse flex space-x-4">
+                                <div class="flex-1 space-y-3 py-1">
+                                    <div class="h-2 bg-slate-200 rounded"></div>
+                                    <div class="h-2 bg-slate-200 rounded w-5/6"></div>
+                                </div>
+                            </div>
+                            <p x-show="!loading" x-text="insight" class="text-[14px] leading-relaxed" style="color: #4A7A80;"></p>
+                        </div>
+                    </div>
+                </div>
+                @endauth
+
                 {{-- About This Scholarship --}}
                 <section class="mb-10">
                     <h2 class="mb-6" style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 40px; color: #0A3040; letter-spacing: -0.015em;">

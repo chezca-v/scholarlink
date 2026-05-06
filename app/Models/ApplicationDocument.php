@@ -11,6 +11,8 @@ class ApplicationDocument extends Model
         'application_id',
         'document_id',
         'submitted_at',
+        'status',
+        'evaluator_notes',
     ];
 
     protected $casts = [

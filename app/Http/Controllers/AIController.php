@@ -158,22 +158,55 @@ PROMPT;
     }
 
     /**
-     * Generate AI recommendation summary for the dashboard.
+     * Generate AI recommendation insight for a specific scholarship detail page.
      */
-    public function getDashboardSummary(Request $request)
+    public function getScholarshipAIInsight(Request $request, $id)
     {
-        $profile = $request->user()->applicantProfile;
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Please log in to see your AI insights.']);
+        }
+        
+        $profile = $user->applicantProfile;
+        if (!$profile) {
+             return response()->json(['message' => 'Complete your profile to see your AI insights.']);
+        }
+
+        $scholarship = Scholarship::find($id);
+        if (!$scholarship) {
+            return response()->json(['message' => 'Scholarship not found.']);
+        }
+
+        $cacheKey = "ai-insight:user-{$user->id}:scholarship-{$scholarship->id}";
+
+        if ($cachedInsight = Cache::get($cacheKey)) {
+            return response()->json([
+                'message' => $cachedInsight,
+                'cached' => true,
+            ]);
+        }
 
         $prompt = "
             You are a friendly scholarship advisor for ScholarLink.
-            Give a short 2-sentence encouragement and tip for a student named {$request->user()->first_name}
-            who is taking {$profile->course} with a GPA of {$profile->gpa}.
+            Give a short 2-sentence encouragement and tip for a student named {$user->first_name}
+            who is taking {$profile->course_program} with a GPA of {$profile->gwa} and is applying for the '{$scholarship->name}' scholarship.
             Keep it warm and motivating. No markdown.
         ";
 
-        $text = $this->callGemini($prompt);
+        try {
+            $text = $this->callGemini($prompt);
+            
+            // Do not cache rate-limit or error messages
+            if (!Str::contains($text, ['pausing new AI requests', 'rate-limited', 'Unable to get AI response'])) {
+                // Cache for 180 days
+                Cache::put($cacheKey, $text, now()->addDays(180));
+            }
 
-        return response()->json(['message' => $text]);
+            return response()->json(['message' => $text]);
+        } catch (\Exception $e) {
+            Log::error('AI Insight Error: ' . $e->getMessage());
+            return response()->json(['message' => "AI insights are currently resting, but you're a great fit based on your profile!"]);
+        }
     }
 
     /**

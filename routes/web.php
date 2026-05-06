@@ -29,6 +29,7 @@ Route::controller(ScholarshipController::class)->group(function () {
     Route::get('/scholarships/{id}', 'show')->name('scholarships.show');
 });
 Route::post('/ai/chat', [AIController::class, 'chat'])->name('ai.chat');
+Route::get('/scholarships/{id}/ai-insight', [AIController::class, 'getScholarshipAIInsight'])->name('scholarships.ai-insight')->middleware('auth');
 
 Route::middleware(['auth', 'role:applicant'])->group(function () {
     Route::get('/profile/setup', [ProfileController::class, 'setup'])->name('profile.setup');

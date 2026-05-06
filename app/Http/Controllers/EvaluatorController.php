@@ -26,26 +26,30 @@ class EvaluatorController extends Controller
             'inactive_orgs'       => Organization::where('is_active', false)->count(),
         ];
 
-        $recentLogs = ActivityLog::with('user')
-            ->latest('created_at')
-            ->take(10)
-            ->get();
+        $firstAssignment = $user->evaluatorAssignments()->first();
+        $adminName = 'System Admin';
+        if ($firstAssignment && $firstAssignment->assigned_by) {
+            $admin = User::find($firstAssignment->assigned_by);
+            if ($admin) {
+                $adminName = trim(($admin->first_name ?? '') . ' ' . ($admin->last_name ?? ''));
+            }
+        }
 
-        return view('superadmin.dashboard', compact('stats', 'recentLogs'));
+        return view('evaluator.dashboard', compact(
+            'now',
+            'unreadNotifications',
+            'stats',
+            'adminName'
+        ));
     }
 
     // -------------------------------------------------------------------------
     // ORGANIZATIONS — Full CRUD
     // -------------------------------------------------------------------------
 
-    /**
-     * List all organizations.
-     * GET /superadmin/organizations
-     */
-    public function organizations()
-    {
-        $organizations = Organization::withCount('users')
-            ->latest()
+        $applications = Application::with('scholarship')
+            ->whereIn('scholarship_id', $assignedScholarshipIds)
+            ->whereIn('status', ['pending', 'under_review', 'revision'])
             ->paginate(15);
 
         return view('superadmin.organizations', compact('organizations'));

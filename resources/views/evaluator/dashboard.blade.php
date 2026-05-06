@@ -16,63 +16,18 @@
     $initials = strtoupper(substr(auth()->user()->first_name ?? 'A', 0, 1) . substr(auth()->user()->last_name ?? 'D', 0, 1));
 @endphp
 
-<div class="app-container">
-    <x-sidebar :user="auth()->user()" :adminName="$adminName" :initials="$initials" :organization="auth()->user()->organization" />
-
-    <div class="main-wrapper">
-        <x-dashboard-header :initials="$initials" :unreadNotifications="$unreadNotifications ?? 0" />
-
-        <main class="dashboard-body">
-            <div class="dashboard-heading">
-                <div>
-                    @php
-                        $organization = auth()->user()->organization ?? null;
-                    @endphp
-                    <p style="font-size:11px; font-weight:700; text-transform:uppercase; color:var(--teal-mid);">{{ $organization?->name ?? 'ScholarLink' }}</p>
-                    <h2 style="font-family:'Fraunces'; font-size:28px; font-weight:700;">Admin Dashboard</h2>
-                    <p style="font-size:12px; color:var(--muted); margin-top:2px;">{{ $now->format('l, F j, Y') }} · Academic Year {{ $now->year }}–{{ $now->copy()->addYear()->year }}</p>
-                </div>
-                <div class="heading-actions">
-                    <form method="POST" action="{{ route('admin.reports.export') ?? '#' }}" style="display:inline;">
-                        @csrf
-                        <button type="submit" class="btn-pri" style="background:white; border:1px solid var(--border-light); color:var(--deep-teal);">Export Report</button>
-                    </form>
-                    <a href="{{ route('admin.scholarships.create') ?? '#' }}" class="btn-pri" style="text-decoration:none; display:inline-block;">New Scholarship</a>
-                </div>
-            </div>
-
-            @php
-                $stats = $stats ?? [];
-            @endphp
-            <x-stat-cards :stats="$stats" />
-
-            <div class="dashboard-main-area">
-                <div>
-                    @php
-                        $alerts = $alerts ?? [];
-                    @endphp
-                    <x-alerts-section :alerts="$alerts" />
-
-                    <x-activity-section :activities="$recentActivity ?? []" />
-
-                    <x-scholarship-overview :scholarships="$scholarshipOverview ?? []" />
-                </div>
-
-                <aside>
-                    @php
-                        $quickActions = $quickActions ?? [];
-                    @endphp
-                    <x-quick-actions :actions="$quickActions" />
-
-                    @php
-                        $breakdownItems = $breakdownItems ?? [];
-                    @endphp
-                    <x-application-breakdown :statusCounts="$statusCounts ?? []" :totalApplications="$totalApplications ?? 0" :breakdownItems="$breakdownItems" />
-
-                    <x-upcoming-deadlines :deadlines="$upcomingDeadlines ?? []" :now="$now" />
-                </aside>
-            </div>
-        </main>
+{{-- ── HERO BANNER ── --}}
+<div style="background:linear-gradient(135deg,#0F4C5C,#1A6B7A); border-radius:20px; padding:28px 32px; display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; position:relative; overflow:hidden;">
+    <div style="position:absolute;top:-40px;right:-40px;width:240px;height:240px;background:rgba(255,255,255,.04);border-radius:50%;"></div>
+    <div style="position:absolute;bottom:-60px;right:100px;width:180px;height:180px;background:rgba(255,255,255,.04);border-radius:50%;"></div>
+    <div style="z-index:1;">
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.55);margin-bottom:4px;">📋 Evaluator Portal</p>
+        <h1 style="font-family:'Fraunces',serif;font-size:26px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:6px;">Welcome back, <span style="color:#F9D679;">{{ $name ?: 'Evaluator' }}</span>!</h1>
+        <p style="font-size:13px;color:rgba(255,255,255,.65);">{{ $now->format('l, F j, Y') }} · Assigned by: {{ $adminName }}</p>
+    </div>
+    <div style="z-index:1; text-align:center;">
+        <div style="width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:26px;font-weight:900;color:#F9D679;margin:0 auto 6px;">{{ $initials }}</div>
+        <p style="font-size:11px;color:rgba(255,255,255,.55);">Active Evaluator</p>
     </div>
 </div>
 
