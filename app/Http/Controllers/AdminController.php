@@ -78,10 +78,11 @@ class AdminController extends Controller
             'rejected' => $applicationsQuery()->where('status', 'rejected')->count(),
         ];
 
+        // Fetch recent activity logs for this admin's own actions.
+        // ActivityLog does not have a scholarship() relationship —
+        // it stores target_type/target_id polymorphically.
         $recentActivity = ActivityLog::query()
-            ->whereHas('scholarship', function($q) use ($adminId) {
-                $q->where('created_by', $adminId);
-            })
+            ->where('user_id', $adminId)
             ->with('user')
             ->latest('created_at')
             ->take(6)

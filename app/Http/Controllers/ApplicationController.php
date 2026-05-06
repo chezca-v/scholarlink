@@ -216,8 +216,8 @@ class ApplicationController extends Controller
             'groupTitle' => 'Endorsement',
             'document_type' => 'Endorsement Letter',
             'label' => 'Endorsement Letter',
-            'smallNote' => 'From Dean or Guidance Counselor',
-            'optional' => false,
+            'smallNote' => 'From Dean or Guidance Counselor (optional)',
+            'optional' => true,
         ];
 
         return view('applicant.applications.create', compact(
@@ -267,7 +267,7 @@ class ApplicationController extends Controller
             'id-photo',
             'income-tax-return',
             'barangay-indigency',
-            'endorsement-letter',
+            // 'endorsement-letter' is optional — applicants may not always have one
         ];
 
         foreach ($requiredSlugs as $slug) {
