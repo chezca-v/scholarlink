@@ -156,6 +156,7 @@
 </footer>
 
 <x-chatbot-widget />
+<x-visitor-counter />
 @stack('scripts')
 </body>
 </html>

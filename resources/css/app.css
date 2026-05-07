@@ -1,4 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Admin Layout Constants */
+
 :root {
     --sidebar-width: 230px;
     --admin-bg: #eef8f8;

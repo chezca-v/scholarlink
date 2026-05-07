@@ -5,78 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $scholarship->name }} — ScholarLink</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --teal-deep: #0F4C5C;
-            --teal-dark: #0A3040;
-            --teal-mid: #1A6B7A;
-            --teal-light: #2A8FA0;
-            --gold: #E8A838;
-            --gold-light: #F9D679;
-            --bg-mint: #F0FAFA;
-            --white: #FFFFFF;
-            --slate: #4A7A80;
-            --muted: #7AACAA;
-            --border: #DFF0EE;
-            --shadow-sm: 0 2px 8px rgba(15, 76, 92, 0.04);
-            --shadow-md: 0 8px 24px rgba(15, 76, 92, 0.08);
-            --radius-md: 16px;
-            --radius-lg: 24px;
-        }
-        body { font-family: 'DM Sans', sans-serif; background: var(--bg-mint); color: var(--teal-dark); }
-        .btn-premium {
-            background: var(--teal-deep);
-            color: var(--gold-light);
-            font-weight: 700;
-            padding: 12px 24px;
-            border-radius: 12px;
-            transition: all 0.3s;
-            box-shadow: var(--shadow-sm);
-        }
-        .btn-premium:hover {
-            background: var(--teal-mid);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        .card-premium {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-sm);
-            padding: 32px;
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
 
+
 <div class="min-h-screen bg-white" style="font-family: 'DM Sans', sans-serif;">
 
-    {{-- ===================== NAVBAR ===================== --}}
-    <nav class="w-full sticky top-0 z-50 border-b" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border-color: var(--border);">
-        <div class="max-w-[1280px] mx-auto px-16 h-[72px] flex items-center justify-between gap-8">
 
-            {{-- Logo --}}
-            <a href="{{ route('landing') }}" class="flex items-center gap-3">
-                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="w-9 h-9 object-contain" style="filter: drop-shadow(0 4px 10px rgba(15,76,92,0.12));">
-                <span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 22px; color: var(--teal-deep); letter-spacing: -0.5px;">ScholarLink</span>
+    {{-- ===================== NAVBAR ===================== --}}
+    <nav class="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
+        <div class="max-w-[1280px] mx-auto px-16 h-[68px] flex items-center justify-between gap-8">
+
+
+            {{-- Logo (always visible) --}}
+            <a href="{{ route('landing') }}" class="flex items-center gap-3 flex-shrink-0">
+                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="w-9 h-9 object-contain flex-shrink-0" style="filter: drop-shadow(0 4px 10px rgba(15,76,92,0.18));">
+                <span style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 21px; color: #0F4C5C; letter-spacing: -0.5px;">ScholarLink</span>
             </a>
+
 
             @auth
                 {{-- ===== LOGGED IN NAV ===== --}}
 
 
+
+
                 {{-- Right Icons --}}
                 <div class="flex items-center gap-3 flex-shrink-0">
-                    
+                   
                     {{-- Back to Dashboard Button --}}
                     <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 border" style="background: #FFFFFF; border-color: #C8E8E4; color: #0F4C5C;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
                         Dashboard
                     </a>
+
 
                     {{-- Notifications Bell --}}
                     <a href="{{ route('notifications.index') }}"
@@ -93,6 +59,7 @@
                         @endif
                     </a>
 
+
                     {{-- Messages (placeholder - not yet implemented) --}}
                     <button class="w-9 h-9 flex items-center justify-center rounded-full transition-all duration-150 hover:bg-[#F0FAFA] opacity-50 cursor-not-allowed"
                             title="Messages (coming soon)">
@@ -100,6 +67,7 @@
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                         </svg>
                     </button>
+
 
                     {{-- Profile Avatar --}}
                     <a href="{{ route('dashboard') }}"
@@ -109,10 +77,13 @@
                         {{ strtoupper(substr(auth()->user()->first_name ?? auth()->user()->name, 0, 1)) }}{{ strtoupper(substr(auth()->user()->last_name ?? '', 0, 1)) }}
                     </a>
 
+
                 </div>
+
 
             @else
                 {{-- ===== PUBLIC NAV ===== --}}
+
 
                 {{-- Nav Center --}}
                 <div class="flex items-center gap-1 px-1 py-1 rounded-[10px]" style="background: #F0FAFA;">
@@ -125,6 +96,7 @@
                     <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">Organizations</a>
                     <a href="#" class="px-4 py-[7px] rounded-lg text-[13px] font-medium transition-all duration-150" style="color: #4A7A80;">About</a>
                 </div>
+
 
                 {{-- Nav Right --}}
                 <div class="flex items-center gap-2 flex-shrink-0">
@@ -140,12 +112,15 @@
                     </a>
                 </div>
 
+
             @endauth
         </div>
     </nav>
 
+
     {{-- ===================== MAIN CONTENT ===================== --}}
     <div class="max-w-[1280px] mx-auto px-16 py-10">
+
 
         {{-- Back Link --}}
         <a href="{{ route('scholarships.index') }}"
@@ -153,6 +128,7 @@
            style="color: #0F4C5C;">
             ← Back to Scholarships
         </a>
+
 
         {{-- Status Badge --}}
         <div class="mb-4">
@@ -177,11 +153,14 @@
             @endif
         </div>
 
+
         {{-- Two Column Layout --}}
         <div class="flex gap-12">
 
+
             {{-- ===== LEFT COLUMN ===== --}}
             <div class="flex-1 min-w-0">
+
 
                 {{-- Name --}}
                 <h1 class="mb-2 leading-none"
@@ -189,11 +168,13 @@
                     {{ $scholarship->name }}
                 </h1>
 
+
                 {{-- Tagline --}}
                 <p class="mb-4"
                    style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px; color: #0A3040; letter-spacing: 0.025em;">
                     {{ $scholarship->tagline }}
                 </p>
+
 
                 {{-- Benefit Snippet Row --}}
                 <div class="flex flex-wrap items-center gap-6 mb-10 text-[15px]" style="color: #000000; letter-spacing: 0.0175em;">
@@ -217,10 +198,11 @@
                     @endif
                 </div>
 
+
                 {{-- AI Insight (Lazy Loaded) --}}
                 @auth
-                <div x-data="{ 
-                        insight: null, 
+                <div x-data="{
+                        insight: null,
                         loading: true,
                         fetchInsight() {
                             fetch('{{ route('scholarships.ai-insight', $scholarship->id) }}')
@@ -234,7 +216,7 @@
                                     this.loading = false;
                                 });
                         }
-                    }" 
+                    }"
                     x-init="fetchInsight()"
                     class="mb-10 p-5 rounded-[16px] border border-[#C8E8E4]" style="background: linear-gradient(135deg, #F0FAFA 0%, #FFFFFF 100%);">
                     <div class="flex items-start gap-4">
@@ -242,7 +224,7 @@
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                         </div>
                         <div class="flex-1">
-                            <h3 class="font-bold text-[15px] mb-1" style="color: #0F4C5C;">Soro AI Insight</h3>
+                            <h3 class="font-bold text-[15px] mb-1" style="color: #0F4C5C;">Scholar AI Insight</h3>
                             <div x-show="loading" class="animate-pulse flex space-x-4">
                                 <div class="flex-1 space-y-3 py-1">
                                     <div class="h-2 bg-slate-200 rounded"></div>
@@ -255,6 +237,7 @@
                 </div>
                 @endauth
 
+
                 {{-- About This Scholarship --}}
                 <section class="mb-10">
                     <h2 class="mb-6" style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 40px; color: #0A3040; letter-spacing: -0.015em;">
@@ -266,6 +249,7 @@
                         @endforeach
                     </div>
                 </section>
+
 
                 {{-- Benefits --}}
                 @if($scholarship->benefits)
@@ -293,6 +277,7 @@
                 </section>
                 @endif
 
+
                 {{-- Requirements --}}
                 @if($scholarship->requirements)
                 <section class="mb-10">
@@ -318,6 +303,7 @@
                     </div>
                 </section>
                 @endif
+
 
                 {{-- Eligibility Checklist --}}
                 @if($scholarship->eligibility)
@@ -346,6 +332,7 @@
                     </div>
                 </section>
                 @endif
+
 
                 {{-- Offered By --}}
                 <section class="mb-10">
@@ -395,14 +382,18 @@
                     </div>
                 </section>
 
+
             </div>{{-- END LEFT COLUMN --}}
+
 
             {{-- ===== RIGHT COLUMN (Sticky Sidebar) ===== --}}
             <div class="w-[378px] flex-shrink-0">
                 <div class="sticky top-[88px] space-y-4">
 
+
                     {{-- Action Bar (Apply + Save + Share) --}}
                     <div class="rounded-[20px] p-6" style="background: #1A6B7A;">
+
 
                         {{-- Apply Now --}}
                         @auth
@@ -419,6 +410,7 @@
                             </a>
                         @endauth
 
+
                         {{-- Save Scholarship --}}
                         @php
                             $isSaved = false;
@@ -428,6 +420,7 @@
                                     ->exists();
                             }
                         @endphp
+
 
                         @auth
                             @if($isSaved)
@@ -467,6 +460,7 @@
                             </a>
                         @endauth
 
+
                         {{-- Share --}}
                         <div class="mt-4 pt-4" style="border-top: 1px solid #C8E8E4;">
                             <p class="text-[13px] font-bold mb-3" style="color: #7AACAA; letter-spacing: 0.5px;">SHARE</p>
@@ -499,6 +493,7 @@
                         </div>
                     </div>
 
+
                     {{-- Slots Remaining --}}
                     <div class="rounded-[20px] p-5 border" style="background: #C8E8E4; border-color: #C8E8E4;">
                         <div class="flex items-center justify-between mb-3">
@@ -526,6 +521,7 @@
                             {{ $pct }}% of slots claimed &bull; {{ $slotsRemaining }} remaining
                         </p>
                     </div>
+
 
                     {{-- Application Deadline Timer --}}
                     <div class="rounded-[20px] p-5 border" style="background: #1A6B7A; border-color: #C8E8E4;"
@@ -559,16 +555,20 @@
                         </div>
                     </div>
 
+
                 </div>
             </div>{{-- END RIGHT COLUMN --}}
 
+
         </div>{{-- END TWO COLUMN --}}
     </div>{{-- END MAIN CONTENT --}}
+
 
     {{-- ===================== FOOTER ===================== --}}
     <footer style="background: #071820;" class="mt-20">
         <div class="max-w-[1280px] mx-auto px-16 pt-16 pb-8">
             <div class="flex gap-12 pb-12" style="border-bottom: 1px solid rgba(255,255,255,0.06);">
+
 
                 {{-- Brand --}}
                 <div class="flex-1">
@@ -581,6 +581,7 @@
                     </p>
                 </div>
 
+
                 {{-- Platform --}}
                 <div class="w-[160px]">
                     <p class="text-[10px] uppercase tracking-[2px] mb-[14px]" style="color: rgba(255,255,255,0.25);">Platform</p>
@@ -591,6 +592,7 @@
                         <li><a href="#" class="text-[13px] transition-colors hover:text-white/70" style="color: rgba(255,255,255,0.45);">AI Matching</a></li>
                     </ul>
                 </div>
+
 
                 {{-- Account --}}
                 <div class="w-[160px]">
@@ -603,6 +605,7 @@
                     </ul>
                 </div>
 
+
                 {{-- Legal --}}
                 <div class="w-[160px]">
                     <p class="text-[10px] uppercase tracking-[2px] mb-[14px]" style="color: rgba(255,255,255,0.25);">Legal</p>
@@ -614,6 +617,7 @@
                     </ul>
                 </div>
 
+
             </div>
             <div class="pt-6">
                 <p class="text-[12px]" style="color: rgba(255,255,255,0.2);">© 2025 ScholarLink. Philippines 🇵🇭</p>
@@ -621,7 +625,9 @@
         </div>
     </footer>
 
+
 </div>
+
 
 <script>
 function countdownTimer(deadline) {
@@ -648,3 +654,6 @@ function countdownTimer(deadline) {
 <x-chatbot-widget />
 </body>
 </html>
+
+
+
