@@ -8,28 +8,25 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,700;0,900;1,300;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --primary: #0F4C5C;
-    --primary-hover: #1A6B7A;
-    --primary-light: #2A8FA0;
-    --accent: #E8A838;
-    --accent-light: #F9D679;
-    --accent-pale: #FDF4E3;
-    --page-bg: #F0FAFA;
-    --card-bg: #FFFFFF;
-    --border: #DFF0EE;
-    --border-mid: #C8E8E4;
-    --ink: #0A3040;
+    --teal-deep: #0F4C5C;
+    --teal-dark: #0A3040;
+    --teal-mid: #1A6B7A;
+    --teal-light: #2A8FA0;
+    --gold: #E8A838;
+    --gold-light: #F9D679;
+    --bg-mint: #F0FAFA;
+    --white: #FFFFFF;
     --slate: #4A7A80;
     --muted: #7AACAA;
-    --sidebar-w: 220px;
-    --nav-h: 60px;
-    --red: #DC2626;
-    --red-bg: #FEF2F2;
-    --green: #059669;
-    --green-bg: #ECFDF5;
-    --yellow: #D97706;
-    --yellow-bg: #FFFBEB;
-    --eval-nav-bg: #F0FAFA;
+    --border: #DFF0EE;
+    --border-mid: #C8E8E4;
+    --shadow-sm: 0 2px 8px rgba(15, 76, 92, 0.04);
+    --shadow-md: 0 8px 24px rgba(15, 76, 92, 0.08);
+    --shadow-lg: 0 16px 48px rgba(15, 76, 92, 0.12);
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --sidebar-w: 240px;
+    --nav-h: 72px;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -51,10 +48,9 @@
   .sidebar-section { padding: 14px 16px 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
   .sidebar-link { display: flex; align-items: center; gap: 10px; padding: 9px 16px; color: var(--slate); font-size: 13px; font-weight: 400; cursor: pointer; border-left: 3px solid transparent; transition: all .15s; text-decoration: none; }
   .sidebar-link:hover { background: var(--page-bg); color: var(--ink); }
-  .sidebar-link.active { background: rgba(15,76,92,.06); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
-  .sidebar-link .icon { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
-  .sidebar-link .badge { margin-left: auto; background: var(--primary); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
-  .sidebar-link .badge.amber { background: var(--accent); color: var(--ink); }
+  .sidebar-link.active { background: var(--bg-mint); color: var(--teal-deep); border-left-color: var(--teal-deep); font-weight: 700; }
+  .sidebar-link .badge { margin-left: auto; background: var(--teal-deep); color: white; font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 10px; min-width: 18px; text-align: center; }
+  .sidebar-link .badge.amber { background: var(--gold); color: var(--teal-deep); }
   .sidebar-footer { margin-top: auto; padding: 14px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
   .sidebar-footer .avatar { width: 32px; height: 32px; border-radius: 50%; background: rgba(15,76,92,.1); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
   .sidebar-footer .name { font-size: 12px; color: var(--ink); font-weight: 500; }
@@ -63,8 +59,11 @@
   /* ─── TOPNAV ───────────────────────────────────────── */
   .topnav {
     position: fixed; top: 0; left: var(--sidebar-w); right: 0; height: var(--nav-h);
-    background: var(--eval-nav-bg); display: flex; align-items: center; padding: 0 24px; gap: 12px;
-    z-index: 99; border-bottom: 1.5px solid var(--border);
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    display: flex; align-items: center; padding: 0 32px; gap: 16px;
+    z-index: 99; border-bottom: 1px solid var(--border);
   }
   .topnav .page-title { font-family: 'Fraunces', serif; font-weight: 700; font-size: 22px; color: var(--ink); flex: 1; }
   .role-pill { padding: 4px 12px; border-radius: 20px; background: #EFF6FF; border: 1.5px solid #BFDBFE; font-size: 11px; font-weight: 600; color: #1D4ED8; }

@@ -11,19 +11,28 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/SplitText.min.js"></script>
 <style>
 :root {
-  --teal-deep: #071820;
+  --teal-deep: #0F4C5C;
   --teal-dark: #0A3040;
-  --teal-mid: #0F4C5C;
-  --teal-light: #1A6B7A;
+  --teal-mid: #1A6B7A;
+  --teal-light: #2A8FA0;
   --teal-pale: #7AACAA;
-  --teal-ghost: #C8E8E4;
-  --teal-mist: #EAF4F3;
+  --teal-ghost: #DFF0EE;
+  --teal-mid-border: #C8E8E4;
   --teal-foam: #F0FAFA;
   --gold: #E8A838;
   --gold-light: #F9D679;
   --gold-pale: #FDF4E3;
   --white: #ffffff;
   --navy: #0A3040;
+  --slate: #4A7A80;
+  --muted: #7AACAA;
+  
+  --shadow-sm: 0 2px 8px rgba(15, 76, 92, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 76, 92, 0.08);
+  --shadow-lg: 0 16px 48px rgba(15, 76, 92, 0.12);
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -41,27 +50,27 @@ body {
 nav {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 200;
-  background: rgba(255,255,255,0.88);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--teal-mist);
-  transform: translateY(-100%);
-  transition: background 0.4s;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border-bottom: 1px solid var(--teal-ghost);
+  transform: translateY(0);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .nav-inner {
-  max-width: 1160px; margin: 0 auto; padding: 0 48px;
-  height: 64px; display: flex; align-items: center; justify-content: space-between;
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
+  height: 72px; display: flex; align-items: center; justify-content: space-between;
 }
 .logo {
-  font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700;
-  color: var(--teal-mid); letter-spacing: -0.5px;
-  display: flex; align-items: center; gap: 10px; text-decoration: none;
+  font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700;
+  color: var(--teal-deep); letter-spacing: -0.5px;
+  display: flex; align-items: center; gap: 12px; text-decoration: none;
 }
 .logo-mark {
-  width: 34px; height: 34px;
+  width: 36px; height: 36px;
   display: block;
   object-fit: contain;
-  filter: drop-shadow(0 4px 10px rgba(15,76,92,0.18));
+  filter: drop-shadow(0 4px 10px rgba(15,76,92,0.12));
 }
 .nav-links { display: flex; gap: 36px; list-style: none; }
 .nav-links a {
@@ -75,27 +84,41 @@ nav {
 .nav-links a:hover { color: var(--teal-mid); }
 .nav-links a:hover::after { transform: scaleX(1); }
 .nav-actions { display: flex; gap: 10px; align-items: center; }
-.btn-text {
-  font-size: 14px; font-weight: 600; padding: 8px 18px;
-  border: none; background: transparent; color: var(--teal-mid); cursor: pointer;
-  text-decoration: none;
-}
+
+/* ── BUTTONS ── */
 .btn-pill {
-  font-size: 13px; font-weight: 700; padding: 9px 22px;
-  border: none; background: var(--teal-mid); color: var(--gold-light);
+  font-size: 13px; font-weight: 700; padding: 12px 28px;
+  border: none; background: var(--teal-deep); color: var(--gold-light);
   border-radius: 999px; cursor: pointer;
-  box-shadow: 0 4px 16px rgba(15,76,92,0.25);
+  box-shadow: var(--shadow-md);
   text-decoration: none; display: inline-block;
   transition: all 0.3s cubic-bezier(.17,.67,.35,1.3);
   position: relative; overflow: hidden;
 }
-.btn-pill::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(135deg, var(--teal-light), var(--teal-mid));
-  opacity: 0; transition: opacity 0.3s;
+.btn-pill:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); background: var(--teal-mid); }
+.btn-pill:active { transform: translateY(0) scale(0.98); }
+
+.btn-text {
+  font-size: 14px; font-weight: 600; padding: 12px 24px;
+  border: none; background: transparent; color: var(--teal-deep); cursor: pointer;
+  text-decoration: none; transition: color 0.2s;
 }
-.btn-pill:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 8px 28px rgba(15,76,92,0.35); }
-.btn-pill:hover::before { opacity: 1; }
+.btn-text:hover { color: var(--teal-light); }
+
+/* ── CARDS ── */
+.card-premium {
+  background: var(--white);
+  border: 1px solid var(--teal-ghost);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.4s cubic-bezier(.17,.67,.35,1);
+}
+.card-premium:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--teal-mid-border);
+}
+
 .nav-links a.active {
   color: var(--teal-mid) !important;
 }
@@ -398,32 +421,56 @@ footer a:hover { color: var(--gold) !important; text-shadow: 0 0 10px rgba(232,1
 .step-desc { font-size: 14px; color: var(--teal-pale); line-height: 1.8; }
 
 /* ── SCHOLARSHIPS ──────────────────────────────── */
-.scholarships { padding: 112px 48px; background: var(--teal-foam); }
+.scholarships { padding: 128px 48px; background: var(--teal-foam); position: relative; }
 .scholarships-inner { max-width: 1160px; margin: 0 auto; }
-.sch-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
-.filters { display: flex; gap: 8px; flex-wrap: wrap; }
+.sch-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 56px; flex-wrap: wrap; gap: 24px; }
+.filters {
+  display: flex;
+  gap: 8px;
+  background: var(--white);
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--teal-ghost);
+  box-shadow: var(--shadow-sm);
+  flex-wrap: wrap;
+}
 .filter {
-  font-size: 12px; font-weight: 600; padding: 8px 18px;
-  border-radius: 999px; border: 1px solid var(--teal-ghost);
-  background: var(--white); color: #4A7A80; cursor: pointer;
-  transition: all 0.25s cubic-bezier(.17,.67,.35,1.3);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--teal-pale);
+  padding: 10px 22px;
+  border-radius: 999px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  text-decoration: none;
 }
-.filter.active, .filter:hover { background: var(--teal-mid); color: var(--gold-light); border-color: var(--teal-mid); transform: translateY(-2px); }
+.filter:hover {
+  color: var(--teal-mid);
+  background: var(--teal-foam);
+}
+.filter.active {
+  background: var(--teal-deep);
+  color: var(--gold-light);
+  box-shadow: 0 4px 12px rgba(15, 76, 92, 0.2);
+}
 
-.s-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.s-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
 .s-card {
-  background: var(--white); border: 1px solid var(--teal-mist);
-  border-radius: 20px; padding: 26px;
+  background: var(--white);
+  border: 1px solid var(--teal-ghost);
+  border-radius: var(--radius-md);
+  padding: 32px;
   display: flex; flex-direction: column;
-  transition: all 0.4s cubic-bezier(.17,.67,.35,1.3); cursor: pointer;
-  opacity: 0; transform: translateY(30px) scale(0.98);
+  transition: all 0.4s cubic-bezier(.17,.67,.35,1);
+  cursor: pointer;
+  opacity: 0; transform: translateY(30px);
   position: relative; overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
-.s-card::after {
-  content: ''; position: absolute;
-  bottom: 0; left: 0; right: 0; height: 0;
-  background: linear-gradient(0deg, rgba(15,76,92,0.04), transparent);
-  transition: height 0.4s;
+.s-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--teal-mid-border);
 }
 .s-card:hover { border-color: var(--teal-mid); box-shadow: 0 20px 48px rgba(15,76,92,0.12); transform: translateY(-6px) scale(1.01); }
 .s-card:hover::after { height: 100%; }
@@ -561,7 +608,11 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
 .footer-col-title { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); margin-bottom: 16px; }
 .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
 .footer-links li { font-size: 13px; color: rgba(255,255,255,0.4); cursor: pointer; transition: color 0.2s; }
-.footer-links li:hover { color: var(--gold-light); }
+.footer-links li:hover { 
+  color: var(--gold-light);
+  text-shadow: 0 0 8px rgba(249,214,121,0.4);
+  transform: translateX(4px);
+}
 .footer-bottom { display: flex; justify-content: space-between; align-items: center; }
 .footer-copy { font-size: 12px; color: rgba(255,255,255,0.18); }
 .footer-badge { font-size: 10px; font-weight: 700; color: var(--gold); border: 1px solid rgba(232,168,56,0.25); border-radius: 999px; padding: 4px 14px; letter-spacing: 1.5px; }
@@ -583,6 +634,10 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
   transform-origin: left; transform: scaleX(0);
   transition: none;
 }
+
+/* ── AMBIENT DRAWING ICONS ─────────────────────── */
+.ambient-icons-container { position: fixed; inset: 0; pointer-events: none; z-index: 1; }
+.ambient-draw-svg { position: absolute; width: 140px; height: 140px; stroke: var(--teal-mid); stroke-width: 0.6; fill: none; opacity: 0.12; }
 
 /* ── SECTION DIVIDERS ──────────────────────────── */
 .wave-divider { width: 100%; overflow: hidden; line-height: 0; margin-bottom: -2px; }
@@ -608,6 +663,8 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
   .footer-grid { grid-template-columns: 1fr; gap: 32px; }
   .stats-row { flex-direction: column; gap: 24px; }
   .hero-actions { flex-direction: column; }
+  .floating-card { display: none !important; }
+  .hero-visual { display: none !important; }
 }
 </style>
 </head>
@@ -622,6 +679,9 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
 
 <!-- Particle canvas -->
 <canvas id="particle-canvas"></canvas>
+
+<!-- Ambient Drawing Icons Container -->
+<div id="ambient-icons" class="ambient-icons-container"></div>
 
 <!-- NAV -->
 <nav id="main-nav">
@@ -771,11 +831,11 @@ footer { background: var(--teal-deep); padding: 72px 48px 36px; }
         <h2 class="section-title" style="margin-bottom:0;font-size:clamp(28px,3vw,42px);">Find yours today.</h2>
       </div>
       <div class="filters">
-        <a href="{{ route('scholarships.index') }}" class="filter active" style="text-decoration:none;display:inline-block;">All</a>
-        <a href="{{ route('scholarships.index', ['category' => ['Merit-Based']]) }}" class="filter" style="text-decoration:none;display:inline-block;">Merit-Based</a>
-        <a href="{{ route('scholarships.index', ['category' => ['Need-Based']]) }}" class="filter" style="text-decoration:none;display:inline-block;">Need-Based</a>
-        <a href="{{ route('scholarships.index', ['category' => ['STEM']]) }}" class="filter" style="text-decoration:none;display:inline-block;">STEM</a>
-        <a href="{{ route('scholarships.index', ['category' => ['Arts & Humanities']]) }}" class="filter" style="text-decoration:none;display:inline-block;">Arts & Humanities</a>
+        <a href="{{ route('scholarships.index') }}" class="filter active">All</a>
+        <a href="{{ route('scholarships.index', ['category' => ['Merit-Based']]) }}" class="filter">Merit-Based</a>
+        <a href="{{ route('scholarships.index', ['category' => ['Need-Based']]) }}" class="filter">Need-Based</a>
+        <a href="{{ route('scholarships.index', ['category' => ['STEM']]) }}" class="filter">STEM</a>
+        <a href="{{ route('scholarships.index', ['category' => ['Arts & Humanities']]) }}" class="filter">Arts & Humanities</a>
       </div>
     </div>
     <div class="s-grid" id="s-grid">
@@ -1126,6 +1186,48 @@ function startHandwritingAnimation() {
   typeNextWithCursor();
 }
 
+// ── AMBIENT LOGO DRAWING ────────────────────────────────────
+function spawnAmbientIcon() {
+  const container = document.getElementById('ambient-icons');
+  if (!container) return;
+  
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.classList.add('ambient-draw-svg');
+  
+  // Graduation Cap Path
+  const p1 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  p1.setAttribute('d', 'M22 10v6M2 10l10-5 10 5-10 5z');
+  const p2 = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  p2.setAttribute('d', 'M6 12v5c3 3 9 3 12 0v-5');
+  
+  svg.appendChild(p1);
+  svg.appendChild(p2);
+  
+  const x = Math.random() * 85;
+  const y = Math.random() * 85;
+  svg.style.left = `${x}%`;
+  svg.style.top = `${y}%`;
+  svg.style.transform = `rotate(${Math.random() * 60 - 30}deg) scale(${0.8 + Math.random() * 0.4})`;
+  
+  container.appendChild(svg);
+  
+  const paths = svg.querySelectorAll('path');
+  paths.forEach(p => {
+    const len = p.getTotalLength();
+    p.style.strokeDasharray = len;
+    p.style.strokeDashoffset = len;
+  });
+  
+  const tl = gsap.timeline({ onComplete: () => svg.remove() });
+  tl.to(paths, { strokeDashoffset: 0, duration: 3, ease: 'power1.inOut' })
+    .to(svg, { opacity: 0, duration: 1.5, ease: 'power2.in' }, '-=1');
+}
+
+// Initial icons
+for(let i=0; i<3; i++) setTimeout(spawnAmbientIcon, i * 1500);
+setInterval(spawnAmbientIcon, 5000);
+
 function drawUnderlineSweep() {
   const underline = document.getElementById('headline-underline');
   if (underline) {
@@ -1467,6 +1569,19 @@ console.log('%cScholarLink ✦ World-class UI loaded', 'color:#E8A838;font-famil
           else link.classList.remove('active');
         }
       });
+    }
+  });
+
+  // ── NAV REVEAL ──────────────────────────────────────────────
+  const nav = document.querySelector('nav');
+  ScrollTrigger.create({
+    start: "top -80",
+    onUpdate: self => {
+      if (self.direction === -1) {
+        gsap.to(nav, { y: 0, duration: 0.4, ease: "power3.out" });
+      } else {
+        gsap.to(nav, { y: "-100%", duration: 0.4, ease: "power3.in" });
+      }
     }
   });
 

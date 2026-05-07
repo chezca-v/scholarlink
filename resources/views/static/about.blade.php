@@ -63,7 +63,42 @@
     .team-badge { background: rgba(15, 76, 92, 0.08); color: var(--teal-mid); padding: 5px 14px; border-radius: 100px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
 
     .section-label { display: inline-flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-    .section-title { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; color: var(--navy); margin-bottom: 24px; }
+    .section-title { font-family: 'Fraunces', serif; font-size: 36px; font-weight: 700; color: var(--navy); margin-bottom: 24px; opacity: 0; transform: translateY(20px); }
+    
+    /* ── FUN ELEMENTS ── */
+    .floating-icon { position: absolute; font-size: 32px; opacity: 0.15; pointer-events: none; z-index: 1; }
+    .story-card { background: var(--white); border: 1px solid var(--teal-ghost); border-radius: var(--radius-md); padding: 48px; transition: all 0.5s cubic-bezier(.17,.67,.35,1); box-shadow: var(--shadow-sm); }
+    .story-card:hover { transform: translateY(-10px) rotate(1deg); box-shadow: var(--shadow-lg); border-color: var(--teal-mid-border); }
+    
+    .team-card { 
+      background: var(--white); 
+      padding: 48px 24px; 
+      border-radius: 24px; 
+      text-align: center; 
+      border: 1px solid var(--teal-ghost); 
+      transition: all 0.4s cubic-bezier(.17,.67,.35,1.3); 
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .team-card:hover { 
+      transform: translateY(-12px) scale(1.02); 
+      border-color: var(--gold); 
+      box-shadow: 0 32px 64px rgba(15,76,92,0.15); 
+    }
+    .team-card::after {
+      content: '✨'; position: absolute; top: 12px; right: 12px; font-size: 18px; 
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .team-card:hover::after { opacity: 1; }
+    
+    .team-fact {
+      font-size: 13px; color: var(--teal-mid); margin-top: 16px;
+      font-style: italic; font-weight: 500;
+      opacity: 0; transform: translateY(10px); transition: all 0.4s cubic-bezier(.17,.67,.35,1.3);
+      background: var(--gold-pale); padding: 8px 12px; border-radius: 12px;
+    }
+    .team-card:hover .team-fact { opacity: 1; transform: translateY(0); }
     
     @media (max-width: 900px) {
         .about-hero { grid-template-columns: 1fr; }
@@ -126,16 +161,19 @@
 </div>
 
 <!-- STORY SECTION -->
-<section style="padding: 100px 48px;">
+<section style="padding: 100px 48px; position: relative; overflow: hidden;">
+    <div class="floating-icon" style="top: 10%; left: 5%; transform: rotate(-15deg);">🎓</div>
+    <div class="floating-icon" style="bottom: 15%; right: 8%; transform: rotate(20deg);">📚</div>
+    
     <div style="max-width: 1000px; margin: 0 auto;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: start;">
-            <div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: stretch;">
+            <div class="story-card reveal">
                 <p class="section-label">Our Mission</p>
                 <h2 class="section-title">Empowering Leaders</h2>
                 <p style="font-size: 16px; color: var(--teal-pale); line-height: 1.8; margin-bottom: 24px;">ScholarLink was born from a simple observation: thousands of Filipino students miss out on scholarships simply because they don't know they exist or find the application process too daunting. We've built a world-class platform that centralizes opportunities from CHED, DOST, and private partners into one intelligent portal.</p>
                 <p style="font-size: 16px; color: var(--teal-pale); line-height: 1.8;">We simplify educational funding by consolidating opportunities, automating matches, and promoting fair evaluation through blind screening.</p>
             </div>
-            <div>
+            <div class="story-card reveal" style="margin-top: 60px;">
                 <p class="section-label">The Strategy</p>
                 <h2 class="section-title">Smart Matching</h2>
                 <p style="font-size: 16px; color: var(--teal-pale); line-height: 1.8; margin-bottom: 24px;">We use AI matching and "Blind Screening" to ensure fairness, letting merit — not connections — decide a student's future. By masking personal identifiable information during the initial review, we guarantee an objective evaluation process.</p>
@@ -186,41 +224,47 @@
         <p style="color: var(--teal-pale); font-size: 15px;">BSCpE 2-2 Students from Pamantasan ng Lungsod ng Maynila</p>
     </div>
     <div class="team-grid">
-        <div class="team-card">
+        <div class="team-card reveal-item">
             <div class="avatar amber">F</div>
             <h5 class="team-name">Franchezca Banayad</h5>
             <p class="team-role">Full Stack — Backend Lead</p>
             <span class="team-badge">BSCpE 2-2</span>
+            <p class="team-fact">"The logic architect. Making sure every query is as sharp as a diamond."</p>
         </div>
-        <div class="team-card">
+        <div class="team-card reveal-item">
             <div class="avatar amber">Y</div>
             <h5 class="team-name">Ysa Frigillana</h5>
             <p class="team-role">UI/UX & Full Stack — Frontend Lead</p>
             <span class="team-badge">BSCpE 2-2</span>
+            <p class="team-fact">"Designing with empathy. If it's beautiful and works, she probably built it."</p>
         </div>
-        <div class="team-card">
+        <div class="team-card reveal-item">
             <div class="avatar amber">P</div>
             <h5 class="team-name">Princess Sanchez</h5>
             <p class="team-role">Full Stack — Database Lead</p>
             <span class="team-badge">BSCpE 2-2</span>
+            <p class="team-fact">"Guardian of the data. Ensuring your profile stays safe and matched."</p>
         </div>
-        <div class="team-card">
+        <div class="team-card reveal-item">
             <div class="avatar">K</div>
             <h5 class="team-name">Karl Esteban</h5>
             <p class="team-role">Full Stack Developer</p>
             <span class="team-badge">BSCpE 2-2</span>
+            <p class="team-fact">"Code ninja. Tackling complex features with speed and precision."</p>
         </div>
-        <div class="team-card">
+        <div class="team-card reveal-item">
             <div class="avatar">E</div>
             <h5 class="team-name">Elena Lanuza</h5>
             <p class="team-role">Front End Developer</p>
             <span class="team-badge">BSCpE 2-2</span>
+            <p class="team-fact">"The visual specialist. Bringing colors and components to life."</p>
         </div>
-        <div class="team-card">
+        <div class="team-card reveal-item">
             <div class="avatar">J</div>
             <h5 class="team-name">Jose Jerico Escaño</h5>
             <p class="team-role">Front End Developer</p>
             <span class="team-badge">BSCpE 2-2</span>
+            <p class="team-fact">"Master of the layout. Ensuring everything is in its perfect place."</p>
         </div>
     </div>
 </section>
@@ -316,5 +360,62 @@ function animateParticles() {
   requestAnimationFrame(animateParticles);
 }
 animateParticles();
+
+// ── REVEAL ANIMATIONS ───────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero Entrance
+const heroTl = gsap.timeline();
+heroTl.to('.hero-title', { opacity: 1, y: 0, duration: 1, ease: 'power4.out', delay: 0.2 })
+      .to('.hero-sub', { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.6')
+      .from('.hero-stats div', { opacity: 0, y: 20, stagger: 0.1, duration: 0.8, ease: 'power3.out' }, '-=0.4');
+
+// Section Reveals
+gsap.utils.toArray('.section-title').forEach(title => {
+  gsap.to(title, {
+    opacity: 1, y: 0, duration: 1,
+    scrollTrigger: { trigger: title, start: 'top 85%' }
+  });
+});
+
+gsap.utils.toArray('.story-card').forEach(card => {
+  gsap.from(card, {
+    opacity: 0, y: 40, duration: 1.2, ease: 'power3.out',
+    scrollTrigger: { trigger: card, start: 'top 80%' }
+  });
+});
+
+// Team Stagger
+gsap.from('.reveal-item', {
+  opacity: 0, y: 30, scale: 0.95, stagger: 0.1, duration: 0.8, ease: 'back.out(1.7)',
+  scrollTrigger: { trigger: '.team-grid', start: 'top 75%' }
+});
+
+// Floating Icons Parallax
+document.addEventListener('mousemove', e => {
+  const x = (e.clientX / window.innerWidth - 0.5) * 40;
+  const y = (e.clientY / window.innerHeight - 0.5) * 40;
+  gsap.to('.floating-icon', { x: x, y: y, duration: 2, ease: 'power2.out', stagger: 0.1 });
+});
+
+// Impact Counters
+function animateCounter(el, target) {
+  let obj = { val: 0 };
+  gsap.to(obj, {
+    val: target, duration: 2, ease: 'power3.out',
+    onUpdate: () => { el.textContent = Math.floor(obj.val).toLocaleString() + (target === 100 ? '%' : (el.textContent.includes('₱') ? '' : '+')); }
+  });
+}
+
+ScrollTrigger.create({
+  trigger: '.impact-row', start: 'top 80%',
+  onEnter: () => {
+    document.querySelectorAll('.impact-num').forEach(el => {
+      const target = parseInt(el.textContent.replace(/[₱+,%]/g, ''));
+      animateCounter(el, target);
+    });
+  }
+});
+
 </script>
 @endpush

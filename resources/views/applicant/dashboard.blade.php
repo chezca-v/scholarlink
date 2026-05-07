@@ -6,21 +6,22 @@
 <style>
 /* ── HERO BANNER ── */
 .hero{
-  border-radius:18px;
-  background:linear-gradient(160deg, #0F4C5C, #2A8FA0);
-  padding:28px 32px;
-  display:flex;align-items:flex-start;justify-content:space-between;
-  margin-bottom:20px;
-  position:relative;
-  overflow:hidden;
+  border-radius: var(--radius-md);
+  background: linear-gradient(160deg, var(--teal-deep), var(--teal-mid));
+  padding: 40px;
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
-.hero-eyebrow{font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.65);margin-bottom:4px;}
-.hero-name{font-family:'Fraunces',serif;font-size:30px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:6px;}
-.hero-name em{color:var(--amber-light);font-style:italic;}
-.hero-sub{font-size:13px;color:rgba(255,255,255,0.65);margin-bottom:18px;}
-.btn-ai{display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg, #E8A838, #F9D679);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;border:none;border-radius:10px;padding:9px 18px;cursor:pointer;transition:all .15s;}
-.btn-ai:hover{background:#F9D679;transform:translateY(-1px);}
-.btn-ai svg{flex-shrink:0;}
+.hero-eyebrow{font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 8px;}
+.hero-name{font-family: 'Fraunces', serif; font-size: 36px; font-weight: 900; color: #fff; line-height: 1.1; margin-bottom: 8px;}
+.hero-name em{color: var(--gold-light); font-style: italic; font-weight: 300;}
+.hero-sub{font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 24px; max-width: 480px;}
+.btn-ai{display: inline-flex; align-items: center; gap: 8px; background: var(--gold); color: var(--teal-deep); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 700; border: none; border-radius: 12px; padding: 12px 24px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(232, 168, 56, 0.3);}
+.btn-ai:hover{background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(232, 168, 56, 0.4);}
+
 .hero-right{display:flex;flex-direction:column;align-items:center;gap:4px;z-index:1;}
 .progress-ring{position:relative;width:80px;height:80px;}
 .progress-ring svg{transform:rotate(-90deg);}
@@ -33,20 +34,13 @@
 .hero-right-hint{font-size:10px;color:rgba(255,255,255,0.55);text-align:center;}
 
 /* ── STAT CARDS ── */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px;}
-.stat-card{background:#fff;border:1.5px solid var(--mist);border-radius:14px;padding:16px 18px;position:relative;overflow:hidden;}
-.stat-badge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;}
-.stat-badge.active{background:var(--green-bg);color:var(--green-text);}
-.stat-badge.ai{background:var(--violet-bg);color:var(--violet-text);}
-.stat-badge.won{background:var(--warn-bg);color:var(--warn-text);}
-.stat-badge.saved{background:var(--light-green);color:var(--teal);}
-.stat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
-.stat-icon.teal{background:var(--light-green);}
-.stat-icon.violet{background:var(--violet-bg);}
-.stat-icon.green{background:var(--green-bg);}
-.stat-icon.amber{background:#fff8e1;}
-.stat-num{font-family:'Fraunces',serif;font-size:32px;font-weight:700;color:var(--ink);line-height:1;}
-.stat-lbl{font-size:12px;color:var(--slate);margin-top:3px;}
+.stat-row{display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 32px;}
+.stat-card{background: #fff; border: 1px solid var(--teal-ghost); border-radius: var(--radius-md); padding: 24px; position: relative; box-shadow: var(--shadow-sm); transition: all 0.3s;}
+.stat-card:hover{transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--teal-mid-border);}
+.stat-icon{width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px;}
+.stat-num{font-family: 'Fraunces', serif; font-size: 36px; font-weight: 800; color: var(--teal-deep); line-height: 1;}
+.stat-lbl{font-size: 13px; font-weight: 600; color: var(--slate); margin-top: 6px;}
+
 
 /* ── SECTION HEADER ── */
 .sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -58,14 +52,17 @@
 
 /* ── AI MATCH CARDS ── */
 .ai-section{
-  background:#fff; /* or any color you want */
-  border:1.5px solid var(--mist);
-  border-radius:16px;
-  padding:18px 20px 2px;
+  background: var(--white);
+  border: 1px solid var(--teal-ghost);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 32px;
 }
-.ai-scroll{display:grid;grid-template-columns:repeat(5,minmax(210px,1fr));gap:12px;margin-bottom:28px;overflow-x:auto;}
-.ai-scroll::-webkit-scrollbar{height:3px;}
-.ai-scroll::-webkit-scrollbar-thumb{background:var(--mist);}
+.ai-scroll{display: grid; grid-template-columns: repeat(5, minmax(240px, 1fr)); gap: 20px; margin-bottom: 8px; overflow-x: auto; padding: 4px 4px 16px;}
+.ai-scroll::-webkit-scrollbar{height: 4px;}
+.ai-scroll::-webkit-scrollbar-thumb{background: var(--teal-ghost); border-radius: 10px;}
+
 .match-card{background:#fff;border:1.5px solid var(--mist);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:0;flex-shrink:0;transition:box-shadow .15s;}
 .match-card:hover{transform:translateY(-7px);box-shadow:0 16px 36px rgba(15,76,92,0.13);}
 .match-card.top{border-color:var(--amber);border-width:2px;}
@@ -192,7 +189,7 @@
 <!-- PENDING OFFERS -->
 @if($pendingOffers->count() > 0)
 @foreach($pendingOffers as $offer)
-<div class="section" style="background:#FEFCE8;border:1.5px solid #FDE047;border-radius:16px;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:0 4px 12px rgba(234,179,8,0.15);">
+<div class="section" style="background: linear-gradient(135deg, #FDF4E3 0%, #FFFFFF 100%); border: 2px solid var(--gold); border-radius: 20px; padding: 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; box-shadow: var(--shadow-md);">
   <div>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
       <span style="background:#EAB308;color:#FFF;font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;text-transform:uppercase;letter-spacing:0.5px;">Offer Pending</span>
@@ -281,7 +278,7 @@
       <div class="mc-top"><span class="mc-cat">{{ $scholarship->provider_name ?? 'Scholarship' }}</span><span class="mc-fit {{ $isTop ? 'top' : ($matchScore >= 80 ? 'great' : ($matchScore >= 70 ? 'good' : 'explore')) }}">{{ $fitLabel }}</span></div>
       <div class="mc-name">{{ $scholarship->name }}</div>
       <div class="mc-org">{{ $scholarship->tagline ?? '' }}</div>
-      <div class="mc-amt">₱{{ number_format($benefitAmount) }} <span class="mc-amt-unit">/ year</span></div>
+      <div class="mc-amt" style="color: var(--teal-deep); font-weight: 800; font-size: 20px;">₱{{ number_format($benefitAmount) }} <span class="mc-amt-unit" style="color: var(--slate); font-weight: 500; font-size: 12px;">/ year</span></div>
       @if($matchScore)
       <div class="mc-score-lbl">Match Score</div>
       <div class="mc-bar-row"><div class="mc-bar"><div class="mc-fill {{ $isTop ? 'gold' : '' }}" style="width:{{ $matchScore }}%"></div></div><span class="mc-pct">{{ round($matchScore) }}%</span></div>

@@ -18,29 +18,23 @@
     <style>
         /* ── Variables ── */
         :root {
-            --primary:      #0F4C5C;
-            --primary-mid:  #1A6B7A;
-            --primary-light:#C8E8E4;
-            --primary-pale: #F0FAFA;
-            --accent:       #E8A838;
-            --accent-pale:  #FEF6E4;
-            --ink:          #0A3040;
+            --teal-deep:    #0F4C5C;
+            --teal-dark:    #0A3040;
+            --teal-mid:     #1A6B7A;
+            --teal-light:   #2A8FA0;
+            --gold:         #E8A838;
+            --gold-light:   #F9D679;
+            --bg-mint:      #F0FAFA;
+            --white:        #ffffff;
             --slate:        #4A7A80;
-            --muted:        #9CBBBB;
-            --border:       #E2ECEA;
-            --page-bg:      #F0F4F3;
-            --surface:      #FFFFFF;
-            --sidebar-w:    220px;
-            --topbar-h:     60px;
-            --red:          #DC2626;
-            --red-light:    #FEE2E2;
-            --green:        #16A34A;
-            --green-light:  #DCFCE7;
-            --yellow:       #D97706;
-            --yellow-bg:    #FFFBEB;
-            --amber:        #E8A838;
-            --shadow-sm:    0 1px 4px rgba(0,0,0,.06);
-            --shadow-md:    0 4px 20px rgba(0,0,0,.09);
+            --muted:        #7AACAA;
+            --border:       #DFF0EE;
+            --shadow-sm:    0 2px 8px rgba(15, 76, 92, 0.04);
+            --shadow-md:    0 8px 24px rgba(15, 76, 92, 0.08);
+            --radius-md:    16px;
+            --radius-lg:    24px;
+            --sidebar-w:    240px;
+            --topbar-h:     72px;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -166,23 +160,25 @@
         /* ── TOPBAR ── */
         .sa-topbar {
             grid-column:     2;
-            background:      var(--primary);
+            background:      rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px) saturate(180%);
+            -webkit-backdrop-filter: blur(12px) saturate(180%);
             height:          var(--topbar-h);
             display:         flex;
             align-items:     center;
             justify-content: space-between;
-            padding:         0 28px;
+            padding:         0 32px;
             position:        sticky;
             top:             0;
             z-index:         10;
-            border-bottom:   1px solid rgba(255,255,255,.08);
+            border-bottom:   1px solid var(--border);
         }
         .sa-topbar__left {}
         .sa-topbar__title {
             font-family:  'Fraunces', serif;
-            font-size:    18px;
-            font-weight:  700;
-            color:        #fff;
+            font-size:    22px;
+            font-weight:  900;
+            color:        var(--teal-deep);
         }
         .sa-topbar__subtitle {
             font-size:  11px;

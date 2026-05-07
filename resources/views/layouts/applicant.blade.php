@@ -14,32 +14,33 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --teal:#0F4C5C;
-  --teal-hover:#0c3f4d;
+  --teal-deep:#0F4C5C;
+  --teal-dark:#0A3040;
+  --teal-mid:#1A6B7A;
   --teal-light:#2A8FA0;
-  --amber:#C9A84C;
-  --amber-light:#F9D679;
-  --cloud:#F4F6FA;
-  --mist:#E2E8F0;
-  --slate:#8A95A3;
-  --ink:#1C1C2E;
-  --green-bg:#dcfce7;
-  --green-text:#15803d;
-  --warn-bg:#fef9c3;
-  --warn-text:#854d0e;
-  --violet-bg:#ede9fe;
-  --violet-text:#6d28d9;
-  --light-green:#F0FAFA;
-  --sidebar-w:210px;
+  --gold:#E8A838;
+  --gold-light:#F9D679;
+  --bg-mint:#F0FAFA;
+  --white:#ffffff;
+  --slate:#4A7A80;
+  --muted:#7AACAA;
+  --border:#DFF0EE;
+  --shadow-sm: 0 2px 8px rgba(15, 76, 92, 0.04);
+  --shadow-md: 0 8px 24px rgba(15, 76, 92, 0.08);
+  --radius-md: 16px;
+  --sidebar-w:220px;
 }
 body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
 
 /* ── NAVBAR (copied from browse page) ── */
 .navbar{
-  background:#FFFF;height:56px;
-  display:flex;align-items:center;padding:0 22px;gap:14px;
-  position:sticky;top:0;z-index:200;
-  box-shadow:0 1px 4px rgba(0,0,0,0.18);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  height: 64px;
+  display: flex; align-items: center; padding: 0 24px; gap: 16px;
+  position: sticky; top: 0; z-index: 200;
+  border-bottom: 1px solid var(--border);
 }
 .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;}
 .logo-box{width:32px;height:32px;object-fit:contain;filter:drop-shadow(0 4px 10px rgba(15,76,92,0.18));}
@@ -64,14 +65,14 @@ body{font-family:'DM Sans',sans-serif;background:#F0FAFA;color:var(--ink);min-he
 
 /* ── SIDEBAR ── */
 .sidebar{
-  width:var(--sidebar-w);flex-shrink:0;
-  background:#fff;
-  border-right:1px solid var(--mist);
-  display:flex;flex-direction:column;
-  position:sticky;top:56px;
-  height:calc(100vh - 56px);
-  overflow-y:auto;
-  padding:20px 0 16px;
+  width: var(--sidebar-w); flex-shrink: 0;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  position: sticky; top: 64px;
+  height: calc(100vh - 64px);
+  overflow-y: auto;
+  padding: 24px 0 16px;
 }
 .sidebar::-webkit-scrollbar{width:3px;}
 .sidebar::-webkit-scrollbar-thumb{background:var(--mist);}

@@ -5,9 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $scholarship->name }} — ScholarLink</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-deep: #0F4C5C;
+            --teal-dark: #0A3040;
+            --teal-mid: #1A6B7A;
+            --teal-light: #2A8FA0;
+            --gold: #E8A838;
+            --gold-light: #F9D679;
+            --bg-mint: #F0FAFA;
+            --white: #FFFFFF;
+            --slate: #4A7A80;
+            --muted: #7AACAA;
+            --border: #DFF0EE;
+            --shadow-sm: 0 2px 8px rgba(15, 76, 92, 0.04);
+            --shadow-md: 0 8px 24px rgba(15, 76, 92, 0.08);
+            --radius-md: 16px;
+            --radius-lg: 24px;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg-mint); color: var(--teal-dark); }
+        .btn-premium {
+            background: var(--teal-deep);
+            color: var(--gold-light);
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-premium:hover {
+            background: var(--teal-mid);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .card-premium {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            padding: 32px;
+        }
+    </style>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -15,13 +56,13 @@
 <div class="min-h-screen bg-white" style="font-family: 'DM Sans', sans-serif;">
 
     {{-- ===================== NAVBAR ===================== --}}
-    <nav class="w-full bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div class="max-w-[1280px] mx-auto px-16 h-[68px] flex items-center justify-between gap-8">
+    <nav class="w-full sticky top-0 z-50 border-b" style="background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border-color: var(--border);">
+        <div class="max-w-[1280px] mx-auto px-16 h-[72px] flex items-center justify-between gap-8">
 
-            {{-- Logo (always visible) --}}
-            <a href="{{ route('landing') }}" class="flex items-center gap-3 flex-shrink-0">
-                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="w-9 h-9 object-contain flex-shrink-0" style="filter: drop-shadow(0 4px 10px rgba(15,76,92,0.18));">
-                <span style="font-family: 'Fraunces', serif; font-weight: 700; font-size: 21px; color: #0F4C5C; letter-spacing: -0.5px;">ScholarLink</span>
+            {{-- Logo --}}
+            <a href="{{ route('landing') }}" class="flex items-center gap-3">
+                <img src="{{ asset('logo-light.png.png') }}" alt="ScholarLink logo" class="w-9 h-9 object-contain" style="filter: drop-shadow(0 4px 10px rgba(15,76,92,0.12));">
+                <span style="font-family: 'Fraunces', serif; font-weight: 900; font-size: 22px; color: var(--teal-deep); letter-spacing: -0.5px;">ScholarLink</span>
             </a>
 
             @auth
