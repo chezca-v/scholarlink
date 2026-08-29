@@ -59,9 +59,6 @@ jobs:
           fi
           echo "✅ No debug dumps detected."
 
-      - name: Check PHP Code Style (Laravel Pint)
-        run: vendor/bin/pint --test
-
       - name: Set up Laravel Environment
         run: |
           cp .env.example .env
@@ -76,6 +73,9 @@ jobs:
           DB_USERNAME: root
           DB_PASSWORD: root
         run: php artisan migrate:fresh --seed --force
+
+      - name: Check PHP Code Style (Laravel Pint)
+        run: vendor/bin/pint --test
 
       - name: Run Laravel Test Suite
         env:
@@ -98,7 +98,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: "npm"
 
       - name: Install NPM Dependencies
