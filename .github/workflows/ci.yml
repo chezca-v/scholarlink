@@ -77,6 +77,11 @@ jobs:
       - name: Check PHP Code Style (Laravel Pint)
         run: vendor/bin/pint --test
 
+      - name: Ensure Vite manifest exists for tests
+        run: |
+          mkdir -p public/build
+          echo '{}' > public/build/manifest.json
+
       - name: Run Laravel Test Suite
         env:
           DB_CONNECTION: mysql
