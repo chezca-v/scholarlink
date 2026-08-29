@@ -6,11 +6,16 @@ use App\Models\Application;
 use App\Models\Evaluation;
 use App\Models\EvaluationSuggestion;
 use App\Models\Scholarship;
+use App\Services\ScholarshipScoringService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class EvaluationController extends Controller
 {
+    public function __construct(
+        private readonly ScholarshipScoringService $scoringService
+    ) {}
+
     public function show($id)
     {
         $evaluator = auth()->user();
@@ -48,8 +53,16 @@ class EvaluationController extends Controller
 
         if (! $evaluation || ($gpaScore == 0 && $incomeScore == 0)) {
             $profile = $application->applicant->applicantProfile;
-            $gpaScore = $this->calculateAutomatedGpaScore($profile->gwa, $application->scholarship->gpa_requirement);
-            $incomeScore = $this->calculateAutomatedIncomeScore($profile->monthly_household_income, $application->scholarship->income_bracket);
+            $gpaScore = $this->scoringService->scoreGpa(
+                $profile->gwa,
+                $application->scholarship->gpa_requirement,
+                ScholarshipScoringService::MISSING_PROFILE_GPA_SCORE
+            );
+            $incomeScore = $this->scoringService->scoreIncome(
+                $profile->monthly_household_income,
+                $application->scholarship->income_bracket,
+                ScholarshipScoringService::EVALUATION_UNKNOWN_INCOME_SCORE
+            );
         }
 
         // Alternative scholarships for suggestion
@@ -116,8 +129,16 @@ class EvaluationController extends Controller
         }
 
         // Compute automated scores
-        $gpaScore = $this->calculateAutomatedGpaScore($profile->gwa, $scholarship->gpa_requirement);
-        $incomeScore = $this->calculateAutomatedIncomeScore($profile->monthly_household_income, $scholarship->income_bracket);
+        $gpaScore = $this->scoringService->scoreGpa(
+            $profile->gwa,
+            $scholarship->gpa_requirement,
+            ScholarshipScoringService::MISSING_PROFILE_GPA_SCORE
+        );
+        $incomeScore = $this->scoringService->scoreIncome(
+            $profile->monthly_household_income,
+            $scholarship->income_bracket,
+            ScholarshipScoringService::EVALUATION_UNKNOWN_INCOME_SCORE
+        );
 
         $evaluation = Evaluation::query()->firstOrNew([
             'application_id' => $id,

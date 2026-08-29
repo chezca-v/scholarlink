@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Scholarship;
+use App\Services\ScholarshipScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -12,6 +13,10 @@ use Illuminate\Support\Str;
 
 class AIController extends Controller
 {
+    public function __construct(
+        private readonly ScholarshipScoringService $scoringService
+    ) {}
+
     /**
      * Chat endpoint used by the floating chatbot widget.
      */
@@ -133,7 +138,7 @@ PROMPT;
         $scholarships = Scholarship::where('status', 'open')->get();
 
         $matches = $scholarships->map(function (Scholarship $scholarship) use ($profile) {
-            $score = $this->calculateScholarshipScore($profile, $scholarship);
+            $score = $this->scoringService->calculateMatchScore($profile, $scholarship);
 
             return [
                 'scholarship_id' => $scholarship->id,
@@ -273,9 +278,9 @@ PROMPT;
 
         if (blank($scholarship->courses)) {
             $segments[] = 'Open to all courses.';
-        } elseif ($this->scoreCourse($profile->course_program, $scholarship->courses) >= 90) {
+        } elseif ($this->scoringService->scoreCourse($profile->course_program, $scholarship->courses) >= 90) {
             $segments[] = 'Course program is a strong match.';
-        } elseif ($this->scoreCourse($profile->course_program, $scholarship->courses) >= 50) {
+        } elseif ($this->scoringService->scoreCourse($profile->course_program, $scholarship->courses) >= 50) {
             $segments[] = 'Course program may match this scholarship.';
         } else {
             $segments[] = 'Course program is not an ideal match.';
@@ -283,7 +288,7 @@ PROMPT;
 
         if (blank($scholarship->income_bracket)) {
             $segments[] = 'No income restriction.';
-        } elseif ($this->scoreIncome($profile->monthly_household_income, $scholarship->income_bracket) === 100) {
+        } elseif ($this->scoringService->scoreIncome($profile->monthly_household_income, $scholarship->income_bracket) === 100) {
             $segments[] = 'Income meets the eligibility bracket.';
         } else {
             $segments[] = 'Income may exceed the scholarship bracket.';
