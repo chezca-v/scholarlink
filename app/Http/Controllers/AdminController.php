@@ -564,6 +564,14 @@ class AdminController extends Controller
         foreach ($ids as $id) {
             $application = Application::find($id);
             if ($application) {
+                \App\Models\EvaluatorAssignment::firstOrCreate([
+                    'evaluator_id' => $request->evaluator_id,
+                    'scholarship_id' => $application->scholarship_id,
+                ], [
+                    'assigned_by' => auth()->id(),
+                    'assigned_at' => now(),
+                ]);
+
                 \App\Models\Evaluation::firstOrCreate([
                     'application_id' => $application->id,
                     'evaluator_id' => $request->evaluator_id,
@@ -588,6 +596,14 @@ class AdminController extends Controller
         ]);
 
         $application = Application::findOrFail($id);
+
+        \App\Models\EvaluatorAssignment::firstOrCreate([
+            'evaluator_id' => $request->evaluator_id,
+            'scholarship_id' => $application->scholarship_id,
+        ], [
+            'assigned_by' => auth()->id(),
+            'assigned_at' => now(),
+        ]);
 
         \App\Models\Evaluation::firstOrCreate([
             'application_id' => $application->id,
