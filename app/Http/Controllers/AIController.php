@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Scholarship;
+use App\Services\ScholarshipScoringService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
@@ -12,6 +13,10 @@ use Illuminate\Support\Str;
 
 class AIController extends Controller
 {
+    public function __construct(
+        private readonly ScholarshipScoringService $scoringService
+    ) {}
+
     /**
      * Chat endpoint used by the floating chatbot widget.
      */
@@ -30,7 +35,7 @@ class AIController extends Controller
             $profile?->gpa,
             $profile?->monthly_household_income,
         ]));
-        $cacheKey = 'ai-chat-response:' . md5(($user?->id ?? $request->ip()) . '|' . $profileFingerprint . '|' . Str::lower($message));
+        $cacheKey = 'ai-chat-response:'.md5(($user?->id ?? $request->ip()).'|'.$profileFingerprint.'|'.Str::lower($message));
 
         if ($cachedReply = Cache::get($cacheKey)) {
             return response()->json([
@@ -39,7 +44,7 @@ class AIController extends Controller
             ]);
         }
 
-        $rateKey = 'ai-chat:' . ($user?->id ? 'user:' . $user->id : 'ip:' . $request->ip());
+        $rateKey = 'ai-chat:'.($user?->id ? 'user:'.$user->id : 'ip:'.$request->ip());
 
         if (RateLimiter::tooManyAttempts($rateKey, 1)) {
             $seconds = RateLimiter::availableIn($rateKey);
@@ -121,7 +126,7 @@ PROMPT;
             ->pluck('updated_at')
             ->implode(',');
 
-        $cacheKey = 'scholarship-match:' . $user->id . ':' . $profileFingerprint . ':' . md5($scholarshipSnapshot);
+        $cacheKey = 'scholarship-match:'.$user->id.':'.$profileFingerprint.':'.md5($scholarshipSnapshot);
 
         if ($cachedMatches = Cache::get($cacheKey)) {
             return response()->json([
@@ -133,7 +138,7 @@ PROMPT;
         $scholarships = Scholarship::where('status', 'open')->get();
 
         $matches = $scholarships->map(function (Scholarship $scholarship) use ($profile) {
-            $score = $this->calculateScholarshipScore($profile, $scholarship);
+            $score = $this->scoringService->calculateMatchScore($profile, $scholarship);
 
             return [
                 'scholarship_id' => $scholarship->id,
@@ -157,107 +162,6 @@ PROMPT;
         return $this->matchScholarships($request);
     }
 
-    private function calculateScholarshipScore($profile, Scholarship $scholarship): int
-    {
-        $gpaScore = $this->scoreGpa($profile->gwa, $scholarship->gpa_requirement);
-        $courseScore = $this->scoreCourse($profile->course_program, $scholarship->courses);
-        $incomeScore = $this->scoreIncome($profile->monthly_household_income, $scholarship->income_bracket);
-
-        $score = (int) round(
-            ($gpaScore * 0.55) +
-            ($courseScore * 0.30) +
-            ($incomeScore * 0.15)
-        );
-
-        return max(0, min(100, $score));
-    }
-
-    private function scoreGpa($profileGpa, $requirement): int
-    {
-        if (blank($requirement)) {
-            return 100;
-        }
-
-        if (blank($profileGpa)) {
-            return 50;
-        }
-
-        $profileGpa = floatval($profileGpa);
-        $requirement = floatval($requirement);
-
-        if ($profileGpa <= $requirement) {
-            return 100;
-        }
-
-        $diff = max(0, $profileGpa - $requirement);
-        return max(0, 100 - (int) round($diff * 30));
-    }
-
-    private function scoreCourse($profileCourse, $scholarshipCourses): int
-    {
-        if (blank($scholarshipCourses)) {
-            return 100;
-        }
-
-        $profileCourse = Str::lower(trim((string) $profileCourse));
-        $courses = is_array($scholarshipCourses) ? $scholarshipCourses : explode(',', (string) $scholarshipCourses);
-        $courses = array_filter(array_map(fn ($course) => Str::lower(trim($course)), $courses));
-
-        if (! $profileCourse || empty($courses)) {
-            return 50;
-        }
-
-        foreach ($courses as $course) {
-            if (!$course) {
-                continue;
-            }
-            if (Str::contains($profileCourse, $course) || Str::contains($course, $profileCourse)) {
-                return 100;
-            }
-
-            $profileWords = preg_split('/\s+/', $profileCourse);
-            foreach ($profileWords as $word) {
-                if ($word && Str::contains($course, $word)) {
-                    return 90;
-                }
-            }
-        }
-
-        return 0;
-    }
-
-    private function scoreIncome($monthlyIncome, $bracket): int
-    {
-        if (blank($bracket)) {
-            return 100;
-        }
-
-        if (is_null($monthlyIncome)) {
-            return 50;
-        }
-
-        $annualIncome = floatval($monthlyIncome) * 12;
-        $threshold = $this->parseIncomeThreshold((string) $bracket);
-
-        if (is_null($threshold)) {
-            return 75;
-        }
-
-        return $annualIncome <= $threshold ? 100 : 20;
-    }
-
-    private function parseIncomeThreshold(string $bracket): ?int
-    {
-        if (preg_match_all('/\d+[\d,]*/', $bracket, $matches)) {
-            $numbers = array_map(fn ($value) => (int) str_replace(',', '', $value), $matches[0]);
-            if (! empty($numbers)) {
-                return max($numbers);
-            }
-        }
-
-        return null;
-    }
-
     private function buildScholarshipMatchReason($profile, Scholarship $scholarship, int $score): string
     {
         $segments = [];
@@ -272,9 +176,9 @@ PROMPT;
 
         if (blank($scholarship->courses)) {
             $segments[] = 'Open to all courses.';
-        } elseif ($this->scoreCourse($profile->course_program, $scholarship->courses) >= 90) {
+        } elseif ($this->scoringService->scoreCourse($profile->course_program, $scholarship->courses) >= 90) {
             $segments[] = 'Course program is a strong match.';
-        } elseif ($this->scoreCourse($profile->course_program, $scholarship->courses) >= 50) {
+        } elseif ($this->scoringService->scoreCourse($profile->course_program, $scholarship->courses) >= 50) {
             $segments[] = 'Course program may match this scholarship.';
         } else {
             $segments[] = 'Course program is not an ideal match.';
@@ -282,7 +186,7 @@ PROMPT;
 
         if (blank($scholarship->income_bracket)) {
             $segments[] = 'No income restriction.';
-        } elseif ($this->scoreIncome($profile->monthly_household_income, $scholarship->income_bracket) === 100) {
+        } elseif ($this->scoringService->scoreIncome($profile->monthly_household_income, $scholarship->income_bracket) === 100) {
             $segments[] = 'Income meets the eligibility bracket.';
         } else {
             $segments[] = 'Income may exceed the scholarship bracket.';
@@ -299,17 +203,17 @@ PROMPT;
     public function getScholarshipAIInsight(Request $request, $id)
     {
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Please log in to see your AI insights.']);
         }
-        
+
         $profile = $user->applicantProfile;
-        if (!$profile) {
-             return response()->json(['message' => 'Complete your profile to see your AI insights.']);
+        if (! $profile) {
+            return response()->json(['message' => 'Complete your profile to see your AI insights.']);
         }
 
         $scholarship = Scholarship::find($id);
-        if (!$scholarship) {
+        if (! $scholarship) {
             return response()->json(['message' => 'Scholarship not found.']);
         }
 
@@ -331,16 +235,17 @@ PROMPT;
 
         try {
             $text = $this->callGemini($prompt);
-            
+
             // Do not cache rate-limit or error messages
-            if (!Str::contains($text, ['pausing new AI requests', 'rate-limited', 'Unable to get AI response'])) {
+            if (! Str::contains($text, ['pausing new AI requests', 'rate-limited', 'Unable to get AI response'])) {
                 // Cache for 180 days
                 Cache::put($cacheKey, $text, now()->addDays(180));
             }
 
             return response()->json(['message' => $text]);
         } catch (\Exception $e) {
-            Log::error('AI Insight Error: ' . $e->getMessage());
+            Log::error('AI Insight Error: '.$e->getMessage());
+
             return response()->json(['message' => "AI insights are currently resting, but you're a great fit based on your profile!"]);
         }
     }
@@ -350,7 +255,7 @@ PROMPT;
      */
     private function callGemini(string $prompt, int $maxOutputTokens = 512): string
     {
-       $apiKeys = collect(config('services.gemini.keys', []))
+        $apiKeys = collect(config('services.gemini.keys', []))
             ->filter(fn ($key) => filled($key))
             ->values()
             ->all();
@@ -358,7 +263,7 @@ PROMPT;
         $model = config('services.gemini.model', 'gemini-2.0-flash');
 
         if (blank($apiKey) && empty($apiKeys)) {
-                        return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar AI, your AI assistant. How can I help you today?";
+            return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar AI, your AI assistant. How can I help you today?";
         }
 
         if (Cache::has('gemini-quota-cooldown')) {
@@ -390,8 +295,8 @@ PROMPT;
                                 ['text' => $prompt],
                             ],
                         ],
-                ],
-                     'generationConfig' => [
+                    ],
+                    'generationConfig' => [
                         'temperature' => 0.4,
                         'maxOutputTokens' => $maxOutputTokens,
                     ],
@@ -411,6 +316,7 @@ PROMPT;
 
             if ($response->status() === 429) {
                 Cache::put("gemini-key-cooldown:{$index}", true, now()->addSeconds(30));
+
                 continue;
             }
 
@@ -420,7 +326,7 @@ PROMPT;
         Cache::put('gemini-quota-cooldown', true, now()->addSeconds(30));
 
         return 'Gemini is available, but all configured API keys are currently rate-limited. Please try again in about a minute.';
-            }
+    }
 
     /**
      * Helper: format scholarships for the prompt.
@@ -431,8 +337,7 @@ PROMPT;
             ->select('id', 'name', 'provider_name', 'gpa_requirement', 'courses', 'income_bracket')
             ->get();
 
-        return $scholarships->map(fn ($scholarship) =>
-            "ID:{$scholarship->id} | {$scholarship->name} by {$scholarship->provider_name} | Min GPA: {$scholarship->gpa_requirement} | Courses: " . (is_array($scholarship->courses) ? implode(', ', $scholarship->courses) : $scholarship->courses) . " | Income: {$scholarship->monthly_household_income}"
+        return $scholarships->map(fn ($scholarship) => "ID:{$scholarship->id} | {$scholarship->name} by {$scholarship->provider_name} | Min GPA: {$scholarship->gpa_requirement} | Courses: ".(is_array($scholarship->courses) ? implode(', ', $scholarship->courses) : $scholarship->courses)." | Income: {$scholarship->monthly_household_income}"
         )->implode("\n");
     }
 }
