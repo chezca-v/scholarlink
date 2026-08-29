@@ -80,7 +80,12 @@ jobs:
       - name: Ensure Vite manifest exists for tests
         run: |
           mkdir -p public/build
-          echo '{}' > public/build/manifest.json
+          cat > public/build/manifest.json <<'JSON'
+          {
+            "resources/css/app.css": { "file": "assets/app.css", "src": "resources/css/app.css", "isEntry": true },
+            "resources/js/app.js": { "file": "assets/app.js", "src": "resources/js/app.js", "isEntry": true }
+          }
+          JSON
 
       - name: Run Laravel Test Suite
         env:
