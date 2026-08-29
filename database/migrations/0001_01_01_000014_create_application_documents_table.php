@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('application_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')
-                  ->constrained('applications')
-                  ->cascadeOnDelete();
+                ->constrained('applications')
+                ->cascadeOnDelete();
             $table->foreignId('document_id')
-                  ->constrained('documents')
-                  ->cascadeOnDelete();
+                ->constrained('documents')
+                ->cascadeOnDelete();
             $table->timestamp('submitted_at')->useCurrent();
             $table->timestamps();
 

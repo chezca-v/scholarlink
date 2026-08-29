@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Application;
 use App\Models\Document;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 class ApplicationDocumentSeeder extends Seeder
@@ -23,12 +23,12 @@ class ApplicationDocumentSeeder extends Seeder
                 DB::table('application_documents')->updateOrInsert(
                     [
                         'application_id' => $application->id,
-                        'document_id'    => $doc->id,
+                        'document_id' => $doc->id,
                     ],
                     [
                         'submitted_at' => now(),
-                        'created_at'   => now(),
-                        'updated_at'   => now(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
                     ]
                 );
             }

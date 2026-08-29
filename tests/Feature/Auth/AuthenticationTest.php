@@ -29,6 +29,7 @@ class AuthenticationTest extends TestCase
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
     }
+
     public function test_admin_users_are_redirected_to_the_admin_dashboard_after_login(): void
     {
         $admin = User::factory()->create([

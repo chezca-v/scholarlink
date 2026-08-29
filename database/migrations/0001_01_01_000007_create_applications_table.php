@@ -12,23 +12,23 @@ return new class extends Migration
             $table->id();
             $table->string('reference_code', 20)->unique();
             $table->foreignId('applicant_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->foreignId('scholarship_id')
-                  ->constrained('scholarships')
-                  ->cascadeOnDelete();
+                ->constrained('scholarships')
+                ->cascadeOnDelete();
             $table->enum('status', [
                 'pending',
                 'under_review',
                 'approved',
                 'rejected',
-                'revision'
+                'revision',
             ])->default('pending');
             $table->enum('stage', [
                 'submitted',
                 'doc_review',
                 'scoring',
-                'decided'
+                'decided',
             ])->default('submitted');
             $table->decimal('ai_match_score', 5, 2)->nullable();
             $table->tinyInteger('conflict_flag')->default(0);

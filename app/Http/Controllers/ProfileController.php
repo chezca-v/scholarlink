@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
-use App\Models\Application;
 use App\Models\ApplicantProfile;
+use App\Models\Application;
 use App\Models\Notification;
 use App\Models\Scholarship;
 use Illuminate\Http\RedirectResponse;
@@ -38,17 +38,19 @@ class ProfileController extends Controller
 
         if ($profile && $availableScholarships->isNotEmpty()) {
             // Calculate local scores (zero API calls)
-            $aiController = new \App\Http\Controllers\AIController();
-            
-            $scholarshipController = new \App\Http\Controllers\ScholarshipController();
+            $aiController = new \App\Http\Controllers\AIController;
+
+            $scholarshipController = new \App\Http\Controllers\ScholarshipController;
             $recommendedScholarships = $availableScholarships->map(function ($scholarship) use ($profile) {
                 $score = app(\App\Http\Controllers\ScholarshipController::class)->calculateMatchScores($profile, [$scholarship])[$scholarship->id] ?? 0;
                 $scholarship->setAttribute('match_score', $score);
+
                 return $scholarship;
             })->sortByDesc('match_score')->take(5)->values();
         } else {
             $recommendedScholarships = $availableScholarships->sortBy('deadline')->take(5)->map(function ($scholarship) {
                 $scholarship->setAttribute('match_score', null);
+
                 return $scholarship;
             })->values();
         }
@@ -119,7 +121,7 @@ class ProfileController extends Controller
 
         $profileCompleteness = $profileFields->isEmpty()
             ? 0
-            : (int) round(($profileFields->filter(fn ($value) => !is_null($value) && $value !== '')->count() / $profileFields->count()) * 100);
+            : (int) round(($profileFields->filter(fn ($value) => ! is_null($value) && $value !== '')->count() / $profileFields->count()) * 100);
 
         return view('applicant.dashboard', compact(
             'user',
@@ -135,7 +137,8 @@ class ProfileController extends Controller
         ));
     }
 
-    public function setup(Request $request): View    {
+    public function setup(Request $request): View
+    {
         $profile = ApplicantProfile::firstOrNew(['user_id' => $request->user()->id]);
         $currentStep = max(1, min(4, (int) $request->integer('step', 1)));
 
@@ -225,6 +228,7 @@ class ProfileController extends Controller
         return redirect()->route('dashboard')
             ->with('status', 'Profile setup completed successfully.');
     }
+
     public function edit(Request $request): View
     {
         return view('profile.edit', [

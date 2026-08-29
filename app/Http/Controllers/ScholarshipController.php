@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Scholarship;
 use App\Models\ApplicantProfile;
+use App\Models\Scholarship;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ScholarshipController extends Controller
 {
-public function index(Request $request)
+    public function index(Request $request)
     {
         // Get user profile early for sorting and scoring
         $profile = null;
@@ -27,15 +27,15 @@ public function index(Request $request)
             $search = $request->q;
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('provider_name', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%")
-                ->orWhere('benefits', 'like', "%{$search}%")
-                ->orWhere('eligibility', 'like', "%{$search}%")
-                ->orWhere('requirements', 'like', "%{$search}%");
+                    ->orWhere('provider_name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('benefits', 'like', "%{$search}%")
+                    ->orWhere('eligibility', 'like', "%{$search}%")
+                    ->orWhere('requirements', 'like', "%{$search}%");
             });
         }
 
-// Apply status filter (multiple)
+        // Apply status filter (multiple)
         if ($request->has('status')) {
             $query->whereIn('status', (array) $request->status);
         } else {
@@ -47,7 +47,7 @@ public function index(Request $request)
         if ($request->has('category') && is_array($request->category)) {
             $query->where(function ($q) use ($request) {
                 foreach ($request->category as $cat) {
-                    $q->orWhere('tags', 'like', '%' . $cat . '%');
+                    $q->orWhere('tags', 'like', '%'.$cat.'%');
                 }
             });
         }
@@ -62,10 +62,10 @@ public function index(Request $request)
         // So we want scholarships where gpa_requirement >= applicant_gwa
         if ($request->filled('gwa')) {
             $gwa = (float) $request->gwa;
-            $query->where(function($q) use ($gwa) {
+            $query->where(function ($q) use ($gwa) {
                 // Assuming GWA is <= 5.0
                 $q->where('gpa_requirement', '>=', $gwa)
-                  ->where('gpa_requirement', '<=', 5.0);
+                    ->where('gpa_requirement', '<=', 5.0);
             });
         }
 
@@ -74,10 +74,10 @@ public function index(Request $request)
         // So we want scholarships where gpa_requirement <= applicant_percentage
         if ($request->filled('percentage')) {
             $percentage = (float) $request->percentage;
-            $query->where(function($q) use ($percentage) {
+            $query->where(function ($q) use ($percentage) {
                 // Assuming Percentage is > 5.0 to distinguish from GWA
                 $q->where('gpa_requirement', '<=', $percentage)
-                  ->where('gpa_requirement', '>', 5.0);
+                    ->where('gpa_requirement', '>', 5.0);
             });
         }
 
@@ -97,7 +97,7 @@ public function index(Request $request)
                     $query->where('deadline', '<=', $now->copy()->addMonths(3))
                         ->where('deadline', '>=', $now);
                     break;
-                // 'Any time' – no additional constraint
+                    // 'Any time' – no additional constraint
             }
         }
 
@@ -116,7 +116,7 @@ public function index(Request $request)
             // });
         }
 
-// Apply sorting
+        // Apply sorting
         $sort = $request->get('sort', 'ai_match');
 
         // For AI-based sorting, we need to get IDs and scores first (limited approach for pagination)
@@ -127,11 +127,11 @@ public function index(Request $request)
             $sortedIds = array_keys($allScores);
 
             // Use FIELD() for MySQL or CASE for SQLite to order by the calculated scores
-            if (!empty($sortedIds)) {
+            if (! empty($sortedIds)) {
                 $driver = $query->getConnection()->getDriverName();
                 if ($driver === 'sqlite') {
-                    $cases = collect($sortedIds)->map(fn($id, $index) => "WHEN {$id} THEN {$index}")->implode(' ');
-                    $query->orderByRaw("CASE id {$cases} ELSE " . count($sortedIds) . " END");
+                    $cases = collect($sortedIds)->map(fn ($id, $index) => "WHEN {$id} THEN {$index}")->implode(' ');
+                    $query->orderByRaw("CASE id {$cases} ELSE ".count($sortedIds).' END');
                 } else {
                     $idsStr = implode(',', $sortedIds);
                     $query->orderByRaw("FIELD(id, {$idsStr})");
@@ -168,14 +168,14 @@ public function index(Request $request)
 
         // Store filters for the view (to populate the sidebar)
         $filters = [
-            'q'        => $request->q,
-            'status'   => $request->status,
+            'q' => $request->q,
+            'status' => $request->status,
             'category' => $request->category,
-            'income'   => $request->income,
-            'gpa'      => $request->gpa,
+            'income' => $request->income,
+            'gpa' => $request->gpa,
             'deadline' => $request->deadline,
-            'match'    => $request->match,
-            'sort'     => $sort,
+            'match' => $request->match,
+            'sort' => $sort,
         ];
 
         // Prepare counts for the dashboard sidebar
@@ -188,7 +188,7 @@ public function index(Request $request)
 
         $incomeBrackets = Scholarship::select('income_bracket')->distinct()->whereNotNull('income_bracket')->pluck('income_bracket');
 
-$applicationCount = 0;
+        $applicationCount = 0;
         $savedCount = 0;
         $unreadCount = 0;
         $aiMatchScores = [];
@@ -204,7 +204,7 @@ $applicationCount = 0;
             if ($profile) {
                 $aiMatchScores = $this->calculateMatchScores($profile, $scholarships->items());
                 // Find top match ID for highlighting
-                if (!empty($aiMatchScores)) {
+                if (! empty($aiMatchScores)) {
                     $topMatchId = array_keys($aiMatchScores, max($aiMatchScores))[0] ?? null;
                 }
             }
@@ -242,7 +242,7 @@ $applicationCount = 0;
         return $scores;
     }
 
-private function scoreGpa($profileGpa, $requirement): int
+    private function scoreGpa($profileGpa, $requirement): int
     {
         // Philippine grading scale: 1.0 = best, 5.0 = fail
         // 1.00 = 100, 1.25 = 96, 1.50 = 92, 1.75 = 88, 2.0 = 84, etc.
@@ -262,6 +262,7 @@ private function scoreGpa($profileGpa, $requirement): int
         // Calculate score based on how much lower the requirement is
         // e.g., profile: 1.5, req: 1.0 → diff = 0.5 → score = 100 - (0.5 * 30) = 85
         $diff = max(0, $profileGpa - $requirement);
+
         return max(0, 100 - (int) round($diff * 30));
     }
 
@@ -275,14 +276,16 @@ private function scoreGpa($profileGpa, $requirement): int
         $courses = is_array($scholarshipCourses)
             ? $scholarshipCourses
             : explode(',', (string) $scholarshipCourses);
-        $courses = array_filter(array_map(fn($c) => Str::lower(trim($c)), $courses));
+        $courses = array_filter(array_map(fn ($c) => Str::lower(trim($c)), $courses));
 
-        if (!$profileCourse || empty($courses)) {
+        if (! $profileCourse || empty($courses)) {
             return 50;
         }
 
         foreach ($courses as $course) {
-            if (!$course) continue;
+            if (! $course) {
+                continue;
+            }
             if (Str::contains($profileCourse, $course) || Str::contains($course, $profileCourse)) {
                 return 100;
             }
@@ -310,9 +313,10 @@ private function scoreGpa($profileGpa, $requirement): int
         $annualIncome = floatval($monthlyIncome) * 12;
 
         if (preg_match_all('/\d+[\d,]*/', (string) $bracket, $matches)) {
-            $numbers = array_map(fn($v) => (int) str_replace(',', '', $v), $matches[0]);
-            if (!empty($numbers)) {
+            $numbers = array_map(fn ($v) => (int) str_replace(',', '', $v), $matches[0]);
+            if (! empty($numbers)) {
                 $threshold = max($numbers);
+
                 return $annualIncome <= $threshold ? 100 : 20;
             }
         }
@@ -384,6 +388,7 @@ private function scoreGpa($profileGpa, $requirement): int
     public function edit($id)
     {
         $scholarship = Scholarship::findOrFail($id);
+
         return view('admin.scholarships.edit', compact('scholarship'));
     }
 

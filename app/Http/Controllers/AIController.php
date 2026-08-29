@@ -30,7 +30,7 @@ class AIController extends Controller
             $profile?->gpa,
             $profile?->monthly_household_income,
         ]));
-        $cacheKey = 'ai-chat-response:' . md5(($user?->id ?? $request->ip()) . '|' . $profileFingerprint . '|' . Str::lower($message));
+        $cacheKey = 'ai-chat-response:'.md5(($user?->id ?? $request->ip()).'|'.$profileFingerprint.'|'.Str::lower($message));
 
         if ($cachedReply = Cache::get($cacheKey)) {
             return response()->json([
@@ -39,7 +39,7 @@ class AIController extends Controller
             ]);
         }
 
-        $rateKey = 'ai-chat:' . ($user?->id ? 'user:' . $user->id : 'ip:' . $request->ip());
+        $rateKey = 'ai-chat:'.($user?->id ? 'user:'.$user->id : 'ip:'.$request->ip());
 
         if (RateLimiter::tooManyAttempts($rateKey, 1)) {
             $seconds = RateLimiter::availableIn($rateKey);
@@ -121,7 +121,7 @@ PROMPT;
             ->pluck('updated_at')
             ->implode(',');
 
-        $cacheKey = 'scholarship-match:' . $user->id . ':' . $profileFingerprint . ':' . md5($scholarshipSnapshot);
+        $cacheKey = 'scholarship-match:'.$user->id.':'.$profileFingerprint.':'.md5($scholarshipSnapshot);
 
         if ($cachedMatches = Cache::get($cacheKey)) {
             return response()->json([
@@ -190,6 +190,7 @@ PROMPT;
         }
 
         $diff = max(0, $profileGpa - $requirement);
+
         return max(0, 100 - (int) round($diff * 30));
     }
 
@@ -208,7 +209,7 @@ PROMPT;
         }
 
         foreach ($courses as $course) {
-            if (!$course) {
+            if (! $course) {
                 continue;
             }
             if (Str::contains($profileCourse, $course) || Str::contains($course, $profileCourse)) {
@@ -299,17 +300,17 @@ PROMPT;
     public function getScholarshipAIInsight(Request $request, $id)
     {
         $user = $request->user();
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'Please log in to see your AI insights.']);
         }
-        
+
         $profile = $user->applicantProfile;
-        if (!$profile) {
-             return response()->json(['message' => 'Complete your profile to see your AI insights.']);
+        if (! $profile) {
+            return response()->json(['message' => 'Complete your profile to see your AI insights.']);
         }
 
         $scholarship = Scholarship::find($id);
-        if (!$scholarship) {
+        if (! $scholarship) {
             return response()->json(['message' => 'Scholarship not found.']);
         }
 
@@ -331,16 +332,17 @@ PROMPT;
 
         try {
             $text = $this->callGemini($prompt);
-            
+
             // Do not cache rate-limit or error messages
-            if (!Str::contains($text, ['pausing new AI requests', 'rate-limited', 'Unable to get AI response'])) {
+            if (! Str::contains($text, ['pausing new AI requests', 'rate-limited', 'Unable to get AI response'])) {
                 // Cache for 180 days
                 Cache::put($cacheKey, $text, now()->addDays(180));
             }
 
             return response()->json(['message' => $text]);
         } catch (\Exception $e) {
-            Log::error('AI Insight Error: ' . $e->getMessage());
+            Log::error('AI Insight Error: '.$e->getMessage());
+
             return response()->json(['message' => "AI insights are currently resting, but you're a great fit based on your profile!"]);
         }
     }
@@ -350,7 +352,7 @@ PROMPT;
      */
     private function callGemini(string $prompt, int $maxOutputTokens = 512): string
     {
-       $apiKeys = collect(config('services.gemini.keys', []))
+        $apiKeys = collect(config('services.gemini.keys', []))
             ->filter(fn ($key) => filled($key))
             ->values()
             ->all();
@@ -358,7 +360,7 @@ PROMPT;
         $model = config('services.gemini.model', 'gemini-2.0-flash');
 
         if (blank($apiKey) && empty($apiKeys)) {
-                        return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar AI, your AI assistant. How can I help you today?";
+            return "Simulated AI Response: I'm currently running in local mode without a Gemini API key. But I am Scholar AI, your AI assistant. How can I help you today?";
         }
 
         if (Cache::has('gemini-quota-cooldown')) {
@@ -390,8 +392,8 @@ PROMPT;
                                 ['text' => $prompt],
                             ],
                         ],
-                ],
-                     'generationConfig' => [
+                    ],
+                    'generationConfig' => [
                         'temperature' => 0.4,
                         'maxOutputTokens' => $maxOutputTokens,
                     ],
@@ -411,6 +413,7 @@ PROMPT;
 
             if ($response->status() === 429) {
                 Cache::put("gemini-key-cooldown:{$index}", true, now()->addSeconds(30));
+
                 continue;
             }
 
@@ -420,7 +423,7 @@ PROMPT;
         Cache::put('gemini-quota-cooldown', true, now()->addSeconds(30));
 
         return 'Gemini is available, but all configured API keys are currently rate-limited. Please try again in about a minute.';
-            }
+    }
 
     /**
      * Helper: format scholarships for the prompt.
@@ -431,8 +434,7 @@ PROMPT;
             ->select('id', 'name', 'provider_name', 'gpa_requirement', 'courses', 'income_bracket')
             ->get();
 
-        return $scholarships->map(fn ($scholarship) =>
-            "ID:{$scholarship->id} | {$scholarship->name} by {$scholarship->provider_name} | Min GPA: {$scholarship->gpa_requirement} | Courses: " . (is_array($scholarship->courses) ? implode(', ', $scholarship->courses) : $scholarship->courses) . " | Income: {$scholarship->monthly_household_income}"
+        return $scholarships->map(fn ($scholarship) => "ID:{$scholarship->id} | {$scholarship->name} by {$scholarship->provider_name} | Min GPA: {$scholarship->gpa_requirement} | Courses: ".(is_array($scholarship->courses) ? implode(', ', $scholarship->courses) : $scholarship->courses)." | Income: {$scholarship->monthly_household_income}"
         )->implode("\n");
     }
 }

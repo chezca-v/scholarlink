@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Scholarship;
-use App\Models\Application;
 use App\Models\ActivityLog;
+use App\Models\Application;
+use App\Models\Scholarship;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
@@ -17,7 +17,7 @@ class AdminController extends Controller
         $startOfMonth = $now->copy()->startOfMonth();
         $previousMonthStart = $now->copy()->subMonthNoOverflow()->startOfMonth();
         $previousMonthEnd = $now->copy()->subMonthNoOverflow()->endOfMonth();
-        
+
         $adminId = auth()->id();
 
         $openScholarships = Scholarship::query()->where('created_by', $adminId)->where('status', 'open')->count();
@@ -30,8 +30,8 @@ class AdminController extends Controller
             ->whereDate('deadline', '<=', $now->copy()->addDays(7)->toDateString())
             ->count();
 
-        $applicationsQuery = function() use ($adminId) {
-            return Application::whereHas('scholarship', function($q) use ($adminId) {
+        $applicationsQuery = function () use ($adminId) {
+            return Application::whereHas('scholarship', function ($q) use ($adminId) {
                 $q->where('created_by', $adminId);
             });
         };
@@ -112,23 +112,23 @@ class AdminController extends Controller
         $stats = [
             [
                 'icon' => '📖',
-                'badge_text' => '↑ ' . $newScholarships . ' new',
+                'badge_text' => '↑ '.$newScholarships.' new',
                 'badge_color' => 'var(--green-success)',
                 'value' => $openScholarships,
                 'label' => 'Open Scholarships',
-                'footer' => $closingSoonScholarships . ' closing soon · ' . $draftScholarships . ' drafting',
+                'footer' => $closingSoonScholarships.' closing soon · '.$draftScholarships.' drafting',
             ],
             [
                 'icon' => '📝',
-                'badge_text' => '↑ ' . $pendingToday . ' today',
+                'badge_text' => '↑ '.$pendingToday.' today',
                 'badge_color' => 'var(--red-alert)',
                 'value' => $pendingReviews,
                 'label' => 'Pending Reviews',
-                'footer' => 'Oldest: ' . $oldestPendingDays . ' days ago',
+                'footer' => 'Oldest: '.$oldestPendingDays.' days ago',
             ],
             [
                 'icon' => '📈',
-                'badge_text' => ($applicationsGrowth >= 0 ? '↑' : '↓') . ' ' . abs($applicationsGrowth) . '%',
+                'badge_text' => ($applicationsGrowth >= 0 ? '↑' : '↓').' '.abs($applicationsGrowth).'%',
                 'badge_color' => 'var(--green-success)',
                 'value' => $totalApplications,
                 'label' => 'Total Applications',
@@ -136,11 +136,11 @@ class AdminController extends Controller
             ],
             [
                 'icon' => '💰',
-                'badge_text' => ($applicationsGrowth >= 0 ? '↑' : '↓') . ' ' . abs($applicationsGrowth) . '%',
+                'badge_text' => ($applicationsGrowth >= 0 ? '↑' : '↓').' '.abs($applicationsGrowth).'%',
                 'badge_color' => 'var(--green-success)',
                 'value' => $approvedAwarded,
                 'label' => 'Approved / Awarded',
-                'footer' => $approvalRate . '% approval rate',
+                'footer' => $approvalRate.'% approval rate',
             ],
         ];
 
@@ -149,7 +149,7 @@ class AdminController extends Controller
             [
                 'type' => 'red',
                 'icon' => '🚨',
-                'title' => $unassignedApplications . ' Applications Unassigned for 4+ Days',
+                'title' => $unassignedApplications.' Applications Unassigned for 4+ Days',
                 'description' => 'Applications with no evaluations assigned yet. Risk of missing SLA.',
                 'link' => route('admin.applications'),
                 'link_text' => 'Assign Evaluators',
@@ -157,7 +157,7 @@ class AdminController extends Controller
             [
                 'type' => 'orange',
                 'icon' => '⏳',
-                'title' => 'Upcoming Deadlines — ' . $incompleteDocsApplications . ' Applicants with Incomplete Docs',
+                'title' => 'Upcoming Deadlines — '.$incompleteDocsApplications.' Applicants with Incomplete Docs',
                 'description' => 'Applicants still missing at least one required document.',
                 'link' => route('admin.applications'),
                 'link_text' => 'View Applicants',
@@ -165,7 +165,7 @@ class AdminController extends Controller
             [
                 'type' => 'blue',
                 'icon' => '📢',
-                'title' => $awaitingApprovalScholarships . ' Scholarships Awaiting Approval',
+                'title' => $awaitingApprovalScholarships.' Scholarships Awaiting Approval',
                 'description' => 'Draft scholarships are ready for review and publication.',
                 'link' => route('admin.scholarships.index'),
                 'link_text' => 'Review Drafts',
@@ -266,10 +266,11 @@ class AdminController extends Controller
         $scholarshipIds = $scholarships->pluck('id');
 
         $evaluatorIds = \Illuminate\Support\Facades\DB::table('evaluator_assignments')
-                            ->whereIn('scholarship_id', $scholarshipIds)
-                            ->pluck('evaluator_id');
+            ->whereIn('scholarship_id', $scholarshipIds)
+            ->pluck('evaluator_id');
 
         $users = User::whereIn('id', $evaluatorIds)->where('role', 'evaluator')->latest()->get();
+
         return view('admin.user', compact('users', 'scholarships'));
     }
 
@@ -312,13 +313,12 @@ class AdminController extends Controller
         // Logic to update user status to inactive
     }
 
-
     public function analytics()
     {
         $adminId = auth()->id();
-        
-        $applicationsQuery = function() use ($adminId) {
-            return Application::whereHas('scholarship', function($q) use ($adminId) {
+
+        $applicationsQuery = function () use ($adminId) {
+            return Application::whereHas('scholarship', function ($q) use ($adminId) {
                 $q->where('created_by', $adminId);
             });
         };
@@ -349,7 +349,7 @@ class AdminController extends Controller
     {
         $monthQuery = $request->get('month');
         if ($monthQuery) {
-            $currentMonth = \Carbon\Carbon::parse($monthQuery . '-01');
+            $currentMonth = \Carbon\Carbon::parse($monthQuery.'-01');
         } else {
             $currentMonth = \Carbon\Carbon::now();
         }
@@ -357,31 +357,31 @@ class AdminController extends Controller
         $nextMonth = $currentMonth->copy()->addMonth();
 
         $scholarships = \App\Models\Scholarship::whereNotNull('deadline')
-                        ->where('created_by', auth()->id())
-                        ->where('status', '!=', 'draft')
-                        ->get();
+            ->where('created_by', auth()->id())
+            ->where('status', '!=', 'draft')
+            ->get();
 
         $calendarDays = [];
         $upcomingDeadlines = [];
-        
+
         $daysInMonth = $currentMonth->daysInMonth;
-        
+
         for ($i = 1; $i <= $daysInMonth; $i++) {
             $currentDate = $currentMonth->copy()->day($i);
             $dayDeadlines = [];
-            
+
             foreach ($scholarships as $scholarship) {
                 if ($scholarship->deadline && $scholarship->deadline->isSameDay($currentDate)) {
                     $daysUntil = \Carbon\Carbon::now()->startOfDay()->diffInDays($scholarship->deadline, false);
                     $type = $daysUntil <= 7 && $daysUntil >= 0 ? 'urgent' : 'standard';
-                    
+
                     $dayDeadlines[] = [
                         'id' => $scholarship->id,
                         'label' => $scholarship->name,
                         'type' => $type,
-                        'days_away' => $daysUntil
+                        'days_away' => $daysUntil,
                     ];
-                    
+
                     if ($daysUntil >= 0 && $daysUntil <= 30) {
                         $upcomingDeadlines[] = [
                             'id' => $scholarship->id,
@@ -389,24 +389,24 @@ class AdminController extends Controller
                             'date' => $scholarship->deadline,
                             'days_away' => $daysUntil,
                             'type' => $type,
-                            'type_label' => ucfirst($type) . ' Deadline',
-                            'meta' => 'Applications close at 11:59 PM'
+                            'type_label' => ucfirst($type).' Deadline',
+                            'meta' => 'Applications close at 11:59 PM',
                         ];
                     }
                 }
             }
-            
+
             $calendarDays[] = [
                 'date' => $currentDate->copy(),
-                'deadlines' => $dayDeadlines
+                'deadlines' => $dayDeadlines,
             ];
         }
-        
-        usort($upcomingDeadlines, function($a, $b) {
+
+        usort($upcomingDeadlines, function ($a, $b) {
             return $a['days_away'] <=> $b['days_away'];
         });
 
-        $upcomingDeadlines = array_map("unserialize", array_unique(array_map("serialize", $upcomingDeadlines)));
+        $upcomingDeadlines = array_map('unserialize', array_unique(array_map('serialize', $upcomingDeadlines)));
 
         $scholarshipLegend = [
             ['bg' => '#1a8fa0', 'label' => 'Standard Deadline'],
@@ -414,7 +414,7 @@ class AdminController extends Controller
         ];
 
         $deadlinesJson = [];
-        
+
         $ui = [
             'page_title' => 'Calendar',
             'topnav_title' => 'Calendar',
@@ -430,18 +430,18 @@ class AdminController extends Controller
             'empty' => 'No upcoming deadlines.',
             'reason_placeholder' => 'Reason for editing...',
             'warning' => 'Note: altering deadlines affects applicants.',
-            'save' => 'Save Changes'
+            'save' => 'Save Changes',
         ];
         $routes = [
             'index' => 'admin.calendar',
-            'update' => 'admin.calendar'
+            'update' => 'admin.calendar',
         ];
         $config = [
             'month_format' => 'F Y',
             'day_format' => 'M d, Y',
             'week_days' => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
             'upcoming_range' => 30,
-            'deadline_types' => ['standard' => 'Standard Deadline', 'urgent' => 'Urgent Deadline']
+            'deadline_types' => ['standard' => 'Standard Deadline', 'urgent' => 'Urgent Deadline'],
         ];
 
         return view('admin.calendar', compact(
@@ -461,10 +461,11 @@ class AdminController extends Controller
     {
         $adminId = auth()->id();
         $applications = Application::with('applicant', 'scholarship')
-            ->whereHas('scholarship', function($q) use ($adminId) {
+            ->whereHas('scholarship', function ($q) use ($adminId) {
                 $q->where('created_by', $adminId);
             })
             ->latest()->paginate(15);
+
         return view('admin.applications', compact('applications'));
     }
 
@@ -472,10 +473,11 @@ class AdminController extends Controller
     {
         $adminId = auth()->id();
         $reviews = Application::with('applicant', 'scholarship')
-            ->whereHas('scholarship', function($q) use ($adminId) {
+            ->whereHas('scholarship', function ($q) use ($adminId) {
                 $q->where('created_by', $adminId);
             })
             ->whereIn('status', ['pending', 'under_review'])->latest()->paginate(15);
+
         return view('admin.reviews', compact('reviews'));
     }
 
@@ -487,9 +489,9 @@ class AdminController extends Controller
             'topnavSubtitle' => 'Manage platform configuration',
             'breadcrumbs' => [
                 ['label' => 'Admin', 'url' => route('admin.dashboard')],
-                ['label' => 'Settings']
+                ['label' => 'Settings'],
             ],
-            'organization' => (object)[
+            'organization' => (object) [
                 'name' => 'ScholarLink',
                 'description' => 'Scholarship matching platform',
                 'emoji' => '🎓',
@@ -507,7 +509,7 @@ class AdminController extends Controller
                 'save_all' => 'Save All',
                 'weights' => 'Scoring Weights',
                 'reset' => 'Reset to Default',
-                'save_weights' => 'Save Weights'
+                'save_weights' => 'Save Weights',
             ],
             'routes' => [
                 'update_profile' => 'admin.settings.update',
@@ -547,7 +549,7 @@ class AdminController extends Controller
 
     public function showApplication($id)
     {
-        return back()->with('success', 'Application ' . $id . ' viewed.');
+        return back()->with('success', 'Application '.$id.' viewed.');
     }
 
     public function bulkAssign(\Illuminate\Http\Request $request)
@@ -558,7 +560,7 @@ class AdminController extends Controller
         ]);
 
         $ids = explode(',', $request->application_ids);
-        
+
         foreach ($ids as $id) {
             $application = Application::find($id);
             if ($application) {
@@ -569,7 +571,7 @@ class AdminController extends Controller
                     'gpa_score' => 0,
                     'income_score' => 0,
                 ]);
-                
+
                 if ($application->status === 'pending') {
                     $application->update(['status' => 'under_review']);
                 }
@@ -586,7 +588,7 @@ class AdminController extends Controller
         ]);
 
         $application = Application::findOrFail($id);
-        
+
         \App\Models\Evaluation::firstOrCreate([
             'application_id' => $application->id,
             'evaluator_id' => $request->evaluator_id,
@@ -594,7 +596,7 @@ class AdminController extends Controller
             'gpa_score' => 0,
             'income_score' => 0,
         ]);
-        
+
         if ($application->status === 'pending') {
             $application->update(['status' => 'under_review']);
         }

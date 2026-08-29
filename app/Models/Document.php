@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Document extends Model
 {
@@ -22,7 +22,7 @@ class Document extends Model
     ];
 
     protected $casts = [
-        'expiry_date'        => 'date',
+        'expiry_date' => 'date',
         'expiry_notified_at' => 'datetime',
     ];
 
@@ -63,7 +63,10 @@ class Document extends Model
     // Helper: check if document is expiring soon (within 30 days)
     public function isExpiringSoon(): bool
     {
-        if (!$this->expiry_date) return false;
+        if (! $this->expiry_date) {
+            return false;
+        }
+
         return $this->expiry_date->diffInDays(now()) <= 30;
     }
 }

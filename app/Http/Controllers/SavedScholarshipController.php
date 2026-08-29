@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Scholarship;
 use App\Models\ApplicantProfile;
+use App\Models\Scholarship;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class SavedScholarshipController extends Controller
@@ -57,7 +57,7 @@ class SavedScholarshipController extends Controller
         return $scores;
     }
 
-private function scoreGpa($profileGpa, $requirement): int
+    private function scoreGpa($profileGpa, $requirement): int
     {
         // Philippine grading scale: 1.0 = best, 5.0 = fail
         // 1.00 = 100, 1.25 = 96, 1.50 = 92, 1.75 = 88, 2.0 = 84, etc.
@@ -77,6 +77,7 @@ private function scoreGpa($profileGpa, $requirement): int
         // Calculate score based on how much lower the requirement is
         // e.g., profile: 1.5, req: 1.0 → diff = 0.5 → score = 100 - (0.5 * 30) = 85
         $diff = max(0, $profileGpa - $requirement);
+
         return max(0, 100 - (int) round($diff * 30));
     }
 
@@ -90,14 +91,16 @@ private function scoreGpa($profileGpa, $requirement): int
         $courses = is_array($scholarshipCourses)
             ? $scholarshipCourses
             : explode(',', (string) $scholarshipCourses);
-        $courses = array_filter(array_map(fn($c) => Str::lower(trim($c)), $courses));
+        $courses = array_filter(array_map(fn ($c) => Str::lower(trim($c)), $courses));
 
-        if (!$profileCourse || empty($courses)) {
+        if (! $profileCourse || empty($courses)) {
             return 50;
         }
 
         foreach ($courses as $course) {
-            if (!$course) continue;
+            if (! $course) {
+                continue;
+            }
             if (Str::contains($profileCourse, $course) || Str::contains($course, $profileCourse)) {
                 return 100;
             }
@@ -125,9 +128,10 @@ private function scoreGpa($profileGpa, $requirement): int
         $annualIncome = floatval($monthlyIncome) * 12;
 
         if (preg_match_all('/\d+[\d,]*/', (string) $bracket, $matches)) {
-            $numbers = array_map(fn($v) => (int) str_replace(',', '', $v), $matches[0]);
-            if (!empty($numbers)) {
+            $numbers = array_map(fn ($v) => (int) str_replace(',', '', $v), $matches[0]);
+            if (! empty($numbers)) {
                 $threshold = max($numbers);
+
                 return $annualIncome <= $threshold ? 100 : 20;
             }
         }

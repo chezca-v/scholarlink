@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
 class StaticPageController extends Controller
 {
     public function about()
@@ -13,6 +11,7 @@ class StaticPageController extends Controller
             'total' => \App\Models\Scholarship::count(),
             'applicants' => \App\Models\User::where('role', 'applicant')->count(),
         ];
+
         return view('static.about', compact('stats'));
     }
 

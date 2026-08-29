@@ -32,17 +32,17 @@ class ActivityLog extends Model
     // Helper: log a new activity anywhere in the app
     public static function record(
         string $action,
-        string $targetType = null,
-        int $targetId = null,
-        int $userId = null
+        ?string $targetType = null,
+        ?int $targetId = null,
+        ?int $userId = null
     ): void {
         static::create([
-            'user_id'     => $userId ?? auth()->id(),
-            'action'      => $action,
+            'user_id' => $userId ?? auth()->id(),
+            'action' => $action,
             'target_type' => $targetType,
-            'target_id'   => $targetId,
-            'ip_address'  => request()->ip(),
-            'user_agent'  => request()->userAgent(),
+            'target_id' => $targetId,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
         ]);
     }
 }

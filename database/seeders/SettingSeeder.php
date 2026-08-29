@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Setting;
+use Illuminate\Database\Seeder;
 
 class SettingSeeder extends Seeder
 {
@@ -93,7 +93,7 @@ class SettingSeeder extends Seeder
                         'manage_orgs' => ['label' => 'Manage Orgs', 'enabled' => true],
                         'system_settings' => ['label' => 'System Settings', 'enabled' => true],
                         'view_logs' => ['label' => 'View Logs', 'enabled' => true],
-                    ]
+                    ],
                 ],
                 'admin' => [
                     'icon' => '🏛️',
@@ -103,7 +103,7 @@ class SettingSeeder extends Seeder
                         'manage_orgs' => ['label' => 'Manage Orgs', 'enabled' => false],
                         'manage_scholarships' => ['label' => 'Manage Scholarships', 'enabled' => true],
                         'review_applications' => ['label' => 'Review Applications', 'enabled' => true],
-                    ]
+                    ],
                 ],
                 'evaluator' => [
                     'icon' => '📋',
@@ -112,7 +112,7 @@ class SettingSeeder extends Seeder
                         'manage_scholarships' => ['label' => 'Manage Scholarships', 'enabled' => false],
                         'review_applications' => ['label' => 'Review Applications', 'enabled' => true],
                         'add_notes' => ['label' => 'Add Notes', 'enabled' => true],
-                    ]
+                    ],
                 ],
                 'applicant' => [
                     'icon' => '🎓',
@@ -120,7 +120,7 @@ class SettingSeeder extends Seeder
                     'permissions' => [
                         'apply_scholarships' => ['label' => 'Apply', 'enabled' => true],
                         'view_status' => ['label' => 'View Status', 'enabled' => true],
-                    ]
+                    ],
                 ],
             ]]
         );

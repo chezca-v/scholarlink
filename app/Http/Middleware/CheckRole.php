@@ -10,7 +10,7 @@ class CheckRole
 {
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (!$request->user() || $request->user()->role !== $role) {
+        if (! $request->user() || $request->user()->role !== $role) {
             // Redirect based on role if they try to access the wrong area
             $userRole = $request->user()?->role;
 

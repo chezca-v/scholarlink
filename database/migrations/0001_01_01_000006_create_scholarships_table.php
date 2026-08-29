@@ -12,9 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('provider_name', 255);
             $table->foreignId('created_by')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
             $table->string('name', 255);
             $table->string('tagline', 255)->nullable();
             $table->text('description');
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->date('open_date')->nullable();
             $table->date('deadline')->nullable();
             $table->enum('status', ['draft', 'open', 'closed', 'coming_soon'])
-                  ->default('draft');
+                ->default('draft');
             $table->tinyInteger('blind_screening')->default(0);
             $table->integer('weight_gpa')->default(50);
             $table->integer('weight_income')->default(50);

@@ -11,9 +11,9 @@ return new class extends Migration
         Schema::create('applicant_profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
-                  ->unique()
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->unique()
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->string('avatar_url', 500)->nullable();
             $table->date('date_of_birth');
             $table->enum('sex', ['Male', 'Female']);

@@ -11,18 +11,18 @@ return new class extends Migration
         Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('application_id')
-                  ->constrained('applications')
-                  ->cascadeOnDelete();
+                ->constrained('applications')
+                ->cascadeOnDelete();
             $table->foreignId('evaluator_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->decimal('gpa_score', 5, 2);
             $table->decimal('income_score', 5, 2);
             $table->decimal('final_score', 5, 2)->nullable();
             $table->enum('decision', [
                 'approved',
                 'rejected',
-                'revision_requested'
+                'revision_requested',
             ])->nullable();
             $table->string('rejection_reason', 255)->nullable();
             $table->text('notes')->nullable();

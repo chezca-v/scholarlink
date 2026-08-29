@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('evaluation_suggestions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('evaluation_id')
-                  ->constrained('evaluations')
-                  ->cascadeOnDelete();
+                ->constrained('evaluations')
+                ->cascadeOnDelete();
             $table->foreignId('scholarship_id')
-                  ->constrained('scholarships')
-                  ->cascadeOnDelete();
+                ->constrained('scholarships')
+                ->cascadeOnDelete();
             $table->timestamp('created_at')->useCurrent();
 
             // Prevent duplicate suggestions per evaluation

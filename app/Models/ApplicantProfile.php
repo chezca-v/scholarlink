@@ -39,13 +39,13 @@ class ApplicantProfile extends Model
     ];
 
     protected $casts = [
-        'date_of_birth'            => 'date',
-        'phone_verified_at'        => 'datetime',
-        'profile_completed_at'     => 'datetime',
-        'gwa'                      => 'decimal:2',
+        'date_of_birth' => 'date',
+        'phone_verified_at' => 'datetime',
+        'profile_completed_at' => 'datetime',
+        'gwa' => 'decimal:2',
         'monthly_household_income' => 'decimal:2',
-        'sms_opted_in'             => 'boolean',
-        'is_4ps'                   => 'boolean',
+        'sms_opted_in' => 'boolean',
+        'is_4ps' => 'boolean',
     ];
 
     // Belongs to a user (1:1)
