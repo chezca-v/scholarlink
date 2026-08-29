@@ -222,21 +222,14 @@ class ScholarshipController extends Controller
     public function calculateMatchScores(ApplicantProfile $profile, array $scholarships): array
     {
         $scores = [];
-        $gwa = $profile->gwa;
-        $course = $profile->course_program;
-        $income = $profile->monthly_household_income;
 
         foreach ($scholarships as $scholarship) {
-            $gpaScore = $this->scoreGpa($gwa, $scholarship->gpa_requirement);
-            $courseScore = $this->scoreCourse($course, $scholarship->courses);
-            $incomeScore = $this->scoreIncome($income, $scholarship->income_bracket);
-
-            $score = (int) round(
-                ($gpaScore * 0.55) +
-                ($courseScore * 0.30) +
-                ($incomeScore * 0.15)
-            );
-            $scores[$scholarship->id] = max(0, min(100, $score));
+            $scores[$scholarship->id] = $this->scoringService
+                ->calculateMatchScore(
+                    $profile,
+                    $scholarship,
+                    ScholarshipScoringService::MISSING_PROFILE_GPA_SCORE
+                );
         }
 
         return $scores;
