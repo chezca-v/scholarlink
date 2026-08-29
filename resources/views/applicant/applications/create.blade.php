@@ -743,14 +743,13 @@ function guardSubmit() {
   const cb  = document.getElementById('certify');
   const lbl = document.getElementById('certify-label');
 
-  // Check required documents
+  // Check required documents (must match ApplicationController::store()'s requiredSlugs)
   const requiredSlugs = [
-    'proof-of-enrollment-acceptance-letter',
-    'latest-report-card-tor',
-    '2x2-id-photo',
-    'income-tax-return-certificate-of-non-filing',
-    'barangay-certificate-of-indigency',
-    'endorsement-letter'
+    'proof-of-enrollment',
+    'report-card',
+    'id-photo',
+    'income-tax-return',
+    'barangay-indigency',
   ];
   let missing = false;
 

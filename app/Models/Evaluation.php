@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Evaluation extends Model
 {
@@ -24,9 +24,9 @@ class Evaluation extends Model
     ];
 
     protected $casts = [
-        'gpa_score'    => 'decimal:2',
+        'gpa_score' => 'decimal:2',
         'income_score' => 'decimal:2',
-        'final_score'  => 'decimal:2',
+        'final_score' => 'decimal:2',
         'evaluated_at' => 'datetime',
     ];
 

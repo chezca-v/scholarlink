@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Application extends Model
 {
@@ -26,11 +26,11 @@ class Application extends Model
     ];
 
     protected $casts = [
-        'submitted_at'    => 'datetime',
-        'decided_at'      => 'datetime',
-        'offer_expires_at'=> 'datetime',
-        'ai_match_score'  => 'decimal:2',
-        'conflict_flag'   => 'boolean',
+        'submitted_at' => 'datetime',
+        'decided_at' => 'datetime',
+        'offer_expires_at' => 'datetime',
+        'ai_match_score' => 'decimal:2',
+        'conflict_flag' => 'boolean',
     ];
 
     // Belongs to the applicant (user)
@@ -112,16 +112,18 @@ class Application extends Model
         $words = explode(' ', preg_replace('/[^a-zA-Z ]/', '', $scholarship->name));
         $initials = '';
         foreach ($words as $word) {
-            if (!in_array(strtolower($word), $skip) && strlen($word) > 0) {
+            if (! in_array(strtolower($word), $skip) && strlen($word) > 0) {
                 $initials .= strtoupper($word[0]);
-                if (strlen($initials) >= 2) break;
+                if (strlen($initials) >= 2) {
+                    break;
+                }
             }
         }
 
         $queue = static::where('scholarship_id', $scholarship->id)
-                       ->whereYear('created_at', $year)
-                       ->count() + 1;
+            ->whereYear('created_at', $year)
+            ->count() + 1;
 
-        return $initials . '-' . $year . '-' . str_pad($queue, 5, '0', STR_PAD_LEFT);
+        return $initials.'-'.$year.'-'.str_pad($queue, 5, '0', STR_PAD_LEFT);
     }
 }

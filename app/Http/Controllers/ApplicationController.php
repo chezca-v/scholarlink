@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Application;
 use App\Models\ApplicantProfile;
+use App\Models\Application;
 use App\Models\Scholarship;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class ApplicationController extends Controller
 {
@@ -55,12 +54,11 @@ class ApplicationController extends Controller
         ]);
     }
 
-
     public function create($id)
     {
         $scholarship = \App\Models\Scholarship::findOrFail($id);
         $applicant = auth()->user();
-        $profile = $applicant->applicantProfile ?? new ApplicantProfile();
+        $profile = $applicant->applicantProfile ?? new ApplicantProfile;
 
         $savedDocuments = \App\Models\Document::where('user_id', $applicant->id)->get();
 
@@ -79,7 +77,7 @@ class ApplicationController extends Controller
         if ($profile->monthly_household_income !== null) {
             if ($scholarship->income_bracket) {
                 preg_match_all('/\d+/', str_replace(',', '', $scholarship->income_bracket), $matches);
-                if (!empty($matches[0])) {
+                if (! empty($matches[0])) {
                     $limit = (float) $matches[0][0];
                     $annualIncome = $profile->monthly_household_income * 12;
                     $incomePass = $annualIncome <= $limit;
@@ -93,9 +91,9 @@ class ApplicationController extends Controller
 
         // Check concurrent scholarship
         $hasActiveScholarship = Application::where('applicant_id', $applicant->id)
-                                ->where('status', 'approved')
-                                ->exists();
-        $concurrentPass = !$hasActiveScholarship;
+            ->where('status', 'approved')
+            ->exists();
+        $concurrentPass = ! $hasActiveScholarship;
 
         // Check enrollment
         $enrollmentPass = null;
@@ -127,7 +125,7 @@ class ApplicationController extends Controller
                 'pass' => $enrollmentPass,
                 'badge' => $enrollmentPass ? 'Passed' : 'Failed',
                 'badgeClass' => $enrollmentPass ? 'b-green' : 'b-red',
-            ]
+            ],
         ];
 
         $documentGroups = [
@@ -155,7 +153,7 @@ class ApplicationController extends Controller
                         'smallNote' => 'Passport-style photo',
                         'optional' => false,
                     ],
-                ]
+                ],
             ],
             [
                 'groupTitle' => 'Financial & Legal Documents',
@@ -180,8 +178,8 @@ class ApplicationController extends Controller
                         'label' => 'Certificate of Good Moral Character',
                         'smallNote' => 'From school/organization',
                         'optional' => true,
-                    ]
-                ]
+                    ],
+                ],
             ],
             [
                 'groupTitle' => 'Supporting Documents',
@@ -206,9 +204,9 @@ class ApplicationController extends Controller
                         'label' => 'PSA Birth Certificate',
                         'smallNote' => 'Original or certified copy',
                         'optional' => true,
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ];
 
         $endorsementSlot = [
@@ -224,7 +222,6 @@ class ApplicationController extends Controller
             'scholarship', 'applicant', 'profile', 'eligibility', 'documentGroups', 'savedDocuments', 'endorsementSlot'
         ));
     }
-
 
     public function store(Request $request)
     {
@@ -272,7 +269,7 @@ class ApplicationController extends Controller
 
         foreach ($requiredSlugs as $slug) {
             if (empty($documents[$slug]) && empty($uploads[$slug])) {
-                return back()->withErrors(['error' => 'Missing required document: ' . ucwords(str_replace('-', ' ', $slug))])->withInput();
+                return back()->withErrors(['error' => 'Missing required document: '.ucwords(str_replace('-', ' ', $slug))])->withInput();
             }
         }
 
@@ -282,7 +279,7 @@ class ApplicationController extends Controller
             'mobile_number', 'university_name', 'university_email', 'course_program',
             'student_number', 'year_level', 'semester', 'academic_year', 'gwa',
             'gwa_scale', 'monthly_household_income', 'num_dependents', 'is_breadwinner',
-            'is_4ps', 'father_employment_status', 'mother_employment_status'
+            'is_4ps', 'father_employment_status', 'mother_employment_status',
         ]);
         $profileData['profile_completed_at'] = now(); // Mark as completed
 
@@ -297,27 +294,27 @@ class ApplicationController extends Controller
             'reference_code' => Application::generateReferenceCode($scholarship, now()->year),
             'applicant_id' => auth()->id(),
             'scholarship_id' => $request->scholarship_id,
-            'status' => 'pending', 
+            'status' => 'pending',
             'stage' => 'submitted',
             'submitted_at' => now(),
         ]);
 
         $docTypes = [
             'proof-of-enrollment' => 'Proof of Enrollment / Acceptance Letter',
-            'report-card'         => 'Latest Report Card / TOR',
-            'id-photo'            => '2x2 ID Photo',
-            'income-tax-return'   => 'Income Tax Return / Certificate of Non-Filing',
-            'barangay-indigency'  => 'Barangay Certificate of Indigency',
-            'good-moral'          => 'Certificate of Good Moral Character',
-            'affidavit-of-need'   => 'Affidavit of Financial Need',
+            'report-card' => 'Latest Report Card / TOR',
+            'id-photo' => '2x2 ID Photo',
+            'income-tax-return' => 'Income Tax Return / Certificate of Non-Filing',
+            'barangay-indigency' => 'Barangay Certificate of Indigency',
+            'good-moral' => 'Certificate of Good Moral Character',
+            'affidavit-of-need' => 'Affidavit of Financial Need',
             'recommendation-letter' => 'Letter of Recommendation',
-            'birth-certificate'   => 'PSA Birth Certificate',
-            'endorsement-letter'  => 'Endorsement Letter',
+            'birth-certificate' => 'PSA Birth Certificate',
+            'endorsement-letter' => 'Endorsement Letter',
         ];
 
         foreach ($uploads as $slug => $file) {
             if ($file) {
-                $filePath = $file->store('documents/user_' . auth()->id(), 'public');
+                $filePath = $file->store('documents/user_'.auth()->id(), 'public');
                 $docTypeStr = $docTypes[$slug] ?? 'Other';
 
                 $doc = \App\Models\Document::create([
@@ -354,7 +351,6 @@ class ApplicationController extends Controller
         ]);
     }
 
-
     public function show($id)
     {
         $application = Application::with(['scholarship', 'applicationDocuments.document'])
@@ -363,7 +359,6 @@ class ApplicationController extends Controller
 
         return view('applicant.applications.show', compact('application', 'id'));
     }
-
 
     public function track($id)
     {
@@ -377,7 +372,7 @@ class ApplicationController extends Controller
     public function respondToOffer(Request $request, $id)
     {
         $request->validate([
-            'action' => 'required|in:accept,reject'
+            'action' => 'required|in:accept,reject',
         ]);
 
         $application = Application::where('applicant_id', auth()->id())
@@ -388,10 +383,12 @@ class ApplicationController extends Controller
         if ($request->action === 'accept') {
             $application->offer_status = 'accepted';
             $application->save();
+
             return redirect()->route('dashboard')->with('success', 'Congratulations! You have accepted the scholarship offer.');
         } else {
             $application->offer_status = 'rejected';
             $application->save();
+
             return redirect()->route('dashboard')->with('success', 'You have declined the scholarship offer.');
         }
     }

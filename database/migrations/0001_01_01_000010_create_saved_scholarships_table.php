@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('saved_scholarships', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->foreignId('scholarship_id')
-                  ->constrained('scholarships')
-                  ->cascadeOnDelete();
+                ->constrained('scholarships')
+                ->cascadeOnDelete();
             $table->timestamp('saved_at')->useCurrent();
             $table->timestamps();
 

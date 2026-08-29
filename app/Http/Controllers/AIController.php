@@ -162,6 +162,108 @@ PROMPT;
         return $this->matchScholarships($request);
     }
 
+    private function calculateScholarshipScore($profile, Scholarship $scholarship): int
+    {
+        $gpaScore = $this->scoreGpa($profile->gwa, $scholarship->gpa_requirement);
+        $courseScore = $this->scoreCourse($profile->course_program, $scholarship->courses);
+        $incomeScore = $this->scoreIncome($profile->monthly_household_income, $scholarship->income_bracket);
+
+        $score = (int) round(
+            ($gpaScore * 0.55) +
+            ($courseScore * 0.30) +
+            ($incomeScore * 0.15)
+        );
+
+        return max(0, min(100, $score));
+    }
+
+    private function scoreGpa($profileGpa, $requirement): int
+    {
+        if (blank($requirement)) {
+            return 100;
+        }
+
+        if (blank($profileGpa)) {
+            return 50;
+        }
+
+        $profileGpa = floatval($profileGpa);
+        $requirement = floatval($requirement);
+
+        if ($profileGpa <= $requirement) {
+            return 100;
+        }
+
+        $diff = max(0, $profileGpa - $requirement);
+
+        return max(0, 100 - (int) round($diff * 30));
+    }
+
+    private function scoreCourse($profileCourse, $scholarshipCourses): int
+    {
+        if (blank($scholarshipCourses)) {
+            return 100;
+        }
+
+        $profileCourse = Str::lower(trim((string) $profileCourse));
+        $courses = is_array($scholarshipCourses) ? $scholarshipCourses : explode(',', (string) $scholarshipCourses);
+        $courses = array_filter(array_map(fn ($course) => Str::lower(trim($course)), $courses));
+
+        if (! $profileCourse || empty($courses)) {
+            return 50;
+        }
+
+        foreach ($courses as $course) {
+            if (! $course) {
+                continue;
+            }
+            if (Str::contains($profileCourse, $course) || Str::contains($course, $profileCourse)) {
+                return 100;
+            }
+
+            $profileWords = preg_split('/\s+/', $profileCourse);
+            foreach ($profileWords as $word) {
+                if ($word && Str::contains($course, $word)) {
+                    return 90;
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    private function scoreIncome($monthlyIncome, $bracket): int
+    {
+        if (blank($bracket)) {
+            return 100;
+        }
+
+        if (is_null($monthlyIncome)) {
+            return 50;
+        }
+
+        $annualIncome = floatval($monthlyIncome) * 12;
+        $threshold = $this->parseIncomeThreshold((string) $bracket);
+
+        if (is_null($threshold)) {
+            return 75;
+        }
+
+        return $annualIncome <= $threshold ? 100 : 20;
+    }
+
+    private function parseIncomeThreshold(string $bracket): ?int
+    {
+        if (preg_match_all('/\d+[\d,]*/', $bracket, $matches)) {
+            $numbers = array_map(fn ($value) => (int) str_replace(',', '', $value), $matches[0]);
+            if (! empty($numbers)) {
+                return max($numbers);
+            }
+        }
+
+        return null;
+    }
+
     private function buildScholarshipMatchReason($profile, Scholarship $scholarship, int $score): string
     {
         $segments = [];

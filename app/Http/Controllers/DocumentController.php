@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApplicationDocument;
+use App\Models\Document;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\File;
-use App\Models\Document;
-use App\Models\ApplicationDocument;
 
 class DocumentController extends Controller
 {
@@ -61,81 +61,82 @@ class DocumentController extends Controller
             ->all();
 
         $stats = [
-            'uploaded'      => $documents->count(),
+            'uploaded' => $documents->count(),
             'expiring_soon' => $documents->where('status', 'expiring_soon')->count(),
-            'expired'       => $documents->where('status', 'expired')->count(),
-            'used_in'       => (int) $documents->sum('used_in_count'),
+            'expired' => $documents->where('status', 'expired')->count(),
+            'used_in' => (int) $documents->sum('used_in_count'),
         ];
+
         return view('applicant.documents.index', [
-            'documents'          => $documents,
-            'documentTypes'      => $documentTypes,
+            'documents' => $documents,
+            'documentTypes' => $documentTypes,
             'totalDocumentTypes' => count(self::DOCUMENT_TYPES),
-            'stats'              => $stats,
+            'stats' => $stats,
         ]);
     }
 
     private function formatBytes(int $bytes): string
     {
         if ($bytes < 1024) {
-            return $bytes . ' B';
+            return $bytes.' B';
         }
 
         if ($bytes < 1024 * 1024) {
-            return round($bytes / 1024, 1) . ' KB';
+            return round($bytes / 1024, 1).' KB';
         }
 
-        return round($bytes / (1024 * 1024), 1) . ' MB';
+        return round($bytes / (1024 * 1024), 1).' MB';
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'document_type'  => [
+            'document_type' => [
                 'required',
                 'string',
             ],
             'custom_document_type' => [
                 'nullable',
                 'string',
-                'max:255'
+                'max:255',
             ],
-            'file'           => [
+            'file' => [
                 'required',
                 File::types(['pdf', 'jpg', 'jpeg', 'png', 'docx'])->max(5 * 1024),
             ],
-            'expiry_date'    => ['nullable', 'date', 'after:today'],
+            'expiry_date' => ['nullable', 'date', 'after:today'],
             'application_id' => ['nullable', 'exists:applications,id'],
         ]);
 
         $file = $request->file('file');
         // Prepend timestamp to avoid collision while retaining original filename
-        $fileName = time() . '_' . preg_replace('/[^a-zA-Z0-9_.-]/', '_', $file->getClientOriginalName());
+        $fileName = time().'_'.preg_replace('/[^a-zA-Z0-9_.-]/', '_', $file->getClientOriginalName());
         $filePath = $file->storeAs(
-            'documents/user_' . Auth::id(),
+            'documents/user_'.Auth::id(),
             $fileName,
             'public'
         );
 
         $docType = $request->document_type;
         if ($docType === 'Other' && $request->filled('custom_document_type')) {
-            $docType = 'Other: ' . $request->custom_document_type;
+            $docType = 'Other: '.$request->custom_document_type;
         }
 
         // Create document record
         $document = Document::create([
-            'user_id'       => Auth::id(),
+            'user_id' => Auth::id(),
             'document_type' => $docType,
-            'file_url'      => $filePath,
-            'status'        => 'pending',
-            'expiry_date'   => $request->expiry_date,
+            'file_url' => $filePath,
+            'status' => 'pending',
+            'expiry_date' => $request->expiry_date,
         ]);
 
         // Link to application if provided
         if ($request->filled('application_id')) {
             ApplicationDocument::create([
                 'application_id' => $request->application_id,
-                'document_id'    => $document->id,
-                'submitted_at'   => now(),
+                'document_id' => $document->id,
+                'submitted_at' => now(),
             ]);
         }
 
@@ -149,14 +150,14 @@ class DocumentController extends Controller
             ->findOrFail($id);
 
         // Confirm file exists in storage
-        abort_if(!Storage::disk('public')->exists($document->file_url), 404, 'File not found.');
+        abort_if(! Storage::disk('public')->exists($document->file_url), 404, 'File not found.');
 
         $filePath = Storage::disk('public')->path($document->file_url);
         $mimeType = mime_content_type($filePath);
 
         return response()->file($filePath, [
-            'Content-Type'        => $mimeType,
-            'Content-Disposition' => 'inline; filename="' . basename($document->file_url) . '"',
+            'Content-Type' => $mimeType,
+            'Content-Disposition' => 'inline; filename="'.basename($document->file_url).'"',
         ]);
     }
 
@@ -166,7 +167,7 @@ class DocumentController extends Controller
         $document = Document::query()->findOrFail($id);
 
         $document->update([
-            'status'      => 'verified',
+            'status' => 'verified',
             'verified_by' => Auth::id(),
         ]);
 

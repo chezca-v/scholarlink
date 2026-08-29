@@ -303,4 +303,46 @@ class EvaluationController extends Controller
 
         return $applicant;
     }
+
+    private function calculateAutomatedGpaScore($profileGpa, $requirement): int
+    {
+        if (blank($requirement) || blank($profileGpa)) {
+            return blank($profileGpa) ? 50 : 100;
+        }
+
+        $profileGpa = floatval($profileGpa);
+        $requirement = floatval($requirement);
+
+        if ($profileGpa <= $requirement) {
+            return 100;
+        }
+
+        $diff = max(0, $profileGpa - $requirement);
+
+        return max(0, 100 - (int) round($diff * 30));
+    }
+
+    private function calculateAutomatedIncomeScore($monthlyIncome, $bracket): int
+    {
+        if (blank($bracket)) {
+            return 100;
+        }
+
+        if (is_null($monthlyIncome)) {
+            return 50;
+        }
+
+        $annualIncome = floatval($monthlyIncome) * 12;
+
+        if (preg_match_all('/\d+[\d,]*/', (string) $bracket, $matches)) {
+            $numbers = array_map(fn ($v) => (int) str_replace(',', '', $v), $matches[0]);
+            if (! empty($numbers)) {
+                $threshold = max($numbers);
+
+                return $annualIncome <= $threshold ? 100 : 20;
+            }
+        }
+
+        return 50;
+    }
 }

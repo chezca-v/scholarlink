@@ -11,15 +11,15 @@ return new class extends Migration
         Schema::create('evaluator_assignments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('evaluator_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->foreignId('scholarship_id')
-                  ->constrained('scholarships')
-                  ->cascadeOnDelete();
+                ->constrained('scholarships')
+                ->cascadeOnDelete();
             $table->foreignId('assigned_by')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
             $table->timestamp('assigned_at')->useCurrent();
             $table->timestamps();
 

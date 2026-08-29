@@ -1,22 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\{
-    PublicController,
-    ScholarshipController,
-    AIController,
-    ProfileController,
-    DocumentController,
-    ApplicationController,
-    SavedScholarshipController,
-    NotificationController,
-    AdminController,
-    EvaluatorController,
-    EvaluationController,
-    SuperadminController,
-    StaticPageController
-};
 use App\Http\Controllers\Admin\ScholarshipController as AdminScholarshipController;
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AIController;
+use App\Http\Controllers\ApplicationController;
+use App\Http\Controllers\DocumentController;
+use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\EvaluatorController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\SavedScholarshipController;
+use App\Http\Controllers\ScholarshipController;
+use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\SuperadminController;
+use Illuminate\Support\Facades\Route;
 
 /*
 Public Routes
@@ -30,8 +28,8 @@ Route::get('/about', [StaticPageController::class, 'about'])->name('about');
 Route::get('/organizations', [StaticPageController::class, 'organizations'])->name('organizations');
 
 // Legacy/alias redirects
-Route::get('/about.php', fn() => redirect()->route('about'));
-Route::get('/organizations.php', fn() => redirect()->route('organizations'));
+Route::get('/about.php', fn () => redirect()->route('about'));
+Route::get('/organizations.php', fn () => redirect()->route('organizations'));
 
 // Static Legal Pages
 Route::get('/terms', [StaticPageController::class, 'terms'])->name('terms');
@@ -62,7 +60,7 @@ Route::middleware(['auth', 'verified', 'role:applicant', 'profile.completed'])->
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
         Route::get('/applicant/dashboard', 'dashboard')->name('applicant.dashboard');
-        
+
         // Profile Setup Routes
         Route::get('/applicant/setup', 'setup')->name('profile.setup');
         Route::post('/applicant/setup/step1', 'setupStep1')->name('profile.setup.step1');
@@ -75,7 +73,7 @@ Route::middleware(['auth', 'verified', 'role:applicant', 'profile.completed'])->
         Route::delete('/profile', 'destroy')->name('profile.destroy');
     });
 
-    //Document Wallet
+    // Document Wallet
     Route::controller(DocumentController::class)->prefix('applicant/documents')->name('applicant.documents.')->group(function () {
         Route::get('', 'index')->name('index');
         Route::post('', 'store')->name('store');
@@ -111,7 +109,9 @@ Route::middleware(['auth', 'verified', 'role:applicant', 'profile.completed'])->
 Admin Routes (Role: admin)
 */
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', function () { return redirect()->route('admin.dashboard'); });
+    Route::get('/', function () {
+        return redirect()->route('admin.dashboard');
+    });
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
 
     // Scholarship CRUD & Extensions
@@ -148,7 +148,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 6.4 Evaluator Routes (Role: evaluator)
 */
 Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evaluator.')->group(function () {
-    Route::get('/', function () { return redirect()->route('evaluator.dashboard'); });
+    Route::get('/', function () {
+        return redirect()->route('evaluator.dashboard');
+    });
     Route::get('/dashboard', [EvaluatorController::class, 'dashboard'])->name('dashboard');
     Route::get('/queue', [EvaluatorController::class, 'queue'])->name('queue');
 
@@ -176,7 +178,9 @@ Route::middleware(['auth', 'role:evaluator'])->prefix('evaluator')->name('evalua
 Superadmin Routes (Role: superadmin)
 */
 Route::middleware(['auth', 'role:superadmin'])->prefix('superadmin')->name('superadmin.')->group(function () {
-    Route::get('/', function () { return redirect()->route('superadmin.dashboard'); });
+    Route::get('/', function () {
+        return redirect()->route('superadmin.dashboard');
+    });
     Route::controller(SuperadminController::class)->group(function () {
         Route::get('/dashboard', 'dashboard')->name('dashboard');
 

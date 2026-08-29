@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActivityLog;
+use App\Models\Application;
+use App\Models\Notification;
+use App\Models\Organization;
+use App\Models\Scholarship;
+use App\Models\Setting;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use App\Models\Organization;
-use App\Models\User;
-use App\Models\Application;
-use App\Models\Scholarship;
-use App\Models\ActivityLog;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use App\Models\Notification;
-use App\Models\Setting;
+use Illuminate\Support\Facades\Hash;
 
 class SuperadminController extends Controller
 {
@@ -42,7 +42,7 @@ class SuperadminController extends Controller
         foreach ($organizations as $org) {
             $userIds = $org->users->pluck('id');
             $scholarshipIds = Scholarship::whereIn('created_by', $userIds)->pluck('id');
-            
+
             $appsQuery = Application::whereIn('scholarship_id', $scholarshipIds);
             $count = $appsQuery->count();
             $approvedCount = (clone $appsQuery)->where('status', 'approved')->count();
@@ -53,7 +53,7 @@ class SuperadminController extends Controller
                     'name' => $org->name,
                     'pct' => $pct,
                     'count' => $count,
-                    'color' => 'linear-gradient(90deg, #0F4C5C, #2A8FA0)'
+                    'color' => 'linear-gradient(90deg, #0F4C5C, #2A8FA0)',
                 ];
             }
         }
@@ -62,8 +62,9 @@ class SuperadminController extends Controller
             return $b['count'] <=> $a['count'];
         });
 
-        $orgPerformance = array_map(function($item) {
+        $orgPerformance = array_map(function ($item) {
             $item['count'] = number_format($item['count']);
+
             return $item;
         }, array_slice($orgPerformanceRaw, 0, 6));
 
@@ -75,7 +76,7 @@ class SuperadminController extends Controller
             $fraudAlerts[] = [
                 'dot' => 'red',
                 'title' => $log->action,
-                'meta' => ($log->user ? $log->user->first_name . " • " : "") . $log->created_at->diffForHumans(),
+                'meta' => ($log->user ? $log->user->first_name.' • ' : '').$log->created_at->diffForHumans(),
             ];
         }
 
@@ -102,7 +103,7 @@ class SuperadminController extends Controller
             $year = $date->format('Y');
             $monthNum = $date->format('m');
             $appsCount = Application::whereYear('created_at', $year)->whereMonth('created_at', $monthNum)->count();
-            
+
             $chartMonths[] = [
                 'month' => $date->format('M'),
                 'raw_count' => $appsCount,
@@ -133,21 +134,21 @@ class SuperadminController extends Controller
     public function organizations(Request $request)
     {
         // Stats
-        $totalOrgs        = Organization::count();
+        $totalOrgs = Organization::count();
         $newOrgsThisMonth = Organization::whereMonth('created_at', Carbon::now()->month)
-                                        ->whereYear('created_at', Carbon::now()->year)->count();
-        $activeOrgs       = Organization::where('is_active', true)->count();
-        $inactiveOrgs     = Organization::where('is_active', false)->count();
-        $pendingOrgs      = 0;
+            ->whereYear('created_at', Carbon::now()->year)->count();
+        $activeOrgs = Organization::where('is_active', true)->count();
+        $inactiveOrgs = Organization::where('is_active', false)->count();
+        $pendingOrgs = 0;
 
         // Table query
         $query = Organization::query()->with('users');
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
         if ($request->filled('status')) {
@@ -162,38 +163,38 @@ class SuperadminController extends Controller
         // Post-process
         $orgTypes = ['Government', 'Private', 'NGO'];
         $organizations->getCollection()->transform(function ($org) use ($orgTypes) {
-            $org->type       = $orgTypes[$org->id % 3];
-            $org->status     = $org->is_active ? 'active' : 'inactive';
-            $org->avatar_bg  = ['Government' => '#E8F8F0', 'Private' => '#FEF3C7', 'NGO' => '#E0F2FE'][$org->type];
-            $org->emoji      = ['Government' => '🏛️',   'Private' => '🏢',       'NGO' => '🤝'][$org->type];
+            $org->type = $orgTypes[$org->id % 3];
+            $org->status = $org->is_active ? 'active' : 'inactive';
+            $org->avatar_bg = ['Government' => '#E8F8F0', 'Private' => '#FEF3C7', 'NGO' => '#E0F2FE'][$org->type];
+            $org->emoji = ['Government' => '🏛️',   'Private' => '🏢',       'NGO' => '🤝'][$org->type];
 
             $admin = $org->users->where('role', 'admin')->first();
             if ($admin) {
-                $admin->full_name = $admin->first_name . ' ' . $admin->last_name;
+                $admin->full_name = $admin->first_name.' '.$admin->last_name;
                 $org->admin = $admin;
             } else {
                 $org->admin = null;
             }
 
-            $userIds          = $org->users->pluck('id');
-            $scholarships     = Scholarship::whereIn('created_by', $userIds)->get();
-            $scholarshipIds   = $scholarships->pluck('id');
+            $userIds = $org->users->pluck('id');
+            $scholarships = Scholarship::whereIn('created_by', $userIds)->get();
+            $scholarshipIds = $scholarships->pluck('id');
             $org->active_scholarships_count = $scholarships->where('status', 'open')->count();
-            $org->applicants_count          = Application::whereIn('scholarship_id', $scholarshipIds)->count();
+            $org->applicants_count = Application::whereIn('scholarship_id', $scholarshipIds)->count();
 
             return $org;
         });
 
         // Top 3 orgs by applicants
-        $orgStats = $organizations->getCollection()->sortByDesc('applicants_count')->take(3)->map(function($org) {
+        $orgStats = $organizations->getCollection()->sortByDesc('applicants_count')->take(3)->map(function ($org) {
             return (object) [
-                'name'             => $org->name,
-                'type'             => $org->type,
+                'name' => $org->name,
+                'type' => $org->type,
                 'scholarships_count' => $org->active_scholarships_count,
                 'applicants_count' => $org->applicants_count,
-                'approval_rate'    => rand(60, 97),
-                'avatar_bg'        => $org->avatar_bg,
-                'emoji'            => $org->emoji,
+                'approval_rate' => rand(60, 97),
+                'avatar_bg' => $org->avatar_bg,
+                'emoji' => $org->emoji,
             ];
         });
 
@@ -201,8 +202,9 @@ class SuperadminController extends Controller
         $unassignedAdmins = User::where('role', 'admin')
             ->whereNull('organization_id')
             ->get()
-            ->map(function($admin) {
-                $admin->full_name = $admin->first_name . ' ' . $admin->last_name;
+            ->map(function ($admin) {
+                $admin->full_name = $admin->first_name.' '.$admin->last_name;
+
                 return $admin;
             });
 
@@ -215,25 +217,25 @@ class SuperadminController extends Controller
     public function storeOrganization(Request $request)
     {
         $request->validate([
-            'name'                  => ['required', 'string', 'max:255'],
-            'email'                 => ['nullable', 'email', 'unique:organizations,email'],
-            'website'               => ['nullable', 'url', 'max:255'],
-            'address'               => ['nullable', 'string', 'max:500'],
-            'is_active'             => ['nullable'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email', 'unique:organizations,email'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'address' => ['nullable', 'string', 'max:500'],
+            'is_active' => ['nullable'],
             // New admin fields
-            'new_admin_first_name'  => ['nullable', 'string', 'max:255'],
-            'new_admin_last_name'   => ['nullable', 'string', 'max:255'],
-            'new_admin_email'       => ['nullable', 'email', 'unique:users,email'],
-            'new_admin_password'    => ['nullable', 'string', 'min:8'],
-            'existing_admin_id'     => ['nullable', 'exists:users,id'],
+            'new_admin_first_name' => ['nullable', 'string', 'max:255'],
+            'new_admin_last_name' => ['nullable', 'string', 'max:255'],
+            'new_admin_email' => ['nullable', 'email', 'unique:users,email'],
+            'new_admin_password' => ['nullable', 'string', 'min:8'],
+            'existing_admin_id' => ['nullable', 'exists:users,id'],
         ]);
 
         // 1. Create the Organization
         $org = Organization::create([
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'website'   => $request->website,
-            'address'   => $request->address,
+            'name' => $request->name,
+            'email' => $request->email,
+            'website' => $request->website,
+            'address' => $request->address,
             'is_active' => (bool) $request->input('is_active', 1),
         ]);
 
@@ -242,13 +244,13 @@ class SuperadminController extends Controller
         // 2a. Create a brand-new admin if fields are filled
         if ($request->filled('new_admin_email') && $request->filled('new_admin_first_name')) {
             $assignedAdmin = User::create([
-                'first_name'        => $request->new_admin_first_name,
-                'last_name'         => $request->new_admin_last_name,
-                'email'             => $request->new_admin_email,
-                'password'          => Hash::make($request->new_admin_password),
-                'role'              => 'admin',
-                'organization_id'   => $org->id,
-                'is_active'         => true,
+                'first_name' => $request->new_admin_first_name,
+                'last_name' => $request->new_admin_last_name,
+                'email' => $request->new_admin_email,
+                'password' => Hash::make($request->new_admin_password),
+                'role' => 'admin',
+                'organization_id' => $org->id,
+                'is_active' => true,
                 'email_verified_at' => Carbon::now(),
             ]);
         }
@@ -261,17 +263,17 @@ class SuperadminController extends Controller
         // 3. Send notification to the assigned admin
         if ($assignedAdmin) {
             Notification::create([
-                'user_id'    => $assignedAdmin->id,
-                'type'       => 'in_app',
-                'title'      => 'Organization Assignment',
-                'body'       => "You have been assigned as the Admin for {$org->name}. Please navigate to your dashboard to draft and publish your scholarships.",
-                'is_read'    => false,
+                'user_id' => $assignedAdmin->id,
+                'type' => 'in_app',
+                'title' => 'Organization Assignment',
+                'body' => "You have been assigned as the Admin for {$org->name}. Please navigate to your dashboard to draft and publish your scholarships.",
+                'is_read' => false,
                 'related_id' => $org->id,
             ]);
         }
 
         return redirect()->route('superadmin.organizations')
-            ->with('success', "Organization \"{$org->name}\" created successfully" . ($assignedAdmin ? " and admin assigned." : "."));
+            ->with('success', "Organization \"{$org->name}\" created successfully".($assignedAdmin ? ' and admin assigned.' : '.'));
     }
 
     public function updateOrganization(Request $request, $id)
@@ -280,7 +282,7 @@ class SuperadminController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:organizations,email,' . $id],
+            'email' => ['required', 'email', 'unique:organizations,email,'.$id],
             'website' => ['nullable', 'url', 'max:255'],
             'address' => ['nullable', 'string', 'max:500'],
             'logo_url' => ['nullable', 'string', 'max:255'],
@@ -310,12 +312,12 @@ class SuperadminController extends Controller
         $activeOrgs = Organization::where('is_active', true)->count();
         $inactiveOrgs = Application::where('status', 'pending')->count();
         $pendingOrgs = 0;
-        
+
         $totalAdmins = User::where('role', 'admin')->count();
         $activeAdmins = User::where('role', 'admin')->where('is_active', true)->count();
         $newAdminsToday = User::where('role', 'admin')->whereDate('created_at', Carbon::today())->count();
         $deactivatedAdmins = User::where('role', 'admin')->where('is_active', false)->count();
-        
+
         $unassignedOrgs = Organization::whereDoesntHave('users', function ($q) {
             $q->where('role', 'admin');
         })->count();
@@ -325,9 +327,9 @@ class SuperadminController extends Controller
         // Improved Search Logic
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where(DB::raw("CONCAT(first_name, ' ', last_name)"), 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -347,12 +349,13 @@ class SuperadminController extends Controller
         $admins = $query->latest()->paginate(15)->withQueryString();
 
         $admins->getCollection()->transform(function ($admin) {
-            $admin->full_name = $admin->first_name . ' ' . $admin->last_name;
+            $admin->full_name = $admin->first_name.' '.$admin->last_name;
             $admin->status = $admin->is_active ? 'active' : 'deactivated';
             $admin->managed_scholars_count = Application::where('status', 'approved')
                 ->whereHas('scholarship', function ($q) use ($admin) {
                     $q->where('created_by', $admin->id);
                 })->count();
+
             return $admin;
         });
 
@@ -364,6 +367,7 @@ class SuperadminController extends Controller
             ->get()
             ->map(function ($org) {
                 $org->admin = $org->admin_count > 0;
+
                 return $org;
             });
 
@@ -404,7 +408,7 @@ class SuperadminController extends Controller
         $request->validate([
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'unique:users,email,' . $id],
+            'email' => ['required', 'email', 'unique:users,email,'.$id],
             'organization_id' => ['required', 'exists:organizations,id'],
         ]);
 
@@ -439,14 +443,14 @@ class SuperadminController extends Controller
 
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('action', 'like', "%{$search}%")
-                  ->orWhere('ip_address', 'like', "%{$search}%")
-                  ->orWhereHas('user', function ($uq) use ($search) {
-                      $uq->where('first_name', 'like', "%{$search}%")
-                         ->orWhere('last_name', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%");
-                  });
+                    ->orWhere('ip_address', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($uq) use ($search) {
+                        $uq->where('first_name', 'like', "%{$search}%")
+                            ->orWhere('last_name', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
             });
         }
 
@@ -456,7 +460,7 @@ class SuperadminController extends Controller
 
         if ($request->filled('user_role')) {
             $role = $request->user_role;
-            $query->whereHas('user', function($q) use ($role) {
+            $query->whereHas('user', function ($q) use ($role) {
                 $q->where('role', $role);
             });
         }
@@ -472,34 +476,34 @@ class SuperadminController extends Controller
         if ($request->filled('quick')) {
             $quick = $request->quick;
             if ($quick === 'login') {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('action', 'like', '%login%')->orWhere('action', 'like', '%logout%');
                 });
             } elseif ($quick === 'errors') {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('action', 'like', '%error%')->orWhere('action', 'like', '%failed%');
                 });
             } elseif ($quick === 'data_changes') {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('action', 'like', '%create%')
-                      ->orWhere('action', 'like', '%update%')
-                      ->orWhere('action', 'like', '%delete%');
+                        ->orWhere('action', 'like', '%update%')
+                        ->orWhere('action', 'like', '%delete%');
                 });
             } elseif ($quick === 'fraud') {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('action', 'like', '%fraud%')->orWhere('action', 'like', '%alert%');
                 });
             }
         }
 
-        $successCount = (clone $query)->where(function($q) {
+        $successCount = (clone $query)->where(function ($q) {
             $q->where('action', 'not like', '%error%')
-              ->where('action', 'not like', '%failed%')
-              ->where('action', 'not like', '%fraud%')
-              ->where('action', 'not like', '%alert%');
+                ->where('action', 'not like', '%failed%')
+                ->where('action', 'not like', '%fraud%')
+                ->where('action', 'not like', '%alert%');
         })->count();
 
-        $errorCount = (clone $query)->where(function($q) {
+        $errorCount = (clone $query)->where(function ($q) {
             $q->where('action', 'like', '%error%')->orWhere('action', 'like', '%failed%');
         })->count();
 
@@ -511,7 +515,7 @@ class SuperadminController extends Controller
 
         $logs->getCollection()->transform(function ($log) {
             $actionLower = strtolower($log->action);
-            
+
             $log->icon = '📝';
             $log->badge_color = 'teal';
             $log->icon_bg = 'rgba(15,76,92,.08)';
@@ -555,17 +559,17 @@ class SuperadminController extends Controller
             }
 
             if ($log->user) {
-                $log->action_label = $log->user->first_name . ' ' . $log->user->last_name;
+                $log->action_label = $log->user->first_name.' '.$log->user->last_name;
             } else {
                 $log->action_label = ucfirst($log->action);
             }
 
             $meta = [];
             if ($log->target_type) {
-                $meta[] = "Target: " . class_basename($log->target_type) . ($log->target_id ? " (#{$log->target_id})" : "");
+                $meta[] = 'Target: '.class_basename($log->target_type).($log->target_id ? " (#{$log->target_id})" : '');
             }
             if ($log->user && $log->user->role) {
-                $meta[] = "Role: " . ucfirst($log->user->role);
+                $meta[] = 'Role: '.ucfirst($log->user->role);
             }
             $log->extra_meta = empty($meta) ? null : implode(' • ', $meta);
 
@@ -602,6 +606,7 @@ class SuperadminController extends Controller
                     $setting->update(['value' => $data]);
                 }
             }
+
             return response()->json(['success' => true]);
         }
 
@@ -614,12 +619,14 @@ class SuperadminController extends Controller
                     $setting->update(['value' => $data]);
                 }
             }
+
             return response()->json(['success' => true]);
         }
 
         if ($request->action === 'reset_templates') {
-            $seeder = new \Database\Seeders\SettingSeeder();
+            $seeder = new \Database\Seeders\SettingSeeder;
             $seeder->run();
+
             return response()->json(['success' => true]);
         }
 
@@ -645,9 +652,10 @@ class SuperadminController extends Controller
                 }
                 $setting->update(['value' => $data]);
             }
+
             return redirect()->route('superadmin.settings')->with('success', 'Settings updated successfully.');
         }
-        
+
         return redirect()->back();
     }
 
@@ -655,6 +663,7 @@ class SuperadminController extends Controller
     {
         $user = Auth::user();
         $notifications = Notification::where('user_id', $user->id)->latest()->get();
+
         return view('superadmin.notifications', compact('user', 'notifications'));
     }
 
@@ -662,12 +671,14 @@ class SuperadminController extends Controller
     {
         $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
         $notification->update(['is_read' => true]);
+
         return back();
     }
 
     public function markAllReadNotifications()
     {
         Notification::where('user_id', Auth::id())->update(['is_read' => true]);
+
         return back();
     }
 }

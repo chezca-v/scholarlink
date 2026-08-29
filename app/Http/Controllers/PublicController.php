@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Scholarship; // Import the Scholarship model for the browse methods
 
 class PublicController extends Controller

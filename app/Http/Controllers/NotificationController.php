@@ -8,20 +8,21 @@ use Illuminate\Support\Facades\Auth;
 
 class NotificationController extends Controller
 {
-    public function index() 
-    { 
+    public function index()
+    {
         $user = Auth::user();
         $profile = $user->applicantProfile;
-        
+
         $notifications = Notification::query()
             ->where('user_id', $user->id)
             ->latest()
             ->get();
-            
-        return view('applicant.notifications', compact('user', 'profile', 'notifications')); 
+
+        return view('applicant.notifications', compact('user', 'profile', 'notifications'));
     }
-    
-    public function markRead(Request $request, $id) { 
+
+    public function markRead(Request $request, $id)
+    {
         $notification = Notification::where('user_id', Auth::id())->findOrFail($id);
         $notification->markAsRead();
         // If a redirect URL was provided (from the notification View button), go there
@@ -29,11 +30,14 @@ class NotificationController extends Controller
             // Only allow relative/internal URLs (no external redirects)
             return redirect($request->redirect);
         }
+
         return back();
     }
-    
-    public function markAllRead() { 
+
+    public function markAllRead()
+    {
         Notification::where('user_id', Auth::id())->update(['is_read' => true]);
+
         return back();
     }
 }

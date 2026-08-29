@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    use Notifiable, SoftDeletes;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
         'organization_id',
@@ -33,9 +34,9 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'email_verified_at'  => 'datetime',
-        'phone_verified_at'  => 'datetime',
-        'is_active'          => 'boolean',
+        'email_verified_at' => 'datetime',
+        'phone_verified_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
     // Belongs to an organization (admins only)

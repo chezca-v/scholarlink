@@ -1,8 +1,8 @@
 <?php
 
+use App\Http\Controllers\AIController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AIController;
 
 // AI & Matching Endpoints
 Route::post('/match', [AIController::class, 'match']);

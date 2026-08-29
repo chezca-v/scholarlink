@@ -11,18 +11,18 @@ return new class extends Migration
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')
-                  ->constrained('users')
-                  ->cascadeOnDelete();
+                ->constrained('users')
+                ->cascadeOnDelete();
             $table->string('document_type', 100);
             $table->string('file_url', 500);
             $table->enum('status', ['pending', 'verified', 'rejected'])
-                  ->default('pending');
+                ->default('pending');
             $table->date('expiry_date')->nullable();
             $table->timestamp('expiry_notified_at')->nullable();
             $table->foreignId('verified_by')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
         });

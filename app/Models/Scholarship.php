@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Scholarship extends Model
 {
@@ -42,13 +42,13 @@ class Scholarship extends Model
     ];
 
     protected $casts = [
-        'open_date'        => 'date',
-        'deadline'         => 'date',
-        'posted_at'        => 'datetime',
-        'courses'             => 'array',
-        'blind_screening'  => 'boolean',
+        'open_date' => 'date',
+        'deadline' => 'date',
+        'posted_at' => 'datetime',
+        'courses' => 'array',
+        'blind_screening' => 'boolean',
         'ai_match_enabled' => 'boolean',
-        'gpa_requirement'  => 'decimal:2',
+        'gpa_requirement' => 'decimal:2',
     ];
 
     // Belongs to the admin who created it
@@ -111,7 +111,10 @@ class Scholarship extends Model
     // Helper: check if deadline has passed
     public function isExpired(): bool
     {
-        if (!$this->deadline) return false;
+        if (! $this->deadline) {
+            return false;
+        }
+
         return $this->deadline->isPast();
     }
 
@@ -119,8 +122,9 @@ class Scholarship extends Model
     public function remainingSlots(): int
     {
         $approved = $this->applications()
-                         ->where('status', 'approved')
-                         ->count();
+            ->where('status', 'approved')
+            ->count();
+
         return max(0, $this->slots - $approved);
     }
 }

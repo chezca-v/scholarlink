@@ -11,13 +11,13 @@ return new class extends Migration
         Schema::create('scholarship_subscriptions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('scholarship_id')
-                  ->constrained('scholarships')
-                  ->cascadeOnDelete();
+                ->constrained('scholarships')
+                ->cascadeOnDelete();
             $table->string('email', 255);
             $table->foreignId('user_id')
-                  ->nullable()
-                  ->constrained('users')
-                  ->nullOnDelete();
+                ->nullable()
+                ->constrained('users')
+                ->nullOnDelete();
             $table->timestamp('subscribed_at')->useCurrent();
             $table->timestamps();
 

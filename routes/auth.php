@@ -9,10 +9,10 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Socialite\Facades\Socialite;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -40,15 +40,17 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/{provider}/redirect', function (string $provider) {
         try {
             if (empty(config("services.{$provider}.client_id"))) {
-                return redirect('/login')->with('error', ucfirst($provider) . ' login is not currently configured.');
+                return redirect('/login')->with('error', ucfirst($provider).' login is not currently configured.');
             }
+
             return Socialite::driver($provider)->redirect();
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Unable to connect to ' . ucfirst($provider) . '.');
+            return redirect('/login')->with('error', 'Unable to connect to '.ucfirst($provider).'.');
         }
     })->whereIn('provider', ['google', 'facebook', 'microsoft'])->name('socialite.redirect');
 
-    Route::get('/auth/{provider}/callback', function (string $provider) {        try {
+    Route::get('/auth/{provider}/callback', function (string $provider) {
+        try {
             $socialUser = Socialite::driver($provider)->user();
             $fullName = trim((string) ($socialUser->name ?? ''));
             $firstName = $fullName !== '' ? strtok($fullName, ' ') : 'Scholar';
@@ -67,11 +69,12 @@ Route::middleware('guest')->group(function () {
             ]);
 
             Auth::login($user);
+
             return redirect()->intended('/dashboard');
         } catch (\Exception $e) {
             return redirect('/login')->with('error', "Authentication with {$provider} failed.");
         }
-        })->whereIn('provider', ['google', 'facebook', 'microsoft'])->name('socialite.callback');
+    })->whereIn('provider', ['google', 'facebook', 'microsoft'])->name('socialite.callback');
 });
 
 Route::middleware('auth')->group(function () {
