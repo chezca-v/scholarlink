@@ -1,0 +1,48 @@
+# ==========================================
+
+# Global Project Fallback / Lead Gatekeeper
+
+# ==========================================
+
+- @chezca-v
+
+# ==========================================
+
+# Backend Architecture & Services
+
+# ==========================================
+
+/app/Http/Controllers/ @chezca-v @cessamaeeee
+/app/Services/ @chezca-v @cessamaeeee
+/app/Http/Middleware/ @chezca-v @cessamaeeee
+/routes/ @chezca-v @cessamaeeee
+
+# ==========================================
+
+# Database Migrations, Seeders & Eloquent Models
+
+# ==========================================
+
+/database/migrations/ @chezca-v @jbenedict-l
+/database/seeders/ @chezca-v @jbenedict-l
+/app/Models/ @chezca-v @jbenedict-l
+
+# ==========================================
+
+# Frontend Blade Views, Layouts, & UI Styling
+
+# ==========================================
+
+/resources/views/ @chezca-v @ysaf-dev
+/resources/css/ @chezca-v @ysaf-dev
+/resources/js/ @chezca-v @ysaf-dev
+
+# ==========================================
+
+# CI/CD, Deployment & Configuration
+
+# ==========================================
+
+/.github/ @chezca-v
+/phpunit.xml @chezca-v
+/vite.config.js @chezca-v

@@ -1,0 +1,108 @@
+name: CI Test Suite & Build Verification
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  backend-tests:
+    name: Backend Tests & Migrations (PHP 8.2)
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: scholarlink_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP Environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, xml, ctype, iconv, intl, pdo, pdo_mysql, bcmath, zip
+          coverage: none
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer/files
+          key: ${{ runner.os }}-php-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install Composer Dependencies
+        run: composer install --no-ansi --no-interaction --no-progress --prefer-dist --optimize-autoloader
+
+      - name: Check for Leftover Debug Statements
+        run: |
+          echo "Scanning for leftover dd(), dump(), or ray() in application code..."
+          if grep -rnw './app/' -e 'dd(' -e 'dump(' -e 'ray('; then
+            echo "❌ Leftover debug statements found! Remove them before merging."
+            exit 1
+          fi
+          echo "✅ No debug dumps detected."
+
+      - name: Set up Laravel Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Run Database Migrations & Seeders
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: scholarlink_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan migrate:fresh --seed --force
+
+      - name: Check PHP Code Style (Laravel Pint)
+        run: vendor/bin/pint --test
+
+      - name: Run Laravel Test Suite
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: scholarlink_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test --testdox
+
+  frontend-build:
+    name: Frontend Asset Build (Vite & Tailwind)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Run Production Asset Build
+        run: npm run build
