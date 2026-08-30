@@ -12,10 +12,10 @@
 
 # ==========================================
 
-/app/Http/Controllers/ @chezca-v @cessamaeeee
-/app/Services/ @chezca-v @cessamaeeee
-/app/Http/Middleware/ @chezca-v @cessamaeeee
-/routes/ @chezca-v @cessamaeeee
+/app/Http/Controllers/ @chezca-v
+/app/Services/ @chezca-v
+/app/Http/Middleware/ @chezca-v
+/routes/ @chezca-v
 
 # ==========================================
 
@@ -23,9 +23,9 @@
 
 # ==========================================
 
-/database/migrations/ @chezca-v @jbenedict-l
-/database/seeders/ @chezca-v @jbenedict-l
-/app/Models/ @chezca-v @jbenedict-l
+/database/migrations/ @chezca-v @cessamaeeee
+/database/seeders/ @chezca-v @cessamaeeee
+/app/Models/ @chezca-v @cessamaeeee
 
 # ==========================================
 
